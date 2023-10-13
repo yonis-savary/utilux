@@ -29,10 +29,6 @@ popacode [PATH]
 # in either Public/public/htdocs with given port (5000 by default)
 popaweb [PATH] [PORT]
 
-# Create an empty Clarity project in current directory
-# An application name can be given ('App' by default)
-popaclarity [APPNAME]
-
 # Recursively convert CRLF to LF inside a directory (. by default)
 popaLF [DIRECTORY]
 ```
