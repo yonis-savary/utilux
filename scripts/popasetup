@@ -66,4 +66,5 @@ then
     installCodeExtention "bmewburn.vscode-intelephense-client"
     installCodeExtention "mechatroner.rainbow-csv"
     installCodeExtention "shardulm94.trailing-spaces"
+    installCodeExtention "streetsidesoftware.code-spell-checker"
 fi
