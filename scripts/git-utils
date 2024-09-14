@@ -1,0 +1,268 @@
+#!/bin/bash
+
+
+
+
+
+function makeDirectoryIfInexistant()
+{
+    DIR=$1
+    if [ ! -d $DIR ]
+    then
+        echo "Making repos directory $DIR"
+        mkdir -p $DIR
+    fi
+}
+
+
+
+function ensureProgramIsInstalled()
+{
+    PROG=$1
+    if [ -z $(which $PROG) ]
+    then
+        echo "$PROG is needed to work with json"
+        echo "you can install it with"
+        echo ""
+        echo "sudo apt install $PROG"
+        exit 1
+    fi
+}
+
+
+
+
+
+
+
+
+
+
+function getGitApiTokenPath()
+{
+    echo "$GITUTILS_CONFIG_PATH/api_key"
+}
+
+function getGitApiToken()
+{
+    GITUTILS_API_KEY_PATH=$(getGitApiTokenPath)
+
+    if [ ! -f $GITUTILS_API_KEY_PATH ]
+    then
+        echo "Please first register a key with git-utils register-key <your_api_key>"
+        exit 1
+    fi
+
+    echo $(<$GITUTILS_API_KEY_PATH)
+}
+
+function registerToken()
+{
+    echo "Registering $1 as api-key"
+
+    GITUTILS_API_KEY_PATH=$(getGitApiTokenPath)
+
+    echo $1 > $GITUTILS_API_KEY_PATH
+    echo "Done."
+}
+
+
+
+
+
+
+function createRepo()
+{
+    ensureProgramIsInstalled "jq"
+
+    REPO_NAME=$1
+    API_TOKEN=$(getGitApiToken)
+
+
+    echo "Create repo $REPO_NAME..."
+
+    OUTPUT=$(curl -L -s \
+      -X POST \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer $API_TOKEN" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      https://api.github.com/user/repos \
+      -d "{\"name\":\"$REPO_NAME\",\"private\":true}")
+
+    URL=$(echo "$OUTPUT" | jq -r ".html_url")
+
+    if [ "$URL" = "null" ]
+    then
+        echo "URL NOT FOUND !"
+        echo "Please ensure that there is no error with curl"
+        echo "Here is the curl output"
+        echo "$OUTPUT"
+        exit 1
+    fi
+
+    REPO_NAME=$(echo "$OUTPUT" | jq -r ".full_name")
+    REPO_PATH="$GITUTILS_REPOS_PATH/$REPO_NAME"
+    OG_PWD=$(pwd)
+
+    git clone $URL $REPO_PATH
+    cd $REPO_PATH
+
+
+    read -p "Add Sharp Framework (y/n) ? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        git submodule add https://github.com/yonis-savary/sharp-php Sharp >/dev/null 2>&1
+        cp -r Sharp/Core/Server/* . >/dev/null 2>&1
+        php do fill-configuration >/dev/null 2>&1
+
+        git add * >/dev/null 2>&1
+        git commit -a -m "Added Sharp-PHP Framework" >/dev/null 2>&1
+
+        echo "Added Sharp framework to your repo !"
+
+        read -p "Add Sharp Extensions Utilities (y/n) ? " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]
+        then
+            git submodule add https://github.com/yonis-savary/sharp-extensions SharpExtensions >/dev/null 2>&1
+
+            php do enable-application SharpExtensions/AssetsKit SharpExtensions/LazySearch SharpExtensions/RemindMe >/dev/null 2>&1
+            php do fill-configuration >/dev/null 2>&1
+
+            git add * >/dev/null 2>&1
+            git commit -a -m "Added Sharp-Extensions Toolkit" >/dev/null 2>&1
+
+            echo "Added SharpExtensions toolkit to your repo !"
+        fi
+
+        git push >/dev/null 2>&1
+    fi
+
+    read -p "Create symlink on your desktop (y/n) ? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        REPO_BASENAME=$(basename $REPO_NAME)
+        REPO_SYMLINK="$HOME_PATH/Desktop/$REPO_BASENAME"
+
+        if [ -L $REPO_SYMLINK ]
+        then
+            echo "It seems that $REPO_SYMLINK already exists !"
+            echo "Please remove it before creating it again"
+            echo "rm $SYMLINK_PATH"
+            echo "ln -s \"$REPO_PATH\" \"$REPO_SYMLINK\""
+        else
+            ln -s "$REPO_PATH" "$REPO_SYMLINK"
+            echo "Created symlink at $REPO_SYMLINK !"
+        fi
+
+    fi
+
+    echo
+    echo "---------------------------"
+    echo "Repo $REPO_NAME successfuly created & pushed !"
+    echo "Url  : $URL"
+    echo "Path : $REPO_PATH"
+    echo "---------------------------"
+    echo
+
+    cd $OG_PWD
+}
+
+
+
+function enableCredentialCache()
+{
+    git config --global credential.helper cache
+    echo "Enabled credential helper cache !"
+}
+
+function disableCredentialCache()
+{
+    git config --global --unset credential.helper
+    echo "Unset credential helper cache !"
+}
+
+
+
+
+function createDesktopSymlink()
+{
+    SYMLINK_PATH="$HOME_PATH/Desktop/repositories"
+
+    if [ -L $SYMLINK_PATH ]
+    then
+        echo "It seems that $SYMLINK_PATH already exists !"
+        echo "Please remove it before creating it again"
+        echo "rm $SYMLINK_PATH"
+        exit 1
+    fi
+
+    ln -s "$GITUTILS_REPOS_PATH" "$SYMLINK_PATH"
+    echo "Created symlink $SYMLINK_PATH"
+    echo "leading to $GITUTILS_REPOS_PATH"
+}
+
+
+function displayHelp()
+{
+    echo "Help available soon"
+}
+
+
+
+
+HOME_PATH=$(realpath ~)
+GITUTILS_CONFIG_PATH="$HOME_PATH/.config/utilux/git-utils"
+GITUTILS_REPOS_PATH="$HOME_PATH/.config/utilux/git-utils/repositories"
+
+makeDirectoryIfInexistant $GITUTILS_CONFIG_PATH
+makeDirectoryIfInexistant $GITUTILS_REPOS_PATH
+
+
+echo "git-utils : collection of tools to make project management easier"
+echo ""
+COMMAND=$1
+
+case $COMMAND in
+    make)
+        createRepo $2
+    ;;
+
+    register-key)
+        registerToken $2
+    ;;
+
+    get-key)
+        echo "Here's your api token:"
+        echo ""
+        echo "    $(getGitApiToken)"
+        echo ""
+    ;;
+
+    enable-cache)
+        enableCredentialCache
+    ;;
+
+    disable-cache)
+        disableCredentialCache
+    ;;
+
+    create-symlink)
+        createDesktopSymlink
+    ;;
+
+    help)
+        displayHelp
+    ;;
+
+    *)
+        echo "Unknown command '$1'"
+        exit 1
+    ;;
+esac
+
+echo
+
+exit 0
