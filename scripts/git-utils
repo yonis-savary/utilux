@@ -207,7 +207,30 @@ function createDesktopSymlink()
 
 function displayHelp()
 {
-    echo "Help available soon"
+    echo "git-utils : collection of tools to make project management easier"
+    echo ""
+    echo "Available Commands"
+    echo
+    echo " make <PROJECT_NAME>"
+    echo "     Make a repository, can install Sharp & SharpExtensions if wanted"
+    echo
+    echo " register-key <API_KEY>"
+    echo "     Register a new GitHub api token"
+    echo
+    echo " get-key"
+    echo "     Get the registered GitHub api token"
+    echo
+    echo " enable-cache"
+    echo "     Enable the credential store cache"
+    echo
+    echo " disable-cache"
+    echo "     Disable the credential store cache"
+    echo
+    echo " create-symlink"
+    echo "     Create a symlink on your desktop to the repositories directory"
+    echo
+    echo " help"
+    echo "     Display this help message"
 }
 
 
@@ -221,8 +244,6 @@ makeDirectoryIfInexistant $GITUTILS_CONFIG_PATH
 makeDirectoryIfInexistant $GITUTILS_REPOS_PATH
 
 
-echo "git-utils : collection of tools to make project management easier"
-echo ""
 COMMAND=$1
 
 case $COMMAND in
