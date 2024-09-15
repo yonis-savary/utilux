@@ -189,7 +189,23 @@ function disableCredentialCache()
 
 function createDesktopSymlink()
 {
-    SYMLINK_PATH="$HOME_PATH/Desktop/repositories"
+    REPO_NAME=$1
+
+    if [ ! -z "$REPO_NAME" ]
+    then
+        REPO_BASENAME=$(basename $REPO_NAME)
+        SYMLINK_TARGET="$GITUTILS_REPOS_PATH/$REPO_NAME"
+        SYMLINK_PATH="$HOME_PATH/Desktop/$REPO_BASENAME"
+    else
+        SYMLINK_TARGET=$GITUTILS_CONFIG_PATH
+        SYMLINK_PATH="$HOME_PATH/Desktop/repositories"
+    fi
+
+    if [ ! -d $SYMLINK_TARGET ]
+    then
+        echo "Error ! Symlink target $SYMLINK_TARGET does not exists"
+        exit 1
+    fi
 
     if [ -L $SYMLINK_PATH ]
     then
@@ -199,10 +215,53 @@ function createDesktopSymlink()
         exit 1
     fi
 
-    ln -s "$GITUTILS_REPOS_PATH" "$SYMLINK_PATH"
+    ln -s "$SYMLINK_TARGET" "$SYMLINK_PATH"
     echo "Created symlink $SYMLINK_PATH"
-    echo "leading to $GITUTILS_REPOS_PATH"
+    echo "leading to $SYMLINK_TARGET"
 }
+
+
+
+function cloneAllRepositories()
+{
+    API_TOKEN=$(getGitApiToken)
+
+    RES=$(curl -L -s \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: Bearer $API_TOKEN" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        https://api.github.com/user/repos)
+
+    URL=$(echo "$RES" | jq -r .[].full_name | tail -n 3)
+
+    if [ "$URL" = "null" ]
+    then
+        echo "URLs NOT FOUND !"
+        echo "Please ensure that there is no error with curl"
+        echo "Here is the curl output"
+        echo "$OUTPUT"
+        exit 1
+    fi
+
+    for REPO_NAME in $URL
+    do
+        echo "Cloning $REPO_NAME"
+
+        REPO_DIRECTORY="$GITUTILS_REPOS_PATH/$REPO_NAME"
+
+        if [ -d $REPO_DIRECTORY ]
+        then
+            echo "Skipping, $REPO_DIRECTORY directory already exists"
+        else
+            git clone "https://github.com/$REPO_NAME" "$REPO_DIRECTORY" --recursive
+        fi
+
+        echo
+
+    done
+
+}
+
 
 
 function displayHelp()
@@ -213,6 +272,9 @@ function displayHelp()
     echo
     echo " make <PROJECT_NAME>"
     echo "     Make a repository, can install Sharp & SharpExtensions if wanted"
+    echo
+    echo " clone-all"
+    echo "     Clone all of your repositories"
     echo
     echo " register-key <API_KEY>"
     echo "     Register a new GitHub api token"
@@ -226,8 +288,11 @@ function displayHelp()
     echo " disable-cache"
     echo "     Disable the credential store cache"
     echo
-    echo " create-symlink"
+    echo " symlink"
     echo "     Create a symlink on your desktop to the repositories directory"
+    echo
+    echo " symlink <Author/Repo>"
+    echo "     Create a symlink on your desktop to the repository directory"
     echo
     echo " help"
     echo "     Display this help message"
@@ -270,12 +335,16 @@ case $COMMAND in
         disableCredentialCache
     ;;
 
-    create-symlink)
-        createDesktopSymlink
+    symlink)
+        createDesktopSymlink $2
     ;;
 
     help)
         displayHelp
+    ;;
+
+    clone-all)
+        cloneAllRepositories
     ;;
 
     *)
