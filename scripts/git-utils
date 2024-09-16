@@ -174,7 +174,7 @@ function createRepo()
 
 function enableCredentialCache()
 {
-    git config --global credential.helper cache
+    git config --global credential.helper store
     echo "Enabled credential helper cache !"
 }
 
@@ -185,6 +185,62 @@ function disableCredentialCache()
 }
 
 
+
+function listInstalledRepos()
+{
+    echo "Repositories inside $GITUTILS_REPOS_PATH"
+    AUTHORS=$(ls -1 $GITUTILS_REPOS_PATH)
+
+    for AUTHOR in $AUTHORS
+    do
+        AUTHOR_PATH="$GITUTILS_REPOS_PATH/$AUTHOR"
+        REPOS=$(ls -1 $AUTHOR_PATH)
+
+        echo
+        echo "$AUTHOR"
+
+        for REPO in $REPOS
+        do
+            echo " - $AUTHOR/$REPO"
+        done
+    done
+}
+
+function listUserRepos()
+{
+    API_TOKEN=$(getGitApiToken)
+
+    RES=$(curl -L -s \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: Bearer $API_TOKEN" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        https://api.github.com/user/repos)
+
+    URL=$(echo "$RES" | jq -r .[].full_name)
+
+    if [ "$URL" = "null" ]
+    then
+        echo "URLs NOT FOUND !"
+        echo "Please ensure that there is no error with curl"
+        echo "Here is the curl output"
+        echo "$OUTPUT"
+        exit 1
+    fi
+
+    echo "Availables repositories to clone"
+
+    for REPO_NAME in $URL
+    do
+        REPO_POTENTIAL_PATH="$GITUTILS_REPOS_PATH/$REPO_NAME"
+        if [ -d $REPO_POTENTIAL_PATH ]
+        then
+            echo " - $REPO_NAME (Installed)"
+        else
+            echo " - $REPO_NAME (Not Installed)"
+        fi
+
+    done
+}
 
 
 function createDesktopSymlink()
@@ -264,6 +320,42 @@ function cloneAllRepositories()
 
 
 
+function pullAllrepos()
+{
+    echo "Repositories inside $GITUTILS_REPOS_PATH"
+    AUTHORS=$(ls -1 $GITUTILS_REPOS_PATH)
+
+    OG_PATH=$(pwd)
+
+    for AUTHOR in $AUTHORS
+    do
+        AUTHOR_PATH="$GITUTILS_REPOS_PATH/$AUTHOR"
+        REPOS=$(ls -1 $AUTHOR_PATH)
+
+        echo
+        echo "$AUTHOR"
+
+        for REPO in $REPOS
+        do
+            REPO_PATH="$AUTHOR_PATH/$REPO"
+            cd $REPO_PATH
+            OUTPUT=$(git status)
+
+            if [[ "$OUTPUT" =~ "Changes not staged" ]]
+            then
+                echo " - $REPO : please commit before pulling"
+            else
+                echo " - $REPO : pulling"
+                git pull
+                echo
+            fi
+        done
+    done
+
+    cd $OG_PATH
+}
+
+
 function displayHelp()
 {
     echo "git-utils : collection of tools to make project management easier"
@@ -293,6 +385,15 @@ function displayHelp()
     echo
     echo " symlink <Author/Repo>"
     echo "     Create a symlink on your desktop to the repository directory"
+    echo
+    echo " list-local"
+    echo "     List locally installed repos"
+    echo
+    echo " list-dist"
+    echo "     List all availables repos"
+    echo
+    echo " pull-all"
+    echo "     Pull all locally installed repositories"
     echo
     echo " help"
     echo "     Display this help message"
@@ -345,6 +446,18 @@ case $COMMAND in
 
     clone-all)
         cloneAllRepositories
+    ;;
+
+    list-local)
+        listInstalledRepos
+    ;;
+
+    list-dist)
+        listUserRepos
+    ;;
+
+    pull-all)
+        pullAllrepos
     ;;
 
     *)
