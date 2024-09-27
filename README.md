@@ -33,6 +33,39 @@ popaweb [PATH] [PORT]
 popaLF [DIRECTORY]
 ```
 
+### `git-utils`
+
+`git-utils` is a utility tool to perform actions on your git repositories and regroup them in a single directory (usually `~/.config/utilux/git-utils/repositories`)
+
+```bash
+# Display a list of available commands
+git-utils help
+
+# Register and get your api token
+git-utils register-key <API_KEY>
+git-utils get-key
+
+# Dis/enable credential cache/storing
+git-utils enable-cache
+git-utils disable-cache
+
+# Clone all of your repositories (inclunding organizations repositories)
+git-utils clone-all
+# Make a repository and push it to github
+git-utils make <PROJECT_NAME>
+# Pull every modifications to your repos excluding where changes where made without committing
+git-utils pull-all
+
+# Make a symlink to your repository directory on your desktop
+git-utils symlink
+# Make a symlink to one of your directory on your desktop
+git-utils symlink <Author/Repo>
+
+# List installed and availables directories
+git-utils list-local
+git-utils list-dist
+```
+
 ## Ressources / Tools
 
 - [ANSI Terminal Codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)

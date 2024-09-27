@@ -20,4 +20,5 @@ if [ -d "public" ]; then cd "public"; fi
 if [ -d "htdocs" ]; then cd "htdocs"; fi
 
 echo "Starting web server at [$(pwd)] on port [$popacode_port]";
+firefox localhost:$popacode_port &
 php -S 0.0.0.0:$popacode_port

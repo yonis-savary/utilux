@@ -44,16 +44,18 @@ function checkInstalled()
 }
 
 echo "Languages/tools to install";
-checkInstalled "php8.0";
-checkInstalled "php8.0-mysql";
-checkInstalled "composer" "php-composer";
+checkInstalled "php8.3";
+checkInstalled "php8.3-mysql";
+checkInstalled "composer"
 checkInstalled "sqlite3";
 checkInstalled "nodejs";
-checkInstalled "lessc" "less";
+checkInstalled "lessc"
+checkInstalled "less";
 
 echo "Software to install";
 checkInstalled "filezilla";
-checkInstalled "code" "vscode";
+checkInstalled "ffmpeg";
+checkInstalled "code";
 
 
 isInstalled 'code';
