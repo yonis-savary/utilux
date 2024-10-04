@@ -7,7 +7,7 @@ function installCodeExtention()
 
     if (( $already_installed > 0 ))
     then
-        echo -e "\e[32m  - [ALREADY-INSTALLED] $1 $alias";
+        echo -e " - \e[32m[INSTALLED]\e[0m $1 $alias";
     else
         echo "$res";
     fi
@@ -36,14 +36,15 @@ function checkInstalled()
 
     if (( $installed == 0))
     then
-        echo -e "\e[31m  - [MISSING] $1 $alias";
+        echo -e " - \e[31m[MISSING]\e[0m $1 $alias";
     else
-        echo -e "\e[32m  - [OK] $1 $alias";
+        echo -e " - \e[32m[OK]\e[0m $1 $alias";
     fi
     echo -ne "\e[0m";
 }
 
 echo "Languages/tools to install";
+checkInstalled "git";
 checkInstalled "php8.3";
 checkInstalled "php8.3-mysql";
 checkInstalled "composer"
@@ -51,11 +52,23 @@ checkInstalled "sqlite3";
 checkInstalled "nodejs";
 checkInstalled "lessc"
 checkInstalled "less";
+checkInstalled "java";
+checkInstalled "native-image";
+checkInstalled "ffmpeg";
 
 echo "Software to install";
 checkInstalled "filezilla";
-checkInstalled "ffmpeg";
 checkInstalled "code";
+checkInstalled "firefox";
+
+echo "Office Softwares"
+checkInstalled "libreoffice";
+checkInstalled "gimp";
+checkInstalled "inkscape";
+
+echo "DVD/Music Utilities"
+checkInstalled "easytag";
+checkInstalled "asunder";
 
 
 isInstalled 'code';
@@ -69,4 +82,16 @@ then
     installCodeExtention "mechatroner.rainbow-csv"
     installCodeExtention "shardulm94.trailing-spaces"
     installCodeExtention "streetsidesoftware.code-spell-checker"
+    installCodeExtention "redhat.vscode-xml"
+
+    echo "Checking code extensions for java"
+    installCodeExtention "vscjava.vscode-java-debug"
+    installCodeExtention "vscjava.vscode-java-pack"
+    installCodeExtention "vscjava.vscode-gradle"
+    installCodeExtention "VisualStudioExptTeam.vscodeintellicode"
+    installCodeExtention "VisualStudioExptTeam.intellicode-api-usage-examples"
+    installCodeExtention "redhat.java"
+    installCodeExtention "vscjava.vscode-maven"
+    installCodeExtention "vscjava.vscode-java-dependency"
+    installCodeExtention "vscjava.vscode-java-test"
 fi
