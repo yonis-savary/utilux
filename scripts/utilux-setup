@@ -53,22 +53,27 @@ checkInstalled "nodejs";
 checkInstalled "lessc"
 checkInstalled "less";
 checkInstalled "java";
+checkInstalled "mvn";
 checkInstalled "native-image";
-checkInstalled "ffmpeg";
+echo
 
 echo "Software to install";
 checkInstalled "filezilla";
 checkInstalled "code";
 checkInstalled "firefox";
+checkInstalled "ffmpeg";
+echo
 
 echo "Office Softwares"
 checkInstalled "libreoffice";
 checkInstalled "gimp";
 checkInstalled "inkscape";
+echo
 
 echo "DVD/Music Utilities"
 checkInstalled "easytag";
 checkInstalled "asunder";
+echo
 
 
 isInstalled 'code';
@@ -83,6 +88,7 @@ then
     installCodeExtention "shardulm94.trailing-spaces"
     installCodeExtention "streetsidesoftware.code-spell-checker"
     installCodeExtention "redhat.vscode-xml"
+    echo
 
     echo "Checking code extensions for java"
     installCodeExtention "vscjava.vscode-java-debug"
@@ -94,4 +100,5 @@ then
     installCodeExtention "vscjava.vscode-maven"
     installCodeExtention "vscjava.vscode-java-dependency"
     installCodeExtention "vscjava.vscode-java-test"
+    echo
 fi
