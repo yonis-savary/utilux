@@ -116,6 +116,49 @@ function testToken()
 # ##    ##  ##       ##        ##     ## ##    ##
 # ##     ## ######## ##         #######   ######
 
+function createSharpPHPProject()
+{
+    git submodule add https://github.com/yonis-savary/sharp-php Sharp >/dev/null 2>&1
+    cp -r Sharp/Core/Server/* . >/dev/null 2>&1
+    php do fill-configuration >/dev/null 2>&1
+
+    git add * >/dev/null 2>&1
+    git commit -a -m "Added Sharp-PHP Framework" >/dev/null 2>&1
+}
+
+function createSharpExtensionProject()
+{
+    createSharpPHPProject
+
+    git submodule add https://github.com/yonis-savary/sharp-extensions SharpExtensions >/dev/null 2>&1
+
+    php do enable-application SharpExtensions/AssetsKit SharpExtensions/LazySearch SharpExtensions/RemindMe >/dev/null 2>&1
+    php do fill-configuration >/dev/null 2>&1
+
+    git add * >/dev/null 2>&1
+    git commit -a -m "Added Sharp-Extensions Toolkit" >/dev/null 2>&1
+}
+
+function createEmptyMavenProject()
+{
+    read -p "App name > "
+    appname="$REPLY"
+
+    username=$(whoami)
+    defaultGroup="org.$username.$appname"
+    defaultArtifact="$appname"
+
+    mvn archetype:generate -DgroupId="$defaultGroup" -DartifactId="$defaultArtifact" -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.5 -DinteractiveMode=false
+
+    if [ -d "./$defaultArtifact" ]
+    then
+        mv ./$defaultArtifact/* .
+        mv ./$defaultArtifact/.[!.]* .
+        rmdir ./$defaultArtifact
+        echo "/target" >> .gitignore
+    fi
+}
+
 
 function createRepo()
 {
@@ -152,37 +195,27 @@ function createRepo()
     git clone $URL $repo_path
     cd $repo_path
 
-
-    read -p "Add Sharp Framework (y/n) ? " -n 1 -r
+    echo "Project template:"
+    echo " 1 - Sharp PHP project"
+    echo " 2 - Sharp PHP + Extensions project"
+    echo " 3 - Java Maven project"
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]
-    then
-        git submodule add https://github.com/yonis-savary/sharp-php Sharp >/dev/null 2>&1
-        cp -r Sharp/Core/Server/* . >/dev/null 2>&1
-        php do fill-configuration >/dev/null 2>&1
+    read -p "Choose a template [empty for none] > " -n 1 -r
+    echo
 
-        git add * >/dev/null 2>&1
-        git commit -a -m "Added Sharp-PHP Framework" >/dev/null 2>&1
+    case "$REPLY" in
+        "1")
+            createSharpPHPProject
+        ;;
+        "2")
+            createSharpExtensionProject
+        ;;
+        "3")
+            createEmptyMavenProject
+        ;;
+    esac
 
-        echo "Added Sharp framework to your repo !"
-
-        read -p "Add Sharp Extensions Utilities (y/n) ? " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]]
-        then
-            git submodule add https://github.com/yonis-savary/sharp-extensions SharpExtensions >/dev/null 2>&1
-
-            php do enable-application SharpExtensions/AssetsKit SharpExtensions/LazySearch SharpExtensions/RemindMe >/dev/null 2>&1
-            php do fill-configuration >/dev/null 2>&1
-
-            git add * >/dev/null 2>&1
-            git commit -a -m "Added Sharp-Extensions Toolkit" >/dev/null 2>&1
-
-            echo "Added SharpExtensions toolkit to your repo !"
-        fi
-
-        git push >/dev/null 2>&1
-    fi
+    git push >/dev/null 2>&1
 
     read -p "Create symlink on your desktop (y/n) ? " -n 1 -r
     echo
