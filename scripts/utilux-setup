@@ -88,6 +88,9 @@ then
     installCodeExtention "shardulm94.trailing-spaces"
     installCodeExtention "streetsidesoftware.code-spell-checker"
     installCodeExtention "redhat.vscode-xml"
+    installCodeExtention "ms-azuretools.vscode-docker"
+    installCodeExtension "rust-lang.rust-analyzer"
+    installCodeExtension "leizongmin.node-module-intellisense"
     echo
 
     echo "Checking code extensions for java"

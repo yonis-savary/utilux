@@ -192,7 +192,8 @@ function createRepo()
     repo_path="$GITUTILS_REPOS_PATH/$repo_name"
     og_path=$(pwd)
 
-    git clone $URL $repo_path
+    echo "Cloning $url repository into $repo_path"
+    git clone $url $repo_path
     cd $repo_path
 
     echo "Project template:"
