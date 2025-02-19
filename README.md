@@ -8,11 +8,8 @@ First clone this repo to your home repository
 ```bash
 cd ~
 git clone https://github.com/YonisSavary/utilux
-```
-
-then add this line to `~/.bashrc`
-```bash
-. ~/utilux/.bashrc
+cd utilux
+./install.sh
 ```
 
 ## Commands
@@ -20,50 +17,66 @@ then add this line to `~/.bashrc`
 ```bash
 # Indicate which needed packages are missing
 # Can also install VSCode extensions
-popasetup
+utilux-setup
 
-# Open code to current or given path and exit console
-popacode [PATH]
+# Install a file in a special directory link to your $PATH
+utilux-install [FILE]
 
-# Same as popacode but also launch php -S
-# in either Public/public/htdocs with given port (5000 by default)
-popaweb [PATH] [PORT]
+# Start a web server that can serve files
+utilux-share [FILE]
 
 # Recursively convert CRLF to LF inside a directory (. by default)
-popaLF [DIRECTORY]
+utilux-lf [DIRECTORY]
+
+# Git utilitary tool that can create and manage your repos
+utilux-git 
+
+dos # docker compose up -d
+dod # docker compose down
+dor # docker compose restart
+dop # docker compose ps
+dol # docker compose logs
+doe # docker compose exec
+
+gxb  # get current branch name
+gxc  # rebase continue
+gxf  # fetch (prune)
+gxp  # push force with lease
+gxpm # delete merged branches (force)
+gxr  # pull rebase on followed branch
 ```
 
-### `git-utils`
+### `utilux-git`
 
-`git-utils` is a utility tool to perform actions on your git repositories and regroup them in a single directory (usually `~/.config/utilux/git-utils/repositories`)
+`utilux-git` is a utility tool to perform actions on your git repositories and regroup them in a single directory (usually `~/.config/utilux/git-utils/repositories`)
 
 ```bash
 # Display a list of available commands
-git-utils help
+utilux-git help
 
 # Register and get your api token
-git-utils register-key <API_KEY>
-git-utils get-key
+utilux-git register-key <API_KEY>
+utilux-git get-key
 
 # Dis/enable credential cache/storing
-git-utils enable-cache
-git-utils disable-cache
+utilux-git enable-cache
+utilux-git disable-cache
 
 # Clone all of your repositories (inclunding organizations repositories)
-git-utils clone-all
+utilux-git clone-all
 # Make a repository and push it to github
-git-utils make <PROJECT_NAME>
+utilux-git make <PROJECT_NAME>
 # Pull every modifications to your repos excluding where changes where made without committing
-git-utils pull-all
+utilux-git pull-all
 
 # Make a symlink to your repository directory on your desktop
-git-utils symlink
+utilux-git symlink
 # Make a symlink to one of your directory on your desktop
-git-utils symlink <Author/Repo>
+utilux-git symlink <Author/Repo>
 
 # List installed and availables directories
-git-utils list-local
-git-utils list-dist
+utilux-git list-local
+utilux-git list-dist
 ```
 
 ## Ressources / Tools

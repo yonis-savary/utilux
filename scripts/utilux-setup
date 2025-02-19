@@ -2,25 +2,28 @@
 
 function installCodeExtention()
 {
-    res=$(code --install-extension "$1" 2>&1);
-    already_installed=$(echo $res | grep 'already installed' | wc -l);
+    packageName="$1"
+    prettyName=$(echo "$packageName" | sed -e 's/^.*\.//g')
+    codeOutput=$(code --install-extension "$packageName" 2>&1);
+    alreadyInstalled=$(echo $codeOutput | grep -c 'already installed');
 
-    if (( $already_installed > 0 ))
+    if [ "$alreadyInstalled" = "0" ]
     then
-        echo -e " - \e[32m[INSTALLED]\e[0m $1 $alias";
-    else
         echo "$res";
+    else
+        echo -e " - \e[32m[INSTALLED]\e[0m $prettyName";
     fi
     echo -ne "\e[0m";
 }
 
 function isInstalled()
 {
-    missing=$(dpkg -s "$1" 2>&1 | grep "not installed" | wc -l)
+    package="$1"
+    missing=$(dpkg -s "$package" 2>&1 | grep -c "not installed")
 
-    if (( $missing > 0 ))
+    if [ "$missing" -ne "0" ]
     then
-        if [ ! -z "$(which $1)" ];
+        if [ ! -z "$(which $package)" ];
         then
             return 1;
         fi
@@ -31,30 +34,31 @@ function isInstalled()
 
 function checkInstalled()
 {
-    isInstalled "$1"
+    package="$1"
+    isInstalled "$package"
     installed=$?
 
-    if (( $installed == 0))
+    if [ "$installed" = "0" ]
     then
-        echo -e " - \e[31m[MISSING]\e[0m $1 $alias";
+        echo -e " - \e[31m[MISSING]\e[0m $package";
     else
-        echo -e " - \e[32m[OK]\e[0m $1 $alias";
+        echo -e " - \e[32m[OK]\e[0m $package";
     fi
     echo -ne "\e[0m";
 }
 
 echo "Languages/tools to install";
 checkInstalled "git";
-checkInstalled "php8.3";
-checkInstalled "php8.3-mysql";
+checkInstalled "php8.4";
+checkInstalled "php8.4-mysql";
+checkInstalled "php8.4-mbstring";
+checkInstalled "php8.4-xml";
 checkInstalled "composer"
 checkInstalled "sqlite3";
 checkInstalled "nodejs";
-checkInstalled "lessc"
-checkInstalled "less";
-checkInstalled "java";
-checkInstalled "mvn";
-checkInstalled "native-image";
+checkInstalled "npm";
+checkInstalled "docker";
+checkInstalled "docker-compose-plugin";
 echo
 
 echo "Software to install";
@@ -75,7 +79,6 @@ checkInstalled "easytag";
 checkInstalled "asunder";
 echo
 
-
 isInstalled 'code';
 if [ "$?" == "1" ]
 then
@@ -83,7 +86,6 @@ then
     installCodeExtention "amiralizadeh9480.laravel-extra-intellisense"
     installCodeExtention "bmewburn.vscode-intelephense-client"
     installCodeExtention "bradlc.vscode-tailwindcss"
-    #installCodeExtention "cjhowe7.laravel-blade"
     installCodeExtention "eamodio.gitlens"
     installCodeExtention "github.github-vscode-theme"
     installCodeExtention "gruntfuggly.todo-tree"
@@ -95,20 +97,11 @@ then
     installCodeExtention "ms-vscode-remote.remote-containers"
     installCodeExtention "mujichok.vscode-project-name-in-statusbar"
     installCodeExtention "pkief.material-icon-theme"
-    #installCodeExtention "redhat.java"
-    #installCodeExtention "redhat.vscode-xml"
     installCodeExtention "shardulm94.trailing-spaces"
-    #installCodeExtention "shufo.vscode-blade-formatter"
     installCodeExtention "streetsidesoftware.code-spell-checker"
     installCodeExtention "usernamehw.errorlens"
     installCodeExtention "visualstudioexptteam.intellicode-api-usage-examples"
     installCodeExtention "visualstudioexptteam.vscodeintellicode"
-    #installCodeExtention "vscjava.vscode-gradle"
-    #installCodeExtention "vscjava.vscode-java-debug"
-    #installCodeExtention "vscjava.vscode-java-dependency"
-    #installCodeExtention "vscjava.vscode-java-pack"
-    #installCodeExtention "vscjava.vscode-java-test"
-    #installCodeExtention "vscjava.vscode-maven"
     installCodeExtention "vue.volar"
     installCodeExtention "yoavbls.pretty-ts-errors"
     installCodeExtention "zhuangtongfa.material-theme"
