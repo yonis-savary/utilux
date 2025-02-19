@@ -1,0 +1,2 @@
+#!/bin/bash
+git push --force-with-lease origin $(git rev-parse --abbrev-ref HEAD)

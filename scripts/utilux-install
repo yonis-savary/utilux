@@ -14,6 +14,5 @@ then
     exit 1
 fi
 
-cp "$binName" "$targetBinName"
-
 echo "Copying $binName to $targetBinName"
+cp "$binName" "$targetBinName"

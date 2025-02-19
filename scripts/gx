@@ -1,0 +1,7 @@
+#!/bin/bash
+echo "gxb       get current branch name"
+echo "gxc       rebase continue"
+echo "gxf       fetch prune"
+echo "gxp       push force lease"
+echo "gxpm      purge merged branches (Force)"
+echo "gxr       pull rebase"
