@@ -1,11 +1,11 @@
 #!/bin/bash
 echo "gxa          Commit ammend with no edit"
 echo "gxb          get current branch name"
-echo "gxc          rebase continue"
 echo "gxf          fetch prune"
 echo "gxp          push force lease"
 echo "gxpm         purge merged branches (Force)"
 echo "gxr          pull rebase"
+echo "gxrc          rebase continue"
 echo "gxs [name]   create a git stash (name is optionnal)"
 echo "gxsa [name]  apply a git stash (name is optionnal)"
 echo "gxsd [name]  drop a git stash (name is optionnal)"
