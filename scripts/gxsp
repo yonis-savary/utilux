@@ -1,0 +1,11 @@
+#!/bin/bash
+
+target_stash=$(gxsf "$1")
+
+if [ -z "$target_stash" ]
+then
+    echo "No stash number found for $stash_name"
+    exit 1
+fi
+
+git stash pop $stash_number
