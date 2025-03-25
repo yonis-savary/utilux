@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ -f "./code.deb" ]
+then 
+    rm code.deb
+fi 
+
+wget "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O code.deb
+
+sudo apt-get install ./code.deb

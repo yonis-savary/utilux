@@ -1,0 +1,29 @@
+#!/bin/bash
+
+server_path=$(realpath ~/file-share-server)
+
+mkdir -p $server_path
+
+
+file_to_share="$1"
+
+if [ -f "$file_to_share" ]
+then
+    echo "Copying $file_to_share to $server_path"
+    file_to_share_basename=$(basename $file_to_share)
+    cp "$file_to_share" "$server_path/$file_to_share_basename"
+fi
+
+local_ip=$(ifconfig | grep -P "192\.168\.\d+\.\d+" -o | head -n 1)
+
+if [ ! -z "$local_ip" ]
+then
+    echo ""
+    echo "-------------------------------------------"
+    echo "Starting web server on $local_ip:9090"
+    echo "-------------------------------------------"
+    echo ""
+fi
+
+cd $server_path
+python3 -m http.server 9090

@@ -1,0 +1,667 @@
+#!/bin/bash
+
+
+
+
+
+function makeDirectoryIfInexistant()
+{
+    directory=$1
+    if [ ! -d $directory ]
+    then
+        echo "Making repos directory $directory"
+        mkdir -p $directory
+    fi
+}
+
+
+
+function ensureProgramIsInstalled()
+{
+    program_name=$1
+    if [ -z $(which $program_name) ]
+    then
+        echo "$program_name program is needed"
+        echo "you can install it with"
+        echo ""
+        echo "sudo apt install $program_name"
+        exit 1
+    fi
+}
+
+
+
+
+
+
+
+#    ###    ########  ####    ##    ## ######## ##    ##
+#   ## ##   ##     ##  ##     ##   ##  ##        ##  ##
+#  ##   ##  ##     ##  ##     ##  ##   ##         ####
+# ##     ## ########   ##     #####    ######      ##
+# ######### ##         ##     ##  ##   ##          ##
+# ##     ## ##         ##     ##   ##  ##          ##
+# ##     ## ##        ####    ##    ## ########    ##
+
+
+function getGitApiTokenPath()
+{
+    echo "$GITUTILS_CONFIG_PATH/api_key"
+}
+
+function getGitApiToken()
+{
+    GITUTILS_API_KEY_PATH=$(getGitApiTokenPath)
+
+    if [ ! -f $GITUTILS_API_KEY_PATH ]
+    then
+        echo "Please first register a key with git-utils register-key <your_api_key>"
+        exit 1
+    fi
+
+    echo $(<$GITUTILS_API_KEY_PATH)
+}
+
+function registerToken()
+{
+    echo "Registering $1 as api-key"
+
+    GITUTILS_API_KEY_PATH=$(getGitApiTokenPath)
+
+    echo $1 > $GITUTILS_API_KEY_PATH
+    echo "Done."
+}
+
+function testToken()
+{
+    GITUTILS_API_KEY_PATH=$(getGitApiTokenPath)
+    if [ -f $GITUTILS_API_KEY_PATH ]
+    then
+        api_key=$(getGitApiToken)
+        echo "Registered Api key : $api_key"
+
+        response=$(curl -L -s \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer $api_key" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/user/repos)
+
+        url=$(echo "$response" | jq -r .[].full_name)
+
+        if [ "$url" = "null" ]
+        then
+            echo "Status: Invalid or expired"
+        else
+            echo "Status: Valid"
+        fi
+
+    else
+        echo "API Key is not configured (you can register one with 'git-utils register-key <key>')"
+    fi
+}
+
+
+
+
+
+
+
+
+
+# ########  ######## ########   #######   ######
+# ##     ## ##       ##     ## ##     ## ##    ##
+# ##     ## ##       ##     ## ##     ## ##
+# ########  ######   ########  ##     ##  ######
+# ##   ##   ##       ##        ##     ##       ##
+# ##    ##  ##       ##        ##     ## ##    ##
+# ##     ## ######## ##         #######   ######
+
+function createSharpPHPProject()
+{
+    git submodule add https://github.com/yonis-savary/sharp-php Sharp >/dev/null 2>&1
+    cp -r Sharp/Core/Server/* . >/dev/null 2>&1
+    php do fill-configuration >/dev/null 2>&1
+
+    git add * >/dev/null 2>&1
+    git commit -a -m "Added Sharp-PHP Framework" >/dev/null 2>&1
+}
+
+function createSharpExtensionProject()
+{
+    createSharpPHPProject
+
+    git submodule add https://github.com/yonis-savary/sharp-extensions SharpExtensions >/dev/null 2>&1
+
+    php do enable-application SharpExtensions/AssetsKit SharpExtensions/LazySearch SharpExtensions/RemindMe >/dev/null 2>&1
+    php do fill-configuration >/dev/null 2>&1
+
+    git add * >/dev/null 2>&1
+    git commit -a -m "Added Sharp-Extensions Toolkit" >/dev/null 2>&1
+}
+
+function createEmptyMavenProject()
+{
+    read -p "App name > "
+    appname="$REPLY"
+
+    username=$(whoami)
+    defaultGroup="org.$username.$appname"
+    defaultArtifact="$appname"
+
+    mvn archetype:generate -DgroupId="$defaultGroup" -DartifactId="$defaultArtifact" -DarchetypeArtifactId=maven-archetype-quickstart -DarchetypeVersion=1.5 -DinteractiveMode=false
+
+    if [ -d "./$defaultArtifact" ]
+    then
+        mv ./$defaultArtifact/* .
+        mv ./$defaultArtifact/.[!.]* .
+        rmdir ./$defaultArtifact
+        echo "/target" >> .gitignore
+    fi
+}
+
+
+function createRepo()
+{
+    ensureProgramIsInstalled "jq"
+
+    repo_name=$1
+    api_token=$(getGitApiToken)
+
+    echo "Create repo $repo_name..."
+
+    output=$(curl -L -s \
+      -X POST \
+      -H "Accept: application/vnd.github+json" \
+      -H "Authorization: Bearer $api_token" \
+      -H "X-GitHub-Api-Version: 2022-11-28" \
+      https://api.github.com/user/repos \
+      -d "{\"name\":\"$repo_name\",\"private\":true}")
+
+    url=$(echo "$output" | jq -r ".html_url")
+
+    if [ "$url" = "null" ]
+    then
+        echo "URL NOT FOUND !"
+        echo "Please ensure that there is no error with curl"
+        echo "Here is the curl output"
+        echo "$output"
+        exit 1
+    fi
+
+    repo_name=$(echo "$output" | jq -r ".full_name")
+    repo_path="$GITUTILS_REPOS_PATH/$repo_name"
+    og_path=$(pwd)
+
+    echo "Cloning $url repository into $repo_path"
+    git clone $url $repo_path
+    cd $repo_path
+
+    echo "Project template:"
+    echo " 1 - Sharp PHP project"
+    echo " 2 - Sharp PHP + Extensions project"
+    echo " 3 - Java Maven project"
+    echo
+    read -p "Choose a template [empty for none] > " -n 1 -r
+    echo
+
+    case "$REPLY" in
+        "1")
+            createSharpPHPProject
+        ;;
+        "2")
+            createSharpExtensionProject
+        ;;
+        "3")
+            createEmptyMavenProject
+        ;;
+    esac
+
+    git push >/dev/null 2>&1
+
+    read -p "Create symlink on your desktop (y/n) ? " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        repo_basename=$(basename $repo_name)
+        repo_symlink="$HOME_PATH/Desktop/$repo_basename"
+
+        if [ -L $repo_symlink ]
+        then
+            echo "It seems that $repo_symlink already exists !"
+            echo "Please remove it before creating it again"
+            echo "rm $SYMLINK_PATH"
+            echo "ln -s \"$repo_path\" \"$repo_symlink\""
+        else
+            ln -s "$repo_path" "$repo_symlink"
+            echo "Created symlink at $repo_symlink !"
+        fi
+
+    fi
+
+    echo
+    echo "---------------------------"
+    echo "Repo $repo_name successfuly created & pushed !"
+    echo "Url  : $URL"
+    echo "Path : $repo_path"
+    echo "---------------------------"
+    echo
+
+    cd $og_path
+}
+
+
+
+function listInstalledRepos()
+{
+    echo "Repositories inside $GITUTILS_REPOS_PATH"
+    authors=$(ls -1 $GITUTILS_REPOS_PATH)
+
+    for author in $authors
+    do
+        author_path="$GITUTILS_REPOS_PATH/$author"
+        repos=$(ls -1 $author_path)
+
+        echo
+        echo "$author"
+
+        for repo in $repos
+        do
+            echo " - $author/$repo"
+        done
+    done
+}
+
+function listUserRepos()
+{
+    api_token=$(getGitApiToken)
+
+    response=$(curl -L -s \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: Bearer $api_token" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        https://api.github.com/user/repos)
+
+    url=$(echo "$response" | jq -r .[].full_name)
+
+    if [ "$url" = "null" ]
+    then
+        echo "URLs NOT FOUND !"
+        echo "Please ensure that there is no error with curl"
+        echo "Here is the curl output"
+        echo "$response"
+        exit 1
+    fi
+
+    echo "Availables repositories to clone"
+
+    for repo_name in $url
+    do
+        repo_potential_path="$GITUTILS_REPOS_PATH/$repo_name"
+        if [ -d $repo_potential_path ]
+        then
+            echo " - $repo_name (Installed)"
+        else
+            echo " - $repo_name (Not Installed)"
+        fi
+
+    done
+}
+
+function cloneAllRepositories()
+{
+    api_token=$(getGitApiToken)
+
+    response=$(curl -L -s \
+        -H "Accept: application/vnd.github+json" \
+        -H "Authorization: Bearer $api_token" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        https://api.github.com/user/repos)
+
+    url=$(echo "$response" | jq -r .[].full_name)
+
+    if [ "$url" = "null" ]
+    then
+        echo "URLs NOT FOUND !"
+        echo "Please ensure that there is no error with curl"
+        echo "Here is the curl output"
+        echo "$OUTPUT"
+        exit 1
+    fi
+
+    for repo_name in $url
+    do
+        echo "Cloning $repo_name"
+
+        repo_directory="$GITUTILS_REPOS_PATH/$repo_name"
+
+        if [ -d $repo_directory ]
+        then
+            echo "Skipping, $repo_directory directory already exists"
+        else
+            git clone "https://github.com/$repo_name" "$repo_directory" --recursive
+        fi
+
+        echo
+
+    done
+
+}
+
+
+
+function pullAllrepos()
+{
+    echo "Repositories inside $GITUTILS_REPOS_PATH"
+    authors=$(ls -1 $GITUTILS_REPOS_PATH)
+
+    og_path=$(pwd)
+
+    for author in $authors
+    do
+        author_path="$GITUTILS_REPOS_PATH/$author"
+        repos=$(ls -1 $author_path)
+
+        echo
+        echo "$author"
+
+        for repo in $repos
+        do
+            repo_path="$author_path/$repo"
+            cd $repo_path
+            output=$(git status)
+
+            if [[ "$output" =~ "Changes not staged" ]]
+            then
+                echo " - $repo : please commit before pulling"
+            else
+                echo " - $repo : pulling"
+                git pull
+                echo
+            fi
+        done
+    done
+
+    cd $og_path
+}
+
+
+function getStatus()
+{
+    VERBOSE_MODE=0
+    EDITED_ONLY=0
+
+    for param in $*
+    do
+        case $param in
+            -v|--verbose)
+                VERBOSE_MODE=1
+            ;;
+            -e|--edited)
+                EDITED_ONLY=1
+            ;;
+        esac
+    done
+
+
+    echo "-------------------------------"
+    echo "   Local repositories status"
+    echo "-------------------------------"
+    echo
+
+    og_path=$(pwd)
+    local_repos_list=$(ls $GITUTILS_REPOS_PATH/*/* -1d)
+
+    if [ "$VERBOSE_MODE" = "1" ]
+    then
+        repos_count=$(echo "$local_repos_list" | wc -l)
+        repos_increment=0
+        for directory in $local_repos_list
+        do
+            repos_increment=$((repos_increment+1))
+
+            cd $directory
+            git_repo_user=$(basename $(realpath ..))
+            git_repo_name=$(basename $(realpath .))
+
+            has_changes=$(git status | grep -E 'Changes not staged|Your branch is ahead' | wc -l)
+
+            if [ "$has_changes" = "0" ] && [ "$EDITED_ONLY" = "1" ]
+            then
+                continue
+            fi
+
+            echo -e -n "\e[30;46m$repos_increment/$repos_count Status of $git_repo_user/$git_repo_name\e[0m"
+            echo
+
+            git status
+
+            echo
+            echo -e -n "\e[30;47mPress a key to continue, press Ctrl+C to exit\e[0m"
+            read -N1
+            echo -e "\e[1Am\e[2K"
+
+        done
+    else
+        for directory in $local_repos_list
+        do
+            cd $directory
+            git_repo_user=$(basename $(realpath ..))
+            git_repo_name=$(basename $(realpath .))
+
+            has_changes=$(git status | grep -E 'Changes not staged|Your branch is ahead' | wc -l)
+
+            if [ ! "$has_changes" = "0" ]
+            then
+                echo -e "\e[1;33m[EDITED] $git_repo_user/$git_repo_name has changes to commit/push \e[0m"
+            elif [ "$EDITED_ONLY" = "0" ]
+            then
+                echo -e "\e[1;32m[UTD]\e[0m $git_repo_user/$git_repo_name is up to date"
+            fi
+        done
+    fi
+
+    echo
+    cd "$og_path"
+
+
+}
+
+
+
+
+#  ######  ########  ######## ########   ######
+# ##    ## ##     ## ##       ##     ## ##    ##
+# ##       ##     ## ##       ##     ## ##
+# ##       ########  ######   ##     ##  ######
+# ##       ##   ##   ##       ##     ##       ##
+# ##    ## ##    ##  ##       ##     ## ##    ##
+#  ######  ##     ## ######## ########   ######
+
+function enableCredentialCache()
+{
+    git config --global credential.helper store
+    echo "Enabled credential helper cache !"
+}
+
+function disableCredentialCache()
+{
+    git config --global --unset credential.helper
+    echo "Unset credential helper cache !"
+}
+
+
+
+
+
+
+#  ######  ##    ## ##     ## ##       #### ##    ## ##    ##
+# ##    ##  ##  ##  ###   ### ##        ##  ###   ## ##   ##
+# ##         ####   #### #### ##        ##  ####  ## ##  ##
+#  ######     ##    ## ### ## ##        ##  ## ## ## #####
+#       ##    ##    ##     ## ##        ##  ##  #### ##  ##
+# ##    ##    ##    ##     ## ##        ##  ##   ### ##   ##
+#  ######     ##    ##     ## ######## #### ##    ## ##    ##
+
+function createDesktopSymlink()
+{
+    repo_name=$1
+
+    if [ ! -z "$repo_name" ]
+    then
+        repo_basename=$(basename $repo_name)
+        symlink_target="$GITUTILS_REPOS_PATH/$repo_name"
+        symlink_path="$HOME_PATH/Desktop/$repo_basename"
+    else
+        symlink_target=$GITUTILS_CONFIG_PATH
+        symlink_path="$HOME_PATH/Desktop/repositories"
+    fi
+
+    if [ ! -d $symlink_target ]
+    then
+        echo "Error ! Symlink target $symlink_target does not exists"
+        exit 1
+    fi
+
+    if [ -L $symlink_path ]
+    then
+        echo "It seems that $symlink_path already exists !"
+        echo "Please remove it before creating it again"
+        echo "rm $symlink_path"
+        exit 1
+    fi
+
+    ln -s "$symlink_target" "$symlink_path"
+    echo "Created symlink $symlink_path"
+    echo "leading to $symlink_target"
+}
+
+
+
+function displayHelp()
+{
+    echo "git-utils : collection of tools to make project management easier"
+    echo ""
+    echo "Available Commands"
+    echo
+    echo " register-key <API_KEY>"
+    echo "     Register a new GitHub api token"
+    echo
+    echo " get-key"
+    echo "     Get the registered GitHub api token"
+    echo
+    echo " test-key"
+    echo "     Test the registered GitHub api token"
+    echo
+    echo " make <PROJECT_NAME>"
+    echo "     Make a repository, can install Sharp & SharpExtensions if wanted"
+    echo
+    echo " clone-all"
+    echo "     Clone all of your repositories"
+    echo
+    echo " pull-all"
+    echo "     Pull all locally installed repositories"
+    echo
+    echo " status"
+    echo "     Display the status of local repos"
+    echo "         -e|--edited to display repos that needs commits/pushes only"
+    echo "         -v|--verbose to display full git status"
+    echo
+    echo " enable-cache"
+    echo "     Enable the credential store cache"
+    echo
+    echo " disable-cache"
+    echo "     Disable the credential store cache"
+    echo
+    echo " symlink"
+    echo "     Create a symlink on your desktop to the repositories directory"
+    echo
+    echo " symlink <Author/Repo>"
+    echo "     Create a symlink on your desktop to the repository directory"
+    echo
+    echo " list-local"
+    echo "     List locally installed repos"
+    echo
+    echo " list-dist"
+    echo "     List all availables repos"
+    echo
+    echo " help"
+    echo "     Display this help message"
+}
+
+
+
+
+HOME_PATH=$(realpath ~)
+GITUTILS_CONFIG_PATH="$HOME_PATH/.config/utilux/git-utils"
+GITUTILS_REPOS_PATH="$HOME_PATH/.config/utilux/git-utils/repositories"
+
+makeDirectoryIfInexistant $GITUTILS_CONFIG_PATH
+makeDirectoryIfInexistant $GITUTILS_REPOS_PATH
+
+
+COMMAND=$1
+
+case $COMMAND in
+    make)
+        createRepo $2
+    ;;
+
+    register-key)
+        registerToken $2
+    ;;
+
+    get-key)
+        echo "Here's your api token:"
+        echo ""
+        echo "    $(getGitApiToken)"
+        echo ""
+    ;;
+
+    test-key)
+        testToken
+    ;;
+
+    enable-cache)
+        enableCredentialCache
+    ;;
+
+    disable-cache)
+        disableCredentialCache
+    ;;
+
+    symlink)
+        createDesktopSymlink $2
+    ;;
+
+    help)
+        displayHelp
+    ;;
+
+    clone-all)
+        cloneAllRepositories
+    ;;
+
+    list-local)
+        listInstalledRepos
+    ;;
+
+    list-dist)
+        listUserRepos
+    ;;
+
+    pull-all)
+        pullAllrepos
+    ;;
+
+    status)
+        getStatus $*
+    ;;
+
+    *)
+        echo "Unknown command '$1'"
+        exit 1
+    ;;
+esac
+
+echo
+exit 0

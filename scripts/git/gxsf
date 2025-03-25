@@ -1,0 +1,21 @@
+#!/bin/bash
+
+stash_name="$1"
+
+if [ -z "$stash_name" ]
+then
+    exit 0
+fi
+
+target_stash=$(git stash list | grep -E ": $stash_name$" | head -n1)
+regex="^stash@\{([0-9]+)\}"
+
+if [ -z "$target_stash" ]
+then
+    exit 0
+fi
+
+if [[ $target_stash =~ $regex ]]
+then
+    echo "${BASH_REMATCH[1]}"
+fi

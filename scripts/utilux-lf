@@ -1,0 +1,20 @@
+#!/bin/bash
+
+to_convert="$1"
+if [ -z $to_convert ]; then to_convert=$(realpath .); fi
+
+if [ ! -d $to_convert ]
+then
+    echo "[$to_convert] directory does not exists!"
+    exit 1
+fi
+
+read -p "Do you really want to convert [$to_convert] ? [y/n] " user_input
+
+if [ ! "$user_input" == "y" ]
+then
+    echo "Bye!"
+    exit 0
+fi
+
+find $to_convert -type f -exec dos2unix {} \;

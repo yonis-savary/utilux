@@ -1,0 +1,117 @@
+#!/bin/bash
+
+function installCodeExtention()
+{
+    packageName="$1"
+    prettyName=$(echo "$packageName" | sed -e 's/^.*\.//g')
+    codeOutput=$(code --install-extension "$packageName" 2>&1);
+    alreadyInstalled=$(echo $codeOutput | grep -c 'already installed');
+
+    if [ "$alreadyInstalled" = "0" ]
+    then
+        echo "$res";
+    else
+        echo -e " - \e[32m[INSTALLED]\e[0m $prettyName";
+    fi
+    echo -ne "\e[0m";
+}
+
+function isInstalled()
+{
+    package="$1"
+    missing=$(dpkg -s "$package" 2>&1 | grep -c "not installed")
+
+    if [ "$missing" -ne "0" ]
+    then
+        if [ ! -z "$(which $package)" ];
+        then
+            return 1;
+        fi
+        return 0;
+    fi
+    return 1;
+}
+
+function checkInstalled()
+{
+    package="$1"
+    isInstalled "$package"
+    installed=$?
+
+    if [ "$installed" = "0" ]
+    then
+        possible_package=$(apt-cache search "$package" | grep -c -E "^$package " )
+
+        if [ "$possible_package" = "0" ]
+        then 
+            echo -e " - \e[31m[MISSING]\e[0m $package (Need manual installation)";
+        else 
+            echo -e " - \e[31m[MISSING]\e[0m $package (sudo apt-get install $package)";
+        fi
+    else
+        echo -e " - \e[32m[OK]\e[0m $package";
+    fi
+    echo -ne "\e[0m";
+}
+
+echo "Languages/tools to install";
+checkInstalled "git";
+checkInstalled "php";
+checkInstalled "php8.4-mysql";
+checkInstalled "php8.4-mbstring";
+checkInstalled "php8.4-curl";
+checkInstalled "php8.4-xml";
+checkInstalled "composer"
+checkInstalled "sqlite3";
+checkInstalled "nodejs";
+checkInstalled "npm";
+checkInstalled "docker";
+checkInstalled "docker-compose-plugin";
+echo
+
+echo "Software to install";
+checkInstalled "filezilla";
+checkInstalled "code";
+checkInstalled "firefox";
+checkInstalled "ffmpeg";
+echo
+
+echo "Office Softwares"
+checkInstalled "libreoffice";
+checkInstalled "gimp";
+checkInstalled "inkscape";
+echo
+
+echo "DVD/Music Utilities"
+checkInstalled "easytag";
+checkInstalled "asunder";
+echo
+
+isInstalled 'code';
+if [ "$?" == "1" ]
+then
+    echo "Checking code extensions..."
+    installCodeExtention "amiralizadeh9480.laravel-extra-intellisense"
+    installCodeExtention "bmewburn.vscode-intelephense-client"
+    installCodeExtention "bradlc.vscode-tailwindcss"
+    installCodeExtention "eamodio.gitlens"
+    installCodeExtention "github.github-vscode-theme"
+    installCodeExtention "gruntfuggly.todo-tree"
+    installCodeExtention "irongeek.vscode-env"
+    installCodeExtention "johnpapa.vscode-peacock"
+    installCodeExtention "mechatroner.rainbow-csv"
+    installCodeExtention "mhutchie.git-graph"
+    installCodeExtention "ms-azuretools.vscode-docker"
+    installCodeExtention "ms-vscode-remote.remote-containers"
+    installCodeExtention "mujichok.vscode-project-name-in-statusbar"
+    installCodeExtention "pkief.material-icon-theme"
+    installCodeExtention "shardulm94.trailing-spaces"
+    installCodeExtention "streetsidesoftware.code-spell-checker"
+    installCodeExtention "usernamehw.errorlens"
+    installCodeExtention "visualstudioexptteam.intellicode-api-usage-examples"
+    installCodeExtention "visualstudioexptteam.vscodeintellicode"
+    installCodeExtention "vue.volar"
+    installCodeExtention "yoavbls.pretty-ts-errors"
+    installCodeExtention "zhuangtongfa.material-theme"
+    echo
+fi

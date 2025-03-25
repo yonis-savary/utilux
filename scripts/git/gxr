@@ -1,0 +1,10 @@
+#!/bin/bash
+followed_branch=$(git rev-parse --abbrev-ref $(gxb)@{upstream} | sed -e 's/origin\///g')
+
+echo "About to execute : git pull --rebase origin $followed_branch"
+read -p "Proceed ? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    git pull --rebase origin $followed_branch
+fi
