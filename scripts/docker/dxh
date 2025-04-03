@@ -1,4 +1,4 @@
-echo "dx   - This help file"
+echo "dxh   - This help file"
 echo "dxb  - Docker compose build"
 echo "dxd  - Docker compose down"
 echo "dxe [service] [command] - Docker compose exec"
