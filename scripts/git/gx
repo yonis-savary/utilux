@@ -1,8 +1,11 @@
 #!/bin/bash
 echo "gxa          Commit ammend with no edit"
 echo "gxb          get current branch name"
+echo "gxb+ [name]  create a new branch based on current one"
+echo "gxf [name]   change current branch upstream"
 echo "gxf          fetch prune"
-echo "gxp          push force lease"
+echo "gxp          push force with lease"
+echo "gxap         gxa && gxp"
 echo "gxpm         purge merged branches (Force)"
 echo "gxr          pull rebase"
 echo "gxrc         rebase continue"
