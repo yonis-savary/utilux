@@ -17,6 +17,7 @@ utilux-install [FILE] # Install a file in a special directory link to your $PATH
 utilux-share [FILE]   # Start a web server that can serve files
 utilux-lf [DIRECTORY] # Recursively convert CRLF to LF inside a directory (. by default)
 utilux-git            # Git utilitary tool that can create and manage your repos
+utilux-ssh            # SSH Key utilities
 
 dx   # alias for docker compose
 dxu  # docker compose up -d

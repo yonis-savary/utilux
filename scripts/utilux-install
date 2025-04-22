@@ -15,4 +15,4 @@ then
 fi
 
 echo "Copying $binName to $targetBinName"
-cp "$binName" "$targetBinName"
+ln -s "$binName" "$targetBinName"

@@ -1,0 +1,102 @@
+#!/bin/bash
+
+function is_valid_key_name {
+    [[ "$1" =~ ^[a-zA-Z0-9_-]+$ ]]
+}
+
+function add_new_ssh_key {
+    name="$1"
+    public_key_path="$HOME/.ssh/$name.pub"
+
+    if [ -f "$public_key_path" ]
+    then
+        echo "Key named $name already exists"
+        exit 1
+    fi
+
+    ssh-keygen -q -N "" -t ed25519 -f ~/.ssh/$name
+
+    echo "✅ Key generated"
+    echo "Public key content"
+    echo ""
+    cat "$public_key_path"
+    echo ""
+}
+
+function list_ssh_keys {
+    echo "List of ssh keys:"
+    ls -1 ~/.ssh/* | grep -E "\.pub$"  | while read line ; do 
+        echo "- $(basename "$line" .pub)"
+    done
+}
+
+
+function delete_ssh_keys {
+    name="$1"
+    public_key_path="$HOME/.ssh/$name.pub"
+    private_key_path="$HOME/.ssh/$name"
+
+    if [ ! -f "$public_key_path" ]
+    then
+        echo "No key named $name exists"
+        exit 1
+    fi
+
+    echo "Deleting ssh key"
+    rm "$public_key_path"
+    rm "$private_key_path"
+
+}
+
+function help {
+    echo ""
+    echo "utilux-ssh - SSH Key utilities"
+    echo ""
+    echo "a|add {name}     Add a new ssh key with a specified name"
+    echo "d|delete {name}  Delete a specific ssh key"
+    echo "l|list           List created ssh keys"
+    echo "h|help           Show this help message"
+}
+
+
+
+action="$1"
+case "$action" in
+    a|add)
+        if [ -z "$2" ]; then
+            echo "Error: You must specify a key name."
+            help
+            exit 1
+        fi
+        if ! is_valid_key_name "$2"; then
+            echo "Error: Invalid key name. Only alphanumeric characters, dashes, and underscores are allowed."
+            exit 1
+        fi
+        add_new_ssh_key "$2"
+        ;;
+    h|help)
+        help
+        ;;
+    l|list)
+        list_ssh_keys
+        ;;
+    d|delete)
+        if [ -z "$2" ]; then
+            echo "Error: You must specify a key name."
+            help
+            exit 1
+        fi
+        if ! is_valid_key_name "$2"; then
+            echo "Error: Invalid key name. Only alphanumeric characters, dashes, and underscores are allowed."
+            exit 1
+        fi
+        delete_ssh_keys "$2"
+        ;;
+    *)
+        echo "Option inconnue : $action"
+        help
+        exit 1
+        ;;
+esac
+
+exit 0
