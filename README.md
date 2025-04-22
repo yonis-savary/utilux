@@ -31,7 +31,8 @@ gx           # help script for every gx* scripts
 gxa          # Commit ammend with no edit
 gxb          # get current branch name
 gxb+ [name]  # create a new branch tracking current one
-gxf [name]   # change current branch upstream
+gxbf [name]  # change current branch upstream
+gxd          # show short diff message
 gxf          # fetch prune
 gxp          # push force with lease
 gxap         # gxa && gxp

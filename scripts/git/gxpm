@@ -1,11 +1,11 @@
 #!/bin/bash
 echo "All of these branches will be force-removed"
-git branch --no-merged | grep -v -E "master|main|develop|^\+"
+git branch --merged | grep -v -E "master|main|develop|^\+"
 
 read -p "Proceed ? " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-    git branch --no-merged | grep -v -E "master|main|develop|^\+" | xargs git branch -D;
+    git branch --merged | grep -v -E "master|main|develop|^\+" | xargs git branch -D;
 fi
 

@@ -1,1 +1,1 @@
-git commit --amend --no-edit
+git commit --amend --no-edit && echo "✅ Amend done."
