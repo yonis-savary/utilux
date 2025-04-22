@@ -5,7 +5,7 @@ this repository holds every scripts/informations needed to make my optimal linux
 ## How to install
 
 ```bash
-cd ~ && git clone https://github.com/YonisSavary/utilux && cd ./utilux && ./install.sh
+git clone https://github.com/YonisSavary/utilux ~/utilux && bash ~/utilux/install.sh
 ```
 
 ## Commands
