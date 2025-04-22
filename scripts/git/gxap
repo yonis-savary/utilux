@@ -1,3 +1,4 @@
+gxd
 git commit --amend --no-edit && \
 git push --force-with-lease origin $(gxb) && \
 echo "✅ Amend + Push done."
