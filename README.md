@@ -48,39 +48,6 @@ gxsl         # list all git stashes
 gxsp [name]  # pop a git stash (name is optionnal)
 ```
 
-### `utilux-git`
-
-`utilux-git` is a utility tool to perform actions on your git repositories and regroup them in a single directory (usually `~/.config/utilux/git-utils/repositories`)
-
-```bash
-# Display a list of available commands
-utilux-git help
-
-# Register and get your api token
-utilux-git register-key <API_KEY>
-utilux-git get-key
-
-# Dis/enable credential cache/storing
-utilux-git enable-cache
-utilux-git disable-cache
-
-# Clone all of your repositories (inclunding organizations repositories)
-utilux-git clone-all
-# Make a repository and push it to github
-utilux-git make <PROJECT_NAME>
-# Pull every modifications to your repos excluding where changes where made without committing
-utilux-git pull-all
-
-# Make a symlink to your repository directory on your desktop
-utilux-git symlink
-# Make a symlink to one of your directory on your desktop
-utilux-git symlink <Author/Repo>
-
-# List installed and availables directories
-utilux-git list-local
-utilux-git list-dist
-```
-
 ## Ressources / Tools
 
 - [ANSI Terminal Codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
