@@ -16,11 +16,8 @@ function parseHeaders(string $headers)
     return $assoc;
 }
 
-function curl(string $service, string $url, array $getParams = [], array $portParams = [], array $headers = [], ?callable $curlModifier = null)
+function curl(string $url, array $getParams = [], array $portParams = [], array $headers = [], ?callable $curlModifier = null)
 {
-    $serviceURL = service($service)['host'] ?? null;
-    $url = $serviceURL . $url;
-
     $urlGetParams = count($getParams) ? '?' . http_build_query($getParams, '', '&') : '';
     $url = trim($url . $urlGetParams);
 
@@ -64,7 +61,6 @@ function curl(string $service, string $url, array $getParams = [], array $portPa
 
     if ($nextURL = ($resHeaders['location'] ?? null)) {
         return curl(
-            $service,
             $nextURL,
             $getParams,
             $postFields,
@@ -83,16 +79,26 @@ function curl(string $service, string $url, array $getParams = [], array $portPa
 
 function gitlabCurl(string $url, array $getParams = [], array $portParams = [])
 {
-    return curl('gitlab', $url, $getParams, $portParams, [
-        'PRIVATE-TOKEN' => service('gitlab')['token']
+    $gitlabService = service('gitlab');
+
+    $serviceURL = $gitlabService['host'] ?? null;
+    $url = $serviceURL . $url;
+
+    return curl($url, $getParams, $portParams, [
+        'PRIVATE-TOKEN' => $gitlabService['token']
     ]);
 }
 
 function jiraCurl(string $url, array $getParams = [], array $portParams = [])
 {
-    return curl('jira', $url, $getParams, $portParams, [], function (&$curl) {
-        $username = service('jira')['email'];
-        $password = service('jira')['token'];
+    $jiraService = service('jira');
+
+    $serviceURL = env('UTILUX_JIRA_HOST', $jiraService['host']) ?? null;
+    $url = $serviceURL . $url;
+
+    return curl($url, $getParams, $portParams, [], function (&$curl) use (&$jiraService) {
+        $username = env('UTILUX_JIRA_EMAIL', $jiraService['email']);
+        $password = env('UTILUX_JIRA_TOKEN', $jiraService['token']);
         curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
     });
 }

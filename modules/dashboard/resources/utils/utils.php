@@ -94,3 +94,12 @@ function command(string $command, ?string $directory = null)
 
     return $output;
 }
+
+
+function env(string $name, ?string $default=null): ?string
+{
+    if ($value = getenv($name))
+        return $value;
+
+    return $default;
+}
