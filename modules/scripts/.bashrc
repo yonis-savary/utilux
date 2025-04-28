@@ -13,3 +13,6 @@ if ! echo "$PATH" | grep -q "$DOCKER_SCRIPTS"; then
 fi
 
 alias dx="docker compose"
+alias dxr="docker compose restart"
+alias dxl="docker compose logs"
+alias dxe="docker compose exec"

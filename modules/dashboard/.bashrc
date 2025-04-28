@@ -8,10 +8,7 @@ IS_LISTENING="$(ss -tuln | awk '{print $5}' | grep -E "$LISTENING_URL" -c)"
 EXAMPLE_CONFIG_FILE="$SCRIPT_DIR/config.example.json"
 CONFIG_FILE="$SCRIPT_DIR/config.json"
 
-if [ ! -f "$CONFIG_FILE" ]
-then
-    cp "$EXAMPLE_CONFIG_FILE" "$CONFIG_FILE"
-fi
+[ -f "$CONFIG_FILE" ] || cp "$EXAMPLE_CONFIG_FILE" "$CONFIG_FILE"
 
 if [ "0" = "$IS_LISTENING" ]
 then

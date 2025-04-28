@@ -9,9 +9,7 @@ if ! echo "$PATH" | grep -q "$DBWAND_BIN_DIR"; then
 fi
 
 DBWAND_CONFIG_DIR="$(realpath ~)/.config/utilux/dbwand"
-if [ ! -d "$DBWAND_CONFIG_DIR" ]
-then 
-    mkdir -p "$DBWAND_CONFIG_DIR"
-fi
+mkdir -p "$DBWAND_CONFIG_DIR" 2>/dev/null
+
 export UTILUX_DBWAND_CONFIG_FILE="$DBWAND_CONFIG_DIR/dbwand.json"
 alias utilux-dbwand-config="nano $UTILUX_DBWAND_CONFIG_FILE"
