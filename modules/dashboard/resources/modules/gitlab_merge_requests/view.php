@@ -1,4 +1,17 @@
 <?php
+
+function gitlabCurl(string $url, array $getParams = [], array $portParams = [])
+{
+    $gitlabService = service('gitlab');
+
+    $serviceURL = $gitlabService['host'] ?? null;
+    $url = $serviceURL . $url;
+
+    return curl($url, $getParams, $portParams, [
+        'PRIVATE-TOKEN' => $gitlabService['token']
+    ]);
+}
+
 $mergeRequests = cache(
     'gitlab-merge-requests',
     fn() => gitlabCurl('/merge_requests', ['author_username' => 'yonis.savary', 'state' => 'opened'])

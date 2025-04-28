@@ -1,4 +1,19 @@
 <?php
+
+function jiraCurl(string $url, array $getParams = [], array $portParams = [])
+{
+    $jiraService = service('jira');
+
+    $serviceURL = env('UTILUX_JIRA_HOST', $jiraService['host']) ?? null;
+    $url = $serviceURL . $url;
+
+    return curl($url, $getParams, $portParams, [], function (&$curl) use (&$jiraService) {
+        $username = env('UTILUX_JIRA_EMAIL', $jiraService['email']);
+        $password = env('UTILUX_JIRA_TOKEN', $jiraService['token']);
+        curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
+    });
+}
+
 $myWork = cache(
     'jira-my-work',
     fn() => jiraCurl('/search/jql', ['fields' => 'status,summary', 'jql' => 'assignee = currentUser() AND status NOT IN (Annule, Annulé, Clôturé, Done, Finished, "Résolu Automatiquement", Terminé) ORDER BY priority DESC, created DESC'])['issues']
@@ -42,7 +57,7 @@ $myWork = cache(
     <?php
     usort($myWork, fn($a, $b) => $a['key'] > $b['key']);
     foreach ($myWork as $issue) { ?>
-        <a href="<?= preg_replace('/\\/rest.+/', '', service('jira')['host']) . '/browse/' . $issue['key']  ?>" class="flex flex-col card" target='_blank'>
+        <a href="<?= preg_replace('/\\/rest.+/', '', env('UTILUX_JIRA_HOST', service('jira')['host'])) . '/browse/' . $issue['key']  ?>" class="flex flex-col card" target='_blank'>
             <div class="flex flex-row items-center">
                 <p class="issue-title" title="<?= $issue['fields']['summary'] ?>">
                     <?= $issue['key'] ?> - <?= $issue['fields']['summary'] ?>

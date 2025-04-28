@@ -75,30 +75,3 @@ function curl(string $url, array $getParams = [], array $portParams = [], array 
 
     return $resBody;
 }
-
-
-function gitlabCurl(string $url, array $getParams = [], array $portParams = [])
-{
-    $gitlabService = service('gitlab');
-
-    $serviceURL = $gitlabService['host'] ?? null;
-    $url = $serviceURL . $url;
-
-    return curl($url, $getParams, $portParams, [
-        'PRIVATE-TOKEN' => $gitlabService['token']
-    ]);
-}
-
-function jiraCurl(string $url, array $getParams = [], array $portParams = [])
-{
-    $jiraService = service('jira');
-
-    $serviceURL = env('UTILUX_JIRA_HOST', $jiraService['host']) ?? null;
-    $url = $serviceURL . $url;
-
-    return curl($url, $getParams, $portParams, [], function (&$curl) use (&$jiraService) {
-        $username = env('UTILUX_JIRA_EMAIL', $jiraService['email']);
-        $password = env('UTILUX_JIRA_TOKEN', $jiraService['token']);
-        curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
-    });
-}

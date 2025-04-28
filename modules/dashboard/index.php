@@ -40,7 +40,7 @@ if (!is_file($tailwind)) {
 
         .page-background-overlay {
             z-index: 1;
-            filter: brightness(50%);
+            filter: brightness(75%);
             background-size: cover;
             background-repeat: no-repeat;
             background-position: 50% 50%;

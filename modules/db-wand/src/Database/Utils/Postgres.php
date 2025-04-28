@@ -100,10 +100,6 @@ class Postgres extends DatabaseUtils
         if (!count($data))
             return "(NULL)";
 
-        $columns = array_keys($data[0]);
-        if (!count($columns))
-            return "(NULL)";
-
         $sqlValues = [];
         foreach ($data as $row)
         {
