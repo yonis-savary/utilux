@@ -55,6 +55,7 @@ function checkInstalled()
 }
 
 echo "Languages/tools to install";
+checkInstalled "jq";
 checkInstalled "git";
 checkInstalled "php";
 checkInstalled "php8.4-mysql";
@@ -102,6 +103,9 @@ then
     installCodeExtention "mechatroner.rainbow-csv"
     installCodeExtention "mhutchie.git-graph"
     installCodeExtention "ms-azuretools.vscode-docker"
+    installCodeExtention "ms-python.debugpy"
+    installCodeExtention "ms-python.python"
+    installCodeExtention "ms-python.vscode-pylance"
     installCodeExtention "ms-vscode-remote.remote-containers"
     installCodeExtention "mujichok.vscode-project-name-in-statusbar"
     installCodeExtention "pkief.material-icon-theme"

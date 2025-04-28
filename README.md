@@ -5,9 +5,13 @@ this repository holds every scripts/informations needed to make my optimal linux
 ## How to install
 
 ```bash
-git clone https://github.com/YonisSavary/utilux ~/utilux && bash ~/utilux/install.sh
+git clone https://github.com/YonisSavary/utilux ~/utilux && bash ~/utilux/install
 ```
 
+Configuration
+```bash
+utilux-config
+```
 
 ## Dashboard Module
 
@@ -26,7 +30,35 @@ So far, this dashboard displays:
 
 ## dbwand Module (WIP)
 
-PHP-Based database-utility to fetch and manipulate data 
+PHP-Based database-utility to fetch and manipulate data locally
+
+Configuration
+
+```bash
+utilux-dbwand-config
+```
+
+Example configuration
+```json
+{
+    "connections": {
+        "my-first-app": "pgsql://user:password@localhost:5432/my-first-app",
+        "my-second-app": "pgsql://user:password@localhost:5432/my-first-app"
+    }
+}
+```
+
+Example of usage
+```bash
+dbwand
+connect my-second-app
+select * from contact
+only id first_name last_name is_client
+select * from dbwand where is_client = true # fake `dbwand` table can be used to select from current dataset
+remove is_client
+show 0-99 --json
+template INSERT INTO contact_client (contact_id) VALUES (:id)
+```
 
 ## Script Module
 

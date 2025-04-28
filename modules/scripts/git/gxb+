@@ -1,6 +1,6 @@
 #!/bin/bash
 branch_name="$1"
-ticket_regex='[A-Z]+-[0-9]+'
+ticket_regex='^[A-Z]+-[0-9]+$'
 
 
 if [[ "$branch_name" =~ $ticket_regex ]]; then
@@ -26,7 +26,12 @@ if [[ "$branch_name" =~ $ticket_regex ]]; then
             jq '.fields.summary' -r | \
             iconv -f utf8 -t ascii//TRANSLIT | \
             tr '[:upper:]' '[:lower:]' | \
-            perl -pe "s/[a-z]'//g and s/.+?\[.+?\]//g and s/[^0-9a-z]/ /g and s/^ | +\$//g and s/ +/-/g"
+            perl -pe "s/[a-z]\'//g" | \
+            perl -pe "s/.+?\[.+?\]//g" | \
+            perl -pe "s/[^0-9a-z]/ /g" | \
+            perl -pe "s/^\s|\s+\$//g" | \
+            perl -pe "s/\b\w{,3}\b//g" | \
+            perl -pe "s/ +/-/g" 
         )
         branch_name="$branch_type/$branch_name/$title"
     else

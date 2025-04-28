@@ -19,7 +19,7 @@ class Connect extends Command
         return "Connect to another connection in your .env file";
     }
 
-    public function execute(array $argv = [], Context &$context): bools
+    public function execute(array $argv = [], Context &$context): bool
     {
         if (! $connectionName = $argv[0] ?? false)
             return $this->failWithReason("This command needs a connection name");

@@ -5,7 +5,7 @@ export UTILUX_PATH=$(dirname "$UTILUX_SCRIPT")
 export UTILUX_BIN_PATH="$UTILUX_PATH/bin";
 export PATH="$PATH:$UTILUX_BIN_PATH"
 
-CONFIG_PATH=$(realpath "~/.config/utilux")
+CONFIG_PATH="$(realpath ~)/.config/utilux"
 # Create dir in .config if inexistent
 if [ ! -d "$CONFIG_PATH" ]
 then
@@ -14,8 +14,7 @@ fi
 
 
 # Custom prompt
-PS1="\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;36m\]\W\[\033[00m\]\$"
-
+PS1='\[\e[92;1m\]\W\[\e[0m\]\$'
 
 # Load setup custom bashrc file
 if [ -f "$UTILUX_PATH/.bashrc.custom" ]
@@ -26,6 +25,7 @@ else
     cp "$UTILUX_PATH/.bashrc.custom.example" "$UTILUX_PATH/.bashrc.custom"
 fi
 
+alias utilux-config="nano $UTILUX_PATH/.bashrc.custom"
 
 # Load installed modules
 MODULES_PATH="$UTILUX_PATH/modules"

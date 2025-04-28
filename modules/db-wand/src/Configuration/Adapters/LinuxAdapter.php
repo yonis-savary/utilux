@@ -17,9 +17,9 @@ class LinuxAdapter implements ConfigurationAdapter
 
         if (is_dir($dotConfigDirectory))
         {
-            $this->configDirectory = $dotConfigDirectory . "/dbwand";
+            $this->configDirectory = $dotConfigDirectory . "/utilux/dbwand";
             if (!is_dir($this->configDirectory))
-                mkdir($this->configDirectory);
+                mkdir($this->configDirectory, recursive:true);
 
             $this->loadJsonConfiguration();
             $this->loadPromptHistory();
