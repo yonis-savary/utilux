@@ -11,7 +11,7 @@ class Configuration implements ConfigurationAdapter
     protected static ?self $instance = null;
     protected ConfigurationAdapter $adapter;
 
-    public function __construct(Context $context)
+    public function __construct(Context &$context)
     {
         if (self::$instance)
             return self::$instance;

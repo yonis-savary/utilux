@@ -7,7 +7,7 @@ use YonisSavary\DBWand\Context;
 
 class UnsupportedOSAdapter implements ConfigurationAdapter
 {
-    public function __construct(Context $context) {}
+    public function __construct(Context &$context) {}
 
     public function getPromptHistory(): array
     {

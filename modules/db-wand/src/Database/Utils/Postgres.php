@@ -28,7 +28,34 @@ class Postgres extends DatabaseUtils
     /** @return ForeignKey[] */
     public function listForeignKeyConstraints(): array
     {
-        return [];
+
+        $statement = $this->database->query(
+            "SELECT * FROM (
+            SELECT
+                pgc.contype as constraint_type,
+                ccu.table_schema AS table_schema,
+                kcu.table_name as table_name,
+                CASE WHEN (pgc.contype = 'f') THEN kcu.COLUMN_NAME ELSE ccu.COLUMN_NAME END as column_name,
+                CASE WHEN (pgc.contype = 'f') THEN ccu.TABLE_NAME ELSE (null) END as reference_table,
+                CASE WHEN (pgc.contype = 'f') THEN ccu.COLUMN_NAME ELSE (null) END as reference_col
+            FROM
+                pg_constraint AS pgc
+                JOIN pg_namespace nsp ON nsp.oid = pgc.connamespace
+                JOIN pg_class cls ON pgc.conrelid = cls.oid
+                JOIN information_schema.key_column_usage kcu ON kcu.constraint_name = pgc.conname
+                LEFT JOIN information_schema.constraint_column_usage ccu
+                            ON pgc.conname = ccu.CONSTRAINT_NAME
+                        AND nsp.nspname = ccu.CONSTRAINT_SCHEMA
+                        WHERE pgc.contype IN ('f')
+            )   as foo
+            ORDER BY table_name desc;
+        "
+        );
+
+        return array_map(
+            fn($row) => new ForeignKey(new Field($row['table_name'], $row['column_name']), new Field($row['reference_table'], $row['reference_col'])),
+            $statement->fetchAll(PDO::FETCH_ASSOC)
+        );
     }
 
     /** @return UniqueConstraint[] */

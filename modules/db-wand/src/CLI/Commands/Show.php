@@ -38,6 +38,10 @@ class Show extends Command
             $context->output->notice("Showing rows from $start to $end");
             $dataToShow = array_values(array_slice($currentData, $start, $end-$start, true));
         }
+        else if ($index == "all")
+        {
+            $dataToShow = &$currentData;
+        }
         else
         {
             $context->output->notice("Unrecognized index format [$index]");

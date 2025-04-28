@@ -10,9 +10,11 @@ class LinuxAdapter implements ConfigurationAdapter
     protected ?string $configDirectory = null;
     protected array $promptHistory = [];
     protected array $jsonConfiguration = [];
+    protected Context $context;
 
-    public function __construct(Context $context)
+    public function __construct(Context &$context)
     {
+        $this->context = $context;
         $dotConfigDirectory = $_SERVER['HOME'] . "/.config";
 
         if (is_dir($dotConfigDirectory))
@@ -23,6 +25,9 @@ class LinuxAdapter implements ConfigurationAdapter
 
             $this->loadJsonConfiguration();
             $this->loadPromptHistory();
+
+            if ($lastData= $this->loadLastContextData())
+                $context->currentData = $lastData;
         }
         else
         {
@@ -35,6 +40,7 @@ class LinuxAdapter implements ConfigurationAdapter
     {
         $this->writeJsonConfiguration();
         $this->writePromptHistory();
+        $this->writeCurrentContextData();
     }
 
     protected function getHistoryFilePath(): string 
@@ -44,6 +50,20 @@ class LinuxAdapter implements ConfigurationAdapter
             file_put_contents($path, '');
 
         return $path;
+    }
+
+    protected function loadLastContextData()
+    {
+        $lastDataPath = $this->configDirectory . "/last-data.json";
+        return is_file($lastDataPath)
+            ? json_decode(file_get_contents($lastDataPath), true, 512, JSON_THROW_ON_ERROR)
+            : false;
+    }
+
+    protected function writeCurrentContextData()
+    {
+        $lastDataPath = $this->configDirectory . "/last-data.json";
+        file_put_contents($lastDataPath, json_encode($this->context->currentData, JSON_THROW_ON_ERROR));
     }
 
     protected function loadJsonConfiguration()

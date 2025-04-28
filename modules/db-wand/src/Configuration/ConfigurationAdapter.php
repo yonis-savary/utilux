@@ -6,7 +6,7 @@ use YonisSavary\DBWand\Context;
 
 interface ConfigurationAdapter
 {
-    public function __construct(Context $context);
+    public function __construct(Context &$context);
 
     public function getPromptHistory(): array;
     public function addToPromptHistory(string $prompt): void;

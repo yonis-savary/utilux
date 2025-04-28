@@ -67,7 +67,7 @@ abstract class DatabaseUtils
         $field = $field->field;
 
         return array_values(array_filter(
-            $this->listUniqueConstraints(),
+            $this->listForeignKeyConstraints(),
             fn(ForeignKey $constraint) =>
                 $constraint->target->table === $table &&
                 $constraint->target->field === $field
