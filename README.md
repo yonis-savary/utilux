@@ -8,16 +8,39 @@ this repository holds every scripts/informations needed to make my optimal linux
 git clone https://github.com/YonisSavary/utilux ~/utilux && bash ~/utilux/install.sh
 ```
 
-## Commands
+
+## Dashboard Module
+
+Configurable productivity dashboard that automatically start on `127.0.0.1:9999` 
+(Port can be changed by setting `UTILUX_DASHBOARD_PORT`)
+
+Configuration:
+```bash
+utilux-dashboard-config
+```
+
+So far, this dashboard displays:
+- Your pending tickets on Jira (Need token)
+- Your pending merge-request on Gitlab (Need token)
+- Your local branches on configured directories
+
+## dbwand Module (WIP)
+
+PHP-Based database-utility to fetch and manipulate data 
+
+## Script Module
+
+### Commands
 
 ```bash
-utilux-setup          # Indicate which needed packages are missing (also install usual VSCode extensions)
-utilux-install-code   # (re)install visual studio code
 utilux-install [FILE] # Install a file in a special directory link to your $PATH
-utilux-share [FILE]   # Start a web server that can serve files
+utilux-install-code   # (re)install visual studio code
 utilux-lf [DIRECTORY] # Recursively convert CRLF to LF inside a directory (. by default)
-utilux-git            # Git utilitary tool that can create and manage your repos
+utilux-setup          # Indicate which needed packages are missing (also install usual VSCode extensions)
+utilux-share [FILE]   # Start a web server that can serve files
 utilux-ssh            # SSH Key utilities
+utilux-git            # Git utilitary tool that can create and manage your repos
+utilux-update         # Utilux self update
 
 dx   # alias for docker compose
 dxu  # docker compose up -d
@@ -29,17 +52,19 @@ dxl  # docker compose logs
 dxe  # docker compose exec
 
 gx           # help script for every gx* scripts
-gxa          # Commit ammend with no edit
-gxb          # get current branch name
+gxa          # commit ammend (no edit)
+gxap         # ammend and push
+gxb          # print current branch name
 gxb+ [name]  # create a new branch tracking current one
 gxbf [name]  # change current branch upstream
 gxd          # show short diff message
 gxf          # fetch prune
 gxp          # push force with lease
-gxap         # gxa && gxp
-gxpm         # purge merged branches (Force)
+gxpm         # purge merged branches (force)
 gxr          # pull rebase
+gxra         # rebase abort
 gxrc         # rebase continue
+gxrs         # rebase skip
 
 gxs [name]   # create a git stash (name is optionnal)
 gxsa [name]  # apply a git stash (name is optionnal)

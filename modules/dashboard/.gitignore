@@ -1,0 +1,5 @@
+config.json
+cache
+views/customs
+resources/assets
+server.log

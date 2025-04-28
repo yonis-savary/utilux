@@ -1,0 +1,36 @@
+{
+    "style": {
+        "background": "/home/foo/Pictures/my-super-background.jpg",
+        "page-content-style": "grid grid-cols-3"
+    },
+    "services": {
+        "gitlab": {
+            "_how_to": "https://YOUR_GITLAB_HOST/-/user_settings/personal_access_tokens",
+            "enabled": true,
+            "view": "resources/modules/gitlab_merge_requests/view.php",
+            "host": "x",
+            "token": "x"
+        },
+        "jira": {
+            "_how_to": "https://id.atlassian.com/manage-profile/security/api-tokens",
+            "enabled": true,
+            "view": "resources/modules/jira_my_work/view.php",
+            "host": "https://YOUR-ORGANISATION.atlassian.net/rest/api/3",
+            "email": "x",
+            "token": "x"
+        },
+        "git": {
+            "enabled": true,
+            "view": "resources/modules/git_branches/view.php",
+            "repositories": [
+                "/home/foo/Desktop/bar",
+                "/home/foo/Desktop/zim"
+            ]
+        }
+    },
+    "blocks": [
+        "jira",
+        "gitlab",
+        "git"
+    ]
+}

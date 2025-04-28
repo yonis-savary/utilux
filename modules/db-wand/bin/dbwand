@@ -1,0 +1,32 @@
+#!/usr/bin/env php
+<?php
+
+use YonisSavary\DBWand\CLI\StdOutput;
+use YonisSavary\DBWand\CLI\Terminal;
+
+if ($composerAutoload = $GLOBALS['_composer_autoload_path'] ?? false)
+{
+    $composerAutoload;
+}
+else
+{
+    $found = false;
+    foreach (['/../../autoload.php', '/../vendor/autoload.php', '/vendor/autoload.php'] as $file) {
+        $file = __DIR__ . $file;
+
+        if (!file_exists($file))
+            continue;
+
+        $found = true;
+        require_once $file;
+        break;
+    }
+    if (!$found)
+        throw new Exception('Could not resolve composer autoload file');
+}
+
+
+$output = new StdOutput;
+$output->info("DBWand : database migration utility - v0.1");
+
+exit((new Terminal($output))->askPrompts());

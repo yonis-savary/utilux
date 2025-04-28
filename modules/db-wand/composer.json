@@ -1,0 +1,22 @@
+{
+    "name": "yonis-savary/db-wand",
+    "description": "DB / Data migration tool suite",
+    "type": "library",
+    "license": "MIT",
+    "bin": "bin/dbwand",
+    "autoload": {
+        "psr-4": {
+            "YonisSavary\\DBWand\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "yonis-savary",
+            "email": "yonissavary@outlook.fr"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require-dev": {
+        "phpunit/phpunit": "^12.1"
+    }
+}

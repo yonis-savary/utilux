@@ -6,7 +6,15 @@ then
     exit 1
 fi
 
-targetBinName="$UTILUX_BIN_PATH/$binName"
+binName="$(realpath "$1")"
+
+if [ ! -f "$binName" ]
+then
+    echo "Cannot install, [$binName] is not a file"
+    exit 1
+fi
+
+targetBinName="$UTILUX_BIN_PATH/$(basename $binName)"
 
 if [ -f "$targetBinName" ]
 then
@@ -14,5 +22,5 @@ then
     exit 1
 fi
 
-echo "Copying $binName to $targetBinName"
+echo "Linking symlink $binName to $targetBinName"
 ln -s "$binName" "$targetBinName"
