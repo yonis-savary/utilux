@@ -29,6 +29,22 @@ $repositories = cache('git-branches', function () {
     return $repositoriesData;
 });
 
+function supportIssueNameInBranchName(string $branch)
+{
+    if (! $jiraHost = env('UTILUX_JIRA_HOST', false))
+        return $branch;
+
+
+    $jiraHost = preg_replace("~/rest/.+~", '', $jiraHost);
+
+    $issues = [];
+    preg_match_all("~\w+\-\d+~", $branch, $issues);
+    foreach ($issues[0] as $issue) 
+        $branch = str_replace($issue, "<a target='_blank' class='underline' href='$jiraHost/browse/$issue'>$issue</a>", $branch);
+
+    return $branch;
+}
+
 ?>
 <div class="flex flex-col gap-4">
     <div class="flex justify-between items-center">
@@ -52,7 +68,7 @@ $repositories = cache('git-branches', function () {
                 <summary>Local Branches (<?= count($repo['branches']) ?>)</summary>
                 <ul class="list-disc pl-5">
                     <?php foreach ($repo['branches'] as $branch) { ?>
-                        <li class="<?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>"><?= $branch ?></li>
+                        <li class="<?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>"><?= supportIssueNameInBranchName($branch) ?></li>
                     <?php } ?>
                 </ul>
             </details>

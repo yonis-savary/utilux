@@ -55,6 +55,7 @@ if (!is_file($tailwind)) {
         .work-container {
             overflow: auto;
         }
+
         .work-container:not(:has(*)) {
             display: none;
         }
@@ -66,14 +67,23 @@ if (!is_file($tailwind)) {
         .card {
             border: solid 1px rgba(125, 125, 125, 40%);
             background-color: rgba(25, 25, 25, 33%);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(4px);
             padding: 1em;
             border-radius: 4px;
+            transition: all 100ms ease-in-out;
         }
 
-        .slot:empty
-        {
+        .card:hover {
+            background-color: rgba(150, 150, 150, 33%);
+            backdrop-filter: blur(8px);
+        }
+
+        .slot:empty {
             display: none;
+        }
+
+        .page-background-overlay {
+            transition: all 2000ms ease;
         }
     </style>
     <div class="page-background-overlay"
@@ -104,6 +114,31 @@ if (!is_file($tailwind)) {
     document.querySelectorAll('script,style').forEach(x => {
         document.body.appendChild(x);
     })
+
+    const randomElement = (arr) => arr[Math.round(Math.random() * (arr.length - 1))];
 </script>
+<?php if (!config('style')['background'] ?? false) { ?>
+    <script>
+        let background = document.querySelector('.page-background-overlay');
+        const setNewBackground = () => {
+            let type = randomElement(['linear-gradient', 'radial-gradient'])
+
+            let hue = Math.round(Math.random() * 360);
+            let startColor = `hsl(${hue}, 50%, 50%)`
+            let endColor = `hsl(${hue}, ${25 + Math.round(Math.random()*50)}%, ${25 + Math.round(Math.random()*50)}%)`
+
+            let direction = Math.round(Math.random() * 360) + "deg";
+
+            let gradient = type === 'radial-gradient' ?
+                `${type}(${startColor}, ${endColor})` :
+                `${type}(${direction}, ${startColor}, ${endColor})`
+
+            background.style.background = gradient
+        }
+
+        setNewBackground();
+        setInterval(setNewBackground, 1000 * 60 * 15);
+    </script>
+<?php } ?>
 
 </html>
