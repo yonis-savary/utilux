@@ -66,9 +66,16 @@ if (!is_file($tailwind)) {
         .card {
             border: solid 1px rgba(125, 125, 125, 40%);
             background-color: rgba(25, 25, 25, 33%);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(4px);
             padding: 1em;
             border-radius: 4px;
+            transition: all 100ms ease-in-out;
+        }
+
+        .card:hover
+        {
+            background-color: rgba(150, 150, 150, 33%);
+            backdrop-filter: blur(8px);
         }
 
         .slot:empty
