@@ -26,6 +26,13 @@
                 "/home/foo/Desktop/bar",
                 "/home/foo/Desktop/zim"
             ]
+        },
+        "jira_gitlab_merger": {
+            "_why": "Merge your Jira Issues and Gitlab merge requests display",
+            "_why_reorder": "Reorder your issues to display issues with MR first",
+            "enabled": true,
+            "reorder": true,
+            "view": "resources/modules/jira_gitlab_merger/view.php"
         }
     },
     "blocks": [

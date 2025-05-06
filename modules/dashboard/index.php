@@ -55,17 +55,25 @@ if (!is_file($tailwind)) {
         .work-container {
             overflow: auto;
         }
+        .work-container:not(:has(*)) {
+            display: none;
+        }
 
         body {
             color: white;
         }
 
         .card {
-            border: solid 1px rgba(255, 255, 255, 50%);
-            background-color: rgba(125, 125, 125, 40%);
-            backdrop-filter: blur(4px);
+            border: solid 1px rgba(125, 125, 125, 40%);
+            background-color: rgba(25, 25, 25, 33%);
+            backdrop-filter: blur(8px);
             padding: 1em;
             border-radius: 4px;
+        }
+
+        .slot:empty
+        {
+            display: none;
         }
     </style>
     <div class="page-background-overlay"
@@ -92,6 +100,10 @@ if (!is_file($tailwind)) {
 
 <script>
     setTimeout(() => location.reload(), 60 * 1000 * 6)
+
+    document.querySelectorAll('script,style').forEach(x => {
+        document.body.appendChild(x);
+    })
 </script>
 
 </html>

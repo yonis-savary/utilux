@@ -40,14 +40,18 @@ $myWork = cache(
     }
 
     .issue-title {
-        max-width: 65ch;
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
     }
+
+    .issue-status 
+    {
+        white-space: nowrap;
+    }
 </style>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4" id="jira-issue-list">
     <div class="flex justify-between items-center">
         <div class="text-2xl font-bold">Jira - My Work</div>
         <?= getCacheTimestamps('jira-my-work') ?>
@@ -57,15 +61,18 @@ $myWork = cache(
     <?php
     usort($myWork, fn($a, $b) => $a['key'] > $b['key']);
     foreach ($myWork as $issue) { ?>
-        <a href="<?= preg_replace('/\\/rest.+/', '', env('UTILUX_JIRA_HOST', service('jira')['host'])) . '/browse/' . $issue['key']  ?>" class="flex flex-col card" target='_blank'>
-            <div class="flex flex-row items-center">
-                <p class="issue-title" title="<?= $issue['fields']['summary'] ?>">
-                    <?= $issue['key'] ?> - <?= $issue['fields']['summary'] ?>
-                </p>
-                <small class="issue ml-auto <?= $issue['fields']['status']['statusCategory']['colorName'] ?>">
-                    <?= $issue['fields']['status']['name'] ?>
-                </small>
-            </div>
-        </a>
+        <div class="flex flex-col jira" issue="<?= $issue['key'] ?>">
+            <a href="<?= preg_replace('/\\/rest.+/', '', env('UTILUX_JIRA_HOST', service('jira')['host'] ?? false)) . '/browse/' . $issue['key']  ?>" class="flex flex-col card" target='_blank'>
+                <div class="flex flex-row items-center">
+                    <p class="issue-title" title="<?= $issue['fields']['summary'] ?>">
+                        <b><?= $issue['key'] ?></b> - <?= $issue['fields']['summary'] ?>
+                    </p>
+                    <small class="issue issue-status ml-auto <?= $issue['fields']['status']['statusCategory']['colorName'] ?>">
+                        <?= $issue['fields']['status']['name'] ?>
+                    </small>
+                </div>
+            </a>
+            <div class="slot"></div>
+        </div>
     <?php } ?>
 </div>
