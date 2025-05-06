@@ -17,7 +17,7 @@ class Refresh extends Command
         return 'Refresh data set with last used select query';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         if (! $lastQuery = $context->getProperty(Select::CONTEXT_LAST_QUERY, false))
             return false;

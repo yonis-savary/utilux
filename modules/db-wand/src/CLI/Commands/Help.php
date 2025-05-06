@@ -17,7 +17,7 @@ class Help extends Command
         return "Show this help message";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $context->output->info("List of commands:");
 

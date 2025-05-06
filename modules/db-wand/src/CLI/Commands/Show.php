@@ -17,36 +17,36 @@ class Show extends Command
         return 'Show some row in the current data set (ex: "show 5", "show 0-99", "show 2-10 --json")';
     }
 
-    public function execute(array $argv=[], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $jsonMode = in_array("--json", $argv);
         $argv = array_diff($argv, ["--json"]);
 
         $index = $argv[0] ?? "0-10";
 
-        $currentData = $context->currentData;
+        $dataset = $context->dataset;
 
         $dataToShow = [];
         if (is_numeric($index))
         {
             $context->output->notice("Showing row number $index");
-            $dataToShow = [$currentData[$index]] ?? ['no result' => "No result found at row $index"];
+            $dataToShow = [$dataset[$index]] ?? ['no result' => "No result found at row $index"];
         }
         else if (preg_match("/^\d+-\d+$/", $index))
         {
             list($start, $end) = explode("-", $index);
             $context->output->notice("Showing rows from $start to $end");
-            $dataToShow = array_values(array_slice($currentData, $start, $end-$start, true));
+            $dataToShow = array_values(array_slice($dataset, $start, $end-$start, true));
         }
         else if ($index == "all")
         {
-            $dataToShow = &$currentData;
+            $dataToShow = &$dataset;
         }
         else
         {
             $context->output->notice("Unrecognized index format [$index]");
             $context->output->notice("Showing first 10 rows");
-            $dataToShow = array_values(array_slice($currentData, 0, 10, true));
+            $dataToShow = array_values(array_slice($dataset, 0, 10, true));
         }
 
         $context->output->info("");

@@ -17,13 +17,13 @@ class Template extends Command
         return 'Format given message with values of current data (ex: "format INSERT INTO (...) VALUES (:id, :label, :code)"), protect sql string by default, use --raw to ignore';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
-        $currentData = $context->currentData;
-        if (!count($currentData))
+        $dataset = $context->dataset;
+        if (!count($dataset))
             return $this->failWithReason('No current data');
         
-        $columns = array_keys($currentData[0]);
+        $columns = array_keys($dataset[0]);
         if (!count($columns))
             return $this->failWithReason('No data field found');
 
@@ -39,7 +39,7 @@ class Template extends Command
                 $markersToReplace[] = $match;
         }
 
-        foreach ($currentData as $row)
+        foreach ($dataset as $row)
         {
             $string = $template;
             foreach ($markersToReplace as $marker)

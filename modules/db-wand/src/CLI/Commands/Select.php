@@ -22,12 +22,12 @@ class Select extends Command
         return 'Perform a select query (you can copy-paste a query in the console directly, "dbwand" table can be used to fetch from dataset)';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         if (strtolower($argv[0] ?? '') !== 'select')
             array_unshift($argv, 'SELECT');
 
-        $currentData = &$context->currentData;
+        $dataset = &$context->dataset;
 
         $command = join(' ', $argv);
         try
@@ -35,7 +35,7 @@ class Select extends Command
             if (str_contains(strtolower($command), "from dbwand"))
             {
                 $context->output->notice("Fetching data from dataset");
-                $valuesTable = $context->utils->datasetToSelectValuesExpression($context->currentData);
+                $valuesTable = $context->utils->datasetToSelectValuesExpression($context->dataset);
                 $command = preg_replace("/FROM dbwand/i", "FROM $valuesTable", $command);
             }
             else 
@@ -45,11 +45,11 @@ class Select extends Command
 
             $statement = $context->database->query($command, PDO::FETCH_ASSOC);
 
-            if (count($currentData))
+            if (count($dataset))
                 Backup::add($context);
 
-            $currentData = $statement->fetchAll();
-            $context->output->notice("Fetched " . count($currentData) . " rows");
+            $dataset = $statement->fetchAll();
+            $context->output->notice("Fetched " . count($dataset) . " rows");
 
             return true;
         }

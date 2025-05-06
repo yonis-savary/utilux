@@ -17,11 +17,11 @@ class Remove extends Command
         return 'Remove specified columns (ex: "remove id name code")';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         Backup::add($context);
 
-        foreach ($context->currentData as &$row)
+        foreach ($context->dataset as &$row)
         {
             foreach ($argv as $field)
                 unset($row[$field]);

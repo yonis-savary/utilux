@@ -17,7 +17,7 @@ class History extends Command
         return "Show typed commands in this session (useful for scripting)";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $context->output->info("# --------------------------------------------");
         $context->output->info("# History");

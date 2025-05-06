@@ -17,7 +17,7 @@ class ExitCLI extends Command
         return "Exit dbwand";
     }
 
-    public function execute(array $argv=[], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $context->output->notice("Bye!");
         exit(0);

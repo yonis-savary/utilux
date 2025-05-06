@@ -27,7 +27,7 @@ class LinuxAdapter implements ConfigurationAdapter
             $this->loadPromptHistory();
 
             if ($lastData= $this->loadLastContextData())
-                $context->currentData = $lastData;
+                $context->dataset = $lastData;
         }
         else
         {
@@ -63,7 +63,7 @@ class LinuxAdapter implements ConfigurationAdapter
     protected function writeCurrentContextData()
     {
         $lastDataPath = $this->configDirectory . "/last-data.json";
-        file_put_contents($lastDataPath, json_encode($this->context->currentData, JSON_THROW_ON_ERROR));
+        file_put_contents($lastDataPath, json_encode($this->context->dataset, JSON_THROW_ON_ERROR));
     }
 
     protected function loadJsonConfiguration()

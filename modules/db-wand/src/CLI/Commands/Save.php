@@ -19,14 +19,14 @@ class Save extends Command
         return 'Save current data to save slot (ex: "save tmp-contact")';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         if (! $name = $argv[0] ?? false)
             return $this->failWithReason("This command needs a slot name as argument");
 
         $slots = &$context->getReference(self::SAVE_SLOTS_NAME, []);
-        $slots[$name] = $context->currentData;
-        $context->output->notice(count($context->currentData) . " rows saved into [$name]");
+        $slots[$name] = $context->dataset;
+        $context->output->notice(count($context->dataset) . " rows saved into [$name]");
         return true;
     }
 }

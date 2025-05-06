@@ -17,11 +17,6 @@ class DBWand
 {
     protected Context $context;
 
-    public static function fromFacade(?LoggerInterface $logger = null): self
-    {
-        return new self(null, DB::getPdo(), $logger);
-    }
-
     public static function fromContext(Context $context): self 
     {
         return new self($context);

@@ -13,22 +13,47 @@ class Postgres extends DatabaseUtils
     /** @return Field[] */
     public function listFields(): array
     {
-        return [];
+        $statement = $this->database->query(
+            "SELECT
+                c.relname AS table_name,
+                a.attname AS column_name
+            FROM pg_catalog.pg_attribute a
+            JOIN pg_catalog.pg_class c ON a.attrelid = c.oid
+            JOIN pg_catalog.pg_namespace n ON c.relnamespace = n.oid
+            WHERE a.attnum > 0 -- ignore les colonnes système
+            AND NOT a.attisdropped -- ignore les colonnes supprimées
+            AND c.relkind IN ('r', 'v', 'm', 'f', 'p') -- r = table, v = vue, m = vue matérialisée, f = table étrangère, p = table partitionnée
+            AND n.nspname NOT IN ('information_schema', 'pg_catalog')
+            ORDER BY table_name, a.attnum;
+        ");
+
+        $fields = array_map(
+            fn($row) => new Field($row['table_name'], $row['column_name']), 
+            $statement->fetchAll(PDO::FETCH_ASSOC)
+        );
+
+        return $fields;
     }
 
     /** @return string[] */
     public function listTables(): array
     {
-        $statement = $this->database->query("SELECT tablename FROM pg_catalog.pg_tables");
+        $statement = $this->database->query(
+            "SELECT c.relname AS table_name
+            FROM pg_catalog.pg_class c
+            JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+            WHERE c.relkind IN ('r', 'v', 'm', 'f', 'p')
+            AND n.nspname NOT IN ('information_schema', 'pg_catalog')
+            ORDER BY table_name
+        ");
         $tables = $statement->fetchAll(PDO::FETCH_ASSOC);
 
-        return array_map(fn($x) => $x['tablename'], $tables);
+        return array_map(fn($x) => $x['table_name'], $tables);
     }
 
     /** @return ForeignKey[] */
     public function listForeignKeyConstraints(): array
     {
-
         $statement = $this->database->query(
             "SELECT * FROM (
             SELECT
@@ -46,7 +71,8 @@ class Postgres extends DatabaseUtils
                 LEFT JOIN information_schema.constraint_column_usage ccu
                             ON pgc.conname = ccu.CONSTRAINT_NAME
                         AND nsp.nspname = ccu.CONSTRAINT_SCHEMA
-                        WHERE pgc.contype IN ('f')
+                WHERE pgc.contype IN ('f')
+                AND nsp.nspname NOT IN ('information_schema', 'pg_catalog')
             )   as foo
             ORDER BY table_name desc;
         "
@@ -147,5 +173,10 @@ class Postgres extends DatabaseUtils
         }
 
         return join(',', $sqlValues);
+    }
+
+    public function escapeTableName(string $table): string
+    {
+        return '"' . $table . '"';
     }
 }

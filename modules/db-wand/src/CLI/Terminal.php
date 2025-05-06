@@ -19,15 +19,17 @@ class Terminal
     const HOUR = self::MINUTE * 60;
 
     protected LoggerInterface $output;
+    protected ?PDO $defaultConnection = null;
 
     /** @var array<string,Command> */
     protected array $commands = [];
 
     protected array $currentSelection = [];
 
-    public function __construct(?LoggerInterface $output = null)
+    public function __construct(?LoggerInterface $output = null, ?PDO $defaultConnection = null)
     {
         $this->output = $output ?? new NullLogger;
+        $this->defaultConnection = $defaultConnection;
         $this->loadCommands();
     }
 
@@ -58,7 +60,7 @@ class Terminal
 
     public function printExecutionTime(int $executionTimeNano, bool $success = true)
     {
-        $executionTimeMilli = $executionTimeNano / 1000000;
+        $executionTimeMilli = round($executionTimeNano / 1000000);
 
         $hours   = floor($executionTimeMilli / self::HOUR);
         $minutes = floor(($executionTimeMilli % self::HOUR) / self::MINUTE);
@@ -94,6 +96,7 @@ class Terminal
         $configuration = new Configuration($context);
         $context->configuration = &$configuration;
 
+        $connection ??= $this->defaultConnection;
         if (!$connection) {
             $connectionFinder = new ConnectionFinder($context);
             $connection = $connectionFinder->getAnyConnection();
@@ -184,7 +187,7 @@ class Terminal
         $this->output->info("");
 
         while (true) {
-            $prompt = readline('[' . count($context->currentData) . '] > ');
+            $prompt = readline('[' . count($context->dataset) . '] > ');
             $context->configuration->addToPromptHistory($prompt);
             $this->handlePrompt($prompt, $context, true);
         }

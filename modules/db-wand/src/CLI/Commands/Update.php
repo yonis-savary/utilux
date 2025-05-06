@@ -19,7 +19,7 @@ class Update extends Command
         return 'Perform an update query (you can copy-paste a query in the console directly)';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         if (strtolower($argv[0] ?? '') !== 'update')
             array_unshift($argv, 'UPDATE');

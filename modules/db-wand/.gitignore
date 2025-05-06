@@ -3,3 +3,4 @@ composer.phar
 
 test.php
 dbwand.ini
+.phpunit.result.cache

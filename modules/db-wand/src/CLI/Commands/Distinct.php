@@ -17,14 +17,14 @@ class Distinct extends Command
         return "Retrieve distinct values from a column";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $column = $argv[0] ?? null;
 
         if (!$column)
             return $this->failWithReason("This command need a column name");
 
-        $data = $context->currentData;
+        $data = $context->dataset;
         if (!count($data))
             return $this->failWithReason("No data to distinct from");
 

@@ -17,14 +17,14 @@ class Join extends Command
         return "Prints a SQL representation of your data";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
-        $currentData = &$context->currentData;
+        $dataset = &$context->dataset;
 
-        if (!count($currentData))
+        if (!count($dataset))
             return $this->failWithReason('No data to print');
 
-        $columns = array_keys($currentData[0]);
+        $columns = array_keys($dataset[0]);
         if (!count($columns))
             return $this->failWithReason("No column to print");
 
@@ -32,11 +32,11 @@ class Join extends Command
         if ($column || count($columns)==1)
         {
             $column ??= $columns[1];
-            $context->output->info($context->utils->datasetToValuesExpression([array_map(fn($x) => $x[$column], $context->currentData)]));
+            $context->output->info($context->utils->datasetToValuesExpression([array_map(fn($x) => $x[$column], $context->dataset)]));
         }
         else 
         {
-            $context->output->info($context->utils->datasetToValuesExpression($context->currentData));
+            $context->output->info($context->utils->datasetToValuesExpression($context->dataset));
         }
 
         return true;

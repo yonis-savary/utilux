@@ -17,10 +17,10 @@ class Map extends Command
         return 'Rename every field with given parameters (ex: "map id label code")';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $newNames = $argv;
-        $oldNames = array_keys($context->currentData[0] ?? []);
+        $oldNames = array_keys($context->dataset[0] ?? []);
 
         if (!count($newNames))
             return $this->failWithReason("No new column names given");
@@ -31,12 +31,12 @@ class Map extends Command
         if (count($newNames) !== count($oldNames))
             return $this->failWithReason("Invalid column count, expected " . count($oldNames) . ' found ' . count($newNames));
 
-        $currentData = &$context->currentData;
+        $dataset = &$context->dataset;
         $nameMap = array_combine($oldNames, $newNames);
 
         Backup::add($context);
 
-        foreach ($currentData as &$row)
+        foreach ($dataset as &$row)
         {
             $newValue = [];
             foreach ($row as $field => $value)

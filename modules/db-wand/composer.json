@@ -6,7 +6,8 @@
     "bin": "bin/dbwand",
     "autoload": {
         "psr-4": {
-            "YonisSavary\\DBWand\\": "src/"
+            "YonisSavary\\DBWand\\": "src/",
+            "YonisSavary\\DBWand\\Tests\\": "tests/"
         }
     },
     "authors": [

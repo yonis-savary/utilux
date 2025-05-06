@@ -19,7 +19,7 @@ class References extends Command
         return "Select every constraint referencing a column from a table";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         if (! $table = $argv[0] ?? null)
             return $this->failWithReason("This command needs a table name and a field name");
@@ -29,7 +29,7 @@ class References extends Command
 
         $constraints = $context->utils->getFieldsPointingTo(new Field($table, $column));
 
-        $context->currentData = array_map(fn(ForeignKey $constraint)=> [
+        $context->dataset = array_map(fn(ForeignKey $constraint)=> [
             "source_table" => $constraint->source->table,
             "source_field" => $constraint->source->field,
             "target_table" => $constraint->target->table,

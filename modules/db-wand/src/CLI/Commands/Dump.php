@@ -17,9 +17,9 @@ class Dump extends Command
         return "Generate an INSERT query from fetched data";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
-        $data = $context->currentData;
+        $data = $context->dataset;
         if (!count($data))
             return $this->failWithReason("No data to dump");
 
@@ -28,12 +28,12 @@ class Dump extends Command
             return $this->failWithReason("Could not retrieve last select query");
 
         $table = [];
-        preg_match("/FROM (\w+)/i", $lastQuery, $table);
+        preg_match("/FROM [\"`]?(\w+)[\"`]?/i", $lastQuery, $table);
         $table = $table[1] ?? 0;
 
         $columns = array_keys($data[0]);
         $columns = $context->utils->datasetToValuesExpression([$columns]);
-        $values = $context->utils->datasetToValuesExpression($context->currentData);
+        $values = $context->utils->datasetToValuesExpression($context->dataset);
 
         $context->output->info("INSERT INTO $table $columns VALUES $values");
         return true;

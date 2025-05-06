@@ -1,0 +1,13 @@
+services:
+  postgres:
+    image: postgres:17.4
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: postgres
+    volumes:
+      - ./tests/schema/postgres.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    tmpfs:
+      - /var/lib/postgresql/data  # Utilise un système de fichiers temporaire (non persistant)
+    ports:
+      - "44001:5432"

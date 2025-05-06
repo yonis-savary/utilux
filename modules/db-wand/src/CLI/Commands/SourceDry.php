@@ -18,7 +18,7 @@ class SourceDry extends Command
         return 'Execute a script file in a transaction and abort it (ex: "source-dry /path/to/file")';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         if (! $script = $argv[0] ?? false)
             return $this->failWithReason("This command needs a filename");

@@ -17,7 +17,7 @@ class ListTables extends Command
         return "List tables in your database";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $tables = $context->utils->listTables();
 

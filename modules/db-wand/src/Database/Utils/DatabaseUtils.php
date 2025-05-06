@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace YonisSavary\DBWand\Database\Utils;
 
@@ -16,8 +16,8 @@ abstract class DatabaseUtils
 
     public function __construct(
         protected PDO $database,
-        ?LoggerInterface $logger=null
-    ){
+        ?LoggerInterface $logger = null
+    ) {
         $this->logger = $logger ?? new NullLogger();
     }
 
@@ -39,15 +39,12 @@ abstract class DatabaseUtils
 
     public function transaction(callable $function): mixed
     {
-        try
-        {
+        try {
             $this->startTransaction();
             $results = ($function)();
             $this->commitTransaction();
             return $results;
-        }
-        catch (Throwable $err)
-        {
+        } catch (Throwable $err) {
             $this->rollbackTransaction();
             return $err;
         }
@@ -56,7 +53,7 @@ abstract class DatabaseUtils
     abstract public function assertTableExists(string $table): void;
     abstract public function assertColumnExists(string $table, string $column): void;
 
-    abstract public function createForeignKeyConstraint(Field $source, Field $target, string $onDelete=ForeignKey::ON_DELETE_RESTRAINT);
+    abstract public function createForeignKeyConstraint(Field $source, Field $target, string $onDelete = ForeignKey::ON_DELETE_RESTRAINT);
 
     /**
      * @return Field[]
@@ -69,12 +66,12 @@ abstract class DatabaseUtils
         return array_values(array_filter(
             $this->listForeignKeyConstraints(),
             fn(ForeignKey $constraint) =>
-                $constraint->target->table === $table &&
+            $constraint->target->table === $table &&
                 $constraint->target->field === $field
         ));
     }
 
     abstract public function datasetToSelectValuesExpression(array $data): string;
     abstract public function datasetToValuesExpression(array $data): string;
-
+    abstract public function escapeTableName(string $table): string;
 }

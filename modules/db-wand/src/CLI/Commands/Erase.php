@@ -5,22 +5,25 @@ namespace YonisSavary\DBWand\CLI\Commands;
 use YonisSavary\DBWand\CLI\Command;
 use YonisSavary\DBWand\Context;
 
-class Test extends Command
+class Erase extends Command
 {
     public function name(): string
     {
-        return "test";
+        return "erase";
     }
-
 
     public function help(): ?string
     {
-        return 'Print a test message';
+        return "Erase a save slot";
     }
 
     public function execute(array $argv, Context &$context): bool
     {
-        $context->output->info("I'm a test !");
-        return true;
+        $name = $argv[0] ?? null;
+        $slots = &$context->getReference(Save::SAVE_SLOTS_NAME, []);
+        if (array_key_exists($name, $slots))
+            unset($slots[$name]);
+        
+        return 0;
     }
 }

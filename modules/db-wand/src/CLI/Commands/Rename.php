@@ -17,11 +17,11 @@ class Rename extends Command
         return 'Rename a column in place in your data set (ex "rename label name")';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
-        $currentData = &$context->currentData;
+        $dataset = &$context->dataset;
 
-        if (!count($currentData))
+        if (!count($dataset))
             return $this->failWithReason("No data to process");
 
         $oldName = $argv[0] ?? null;
@@ -30,15 +30,15 @@ class Rename extends Command
         if (!($oldName || $newName))
             return $this->failWithReason('Usage: rename <old-column-name> <new-column-name>');
 
-        if (!array_key_exists($oldName, $currentData[0]))
+        if (!array_key_exists($oldName, $dataset[0]))
             return $this->failWithReason("No column [$oldName] found");
 
-        if (array_key_exists($newName, $currentData[0]))
+        if (array_key_exists($newName, $dataset[0]))
             return $this->failWithReason("Column [$newName] already exists");
 
         Backup::add($context);
 
-        foreach ($currentData as &$row)
+        foreach ($dataset as &$row)
         {
             $newValue = [];
             foreach ($row as $header => $value)

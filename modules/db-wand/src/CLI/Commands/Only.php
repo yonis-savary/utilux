@@ -17,19 +17,19 @@ class Only extends Command
         return 'Keep only specified columns (ex: "only id label deleted_at")';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
-        $currentData = &$context->currentData;
+        $dataset = &$context->dataset;
 
-        if (!count($currentData))
+        if (!count($dataset))
             return $this->failWithReason('No data to filter');
 
-        $allKeys = array_keys($currentData[0]);
+        $allKeys = array_keys($dataset[0]);
         $keyToDelete = array_diff($allKeys, $argv);
 
         Backup::add($context);
 
-        foreach ($currentData as &$row)
+        foreach ($dataset as &$row)
         {
             foreach ($keyToDelete as $key)
                 unset($row[$key]);

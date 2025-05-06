@@ -39,7 +39,7 @@ class Context
     }
 
     public array $promptHistory = [];
-    public array $currentData = [];
+    public array $dataset = [];
 
     public array $properties = [];
 

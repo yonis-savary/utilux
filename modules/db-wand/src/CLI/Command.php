@@ -13,7 +13,7 @@ abstract class Command
     public function __construct() {}
 
     abstract public function name(): string;
-    abstract public function execute(array $argv = [], Context &$context): bool;
+    abstract public function execute(array $argv, Context &$context): bool;
 
 
     protected function setLastException(Throwable $exception)

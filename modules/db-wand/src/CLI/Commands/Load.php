@@ -19,7 +19,7 @@ class Load extends Command
         return 'Load data from save slot (ex: "load tmp-contact")';
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         if (! $name = $argv[0] ?? false)
             return $this->failWithReason("This command needs a slot name as argument");
@@ -28,8 +28,8 @@ class Load extends Command
         if (! array_key_exists($name, $slots))
             return $this->failWithReason("No slot named [$name] exists");
 
-        $context->currentData = $slots[$name];
-        $context->output->notice("Loaded " . count($context->currentData) . " rows from $name");
+        $context->dataset = $slots[$name];
+        $context->output->notice("Loaded " . count($context->dataset) . " rows from $name");
         return true;
     }
 }

@@ -11,7 +11,7 @@ class Backup extends Command
 
     public static function add(Context &$context)
     {
-        $data = $context->currentData;
+        $data = $context->dataset;
         $stack = &$context->getReference(self::CONTEXT_DATA_STACK, []);
         if (count($stack) > 10)
             array_shift($stack);
@@ -29,7 +29,7 @@ class Backup extends Command
         return "Backup previous set of data before editing (max 10 backups)";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
         $stack = &$context->getReference(self::CONTEXT_DATA_STACK, []);
 
@@ -39,7 +39,7 @@ class Backup extends Command
         }
 
         $old = array_pop($stack);
-        $context->currentData = $old;
+        $context->dataset = $old;
         $context->output->notice("Recovered previous data");
 
         return true;

@@ -17,9 +17,9 @@ class Describe extends Command
         return "List columns in your dataset";
     }
 
-    public function execute(array $argv = [], Context &$context): bool
+    public function execute(array $argv, Context &$context): bool
     {
-        $data = $context->currentData;
+        $data = $context->dataset;
 
         if (!count($data))
             return $this->failWithReason("No data to describe");
