@@ -1,5 +1,9 @@
 #!/bin/bash
-followed_branch=$(git rev-parse --abbrev-ref $(gxb)@{upstream} | sed -e 's/origin\///g')
+
+followed_branch="$1"
+if [ -z "$followed_branch" ]; then 
+    followed_branch="develop"
+fi
 
 echo "About to execute : git pull --rebase origin $followed_branch"
 read -p "Proceed ? " -n 1 -r
