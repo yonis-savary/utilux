@@ -91,6 +91,7 @@ gxb+ [name]  # create a new branch tracking current one
 gxbf [name]  # change current branch upstream
 gxd          # show short diff message
 gxf          # fetch prune
+gxi          # git initialize/reset, cleanup your git repository
 gxp          # push force with lease
 gxpm         # purge merged branches (force)
 gxr          # pull rebase

@@ -1,0 +1,49 @@
+#!/bin/bash
+# git init - make your projet fresh to start something
+
+set -euo pipefail
+
+# Couleurs pour un affichage stylé
+RED="\033[0;31m"
+GREEN="\033[0;32m"
+YELLOW="\033[1;33m"
+NC="\033[0m" # No Color
+
+echo -e "${YELLOW}⚠️  Warning ! This command will perform a git reset --hard${NC}"
+read -p "Proceed ? [y/N]:" -n 1 -r
+echo
+
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo -e "${RED}❌ Aborted.${NC}"
+    exit 1
+fi
+
+echo
+echo -e "${GREEN}🧹 Cleaning up your repo...${NC}"
+git reset --hard
+git clean -fd
+
+echo
+echo -e "${GREEN}🔁 Syncing remote branch with local...${NC}"
+git for-each-ref --format='%(refname:short)' refs/heads | while read branch ; do
+    if [ "$branch" = "main" ]; then
+        continue
+    fi
+
+    if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+        git branch --set-upstream-to="origin/$branch" "$branch"
+        echo -e "🔗 Upstream defined for ${branch} → origin/${branch}"
+    else
+        echo -e "${YELLOW}⚠️  No remote branch for ${branch}${NC}"
+    fi
+
+done
+
+echo
+echo -e "${GREEN}📥 Retrieving missing work...${NC}"
+gxf
+git pull --all
+
+
+echo
+echo -e "${GREEN}✅ Your repo is now ready to work with !${NC}"
