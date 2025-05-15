@@ -59,7 +59,7 @@ $myWork = cache(
     </div>
 
     <?php
-    usort($myWork, fn($a, $b) => $a['key'] > $b['key']);
+    usort($myWork, fn($a, $b) => $a['key'] > $b['key'] ? 1:-1);
     foreach ($myWork as $issue) { ?>
         <div class="flex flex-col jira" issue="<?= $issue['key'] ?>">
             <a href="<?= preg_replace('/\\/rest.+/', '', env('UTILUX_JIRA_HOST', service('jira')['host'] ?? false)) . '/browse/' . $issue['key']  ?>" class="flex flex-col card" target='_blank'>
