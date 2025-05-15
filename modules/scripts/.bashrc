@@ -16,3 +16,5 @@ alias dx="docker compose"
 alias dxr="docker compose restart"
 alias dxl="docker compose logs"
 alias dxe="docker compose exec"
+
+alias gxc="git checkout"

@@ -89,6 +89,7 @@ gxap         # ammend and push
 gxb          # print current branch name
 gxb+ [name]  # create a new branch tracking current one
 gxbf [name]  # change current branch upstream
+gxc          # git checkout
 gxd          # show short diff message
 gxf          # fetch prune
 gxi          # git initialize/reset, cleanup your git repository
