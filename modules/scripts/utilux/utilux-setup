@@ -1,67 +1,101 @@
 #!/bin/bash
 
-function installCodeExtention()
+installCodeExtention()
 {
-    packageName="$1"
-    prettyName=$(echo "$packageName" | sed -e 's/^.*\.//g')
-    codeOutput=$(code --install-extension "$packageName" 2>&1);
-    alreadyInstalled=$(echo $codeOutput | grep -c 'already installed');
+    local packageName="$1"
+    local prettyName="${packageName##*.}"
 
-    if [ "$alreadyInstalled" = "0" ]
-    then
-        echo "$res";
-    else
-        echo -e " - \e[32m[INSTALLED]\e[0m $prettyName";
+    if [[ -z "$packageName" ]]; then
+        echo -e "\e[31m[ERROR]\e[0m No package name provided."
+        return 1
     fi
-    echo -ne "\e[0m";
+
+    local codeOutput
+    if ! codeOutput=$(code --install-extension "$packageName" 2>&1); then
+        echo -e "\e[31m[FAILED]\e[0m Failed to install $prettyName:"
+        echo "$codeOutput"
+        return 1
+    fi
+
+    if echo "$codeOutput" | grep -q "already installed"; then
+        echo -e " - \e[33m[ALREADY]\e[0m $prettyName"
+    else
+        echo -e " - \e[32m[INSTALLED]\e[0m $prettyName"
+    fi
 }
 
-function isInstalled()
+isInstalled()
 {
-    package="$1"
-    missing=$(dpkg -s "$package" 2>&1 | grep -c "not installed")
+    local package="$1"
 
-    if [ "$missing" -ne "0" ]
-    then
-        if [ ! -z "$(which $package)" ];
-        then
-            return 1;
-        fi
-        return 0;
+    if dpkg -s "$package" >/dev/null 2>&1; then
+        return 0 
     fi
-    return 1;
+
+    if command -v "$package" >/dev/null 2>&1; then
+        return 0
+    fi
+
+    return 1
 }
 
-function checkInstalled()
-{
-    package="$1"
-    isInstalled "$package"
-    installed=$?
+checkInstalled() {
+    local package="$1"
 
-    if [ "$installed" = "0" ]
-    then
-        possible_package=$(apt-cache search "$package" | grep -c -E "^$package " )
-
-        if [ "$possible_package" = "0" ]
-        then 
-            echo -e " - \e[31m[MISSING]\e[0m $package (Need manual installation)";
-        else 
-            echo -e " - \e[31m[MISSING]\e[0m $package (sudo apt-get install $package)";
-        fi
+    if isInstalled "$package"; then
+        echo -e " - \e[32m[OK]\e[0m $package"
     else
-        echo -e " - \e[32m[OK]\e[0m $package";
+        if apt-cache show "$package" >/dev/null 2>&1; then
+            echo -e " - \e[31m[MISSING]\e[0m $package (→ sudo apt-get install $package)"
+        else
+            echo -e " - \e[31m[MISSING]\e[0m $package (→ manual installation required)"
+        fi
     fi
-    echo -ne "\e[0m";
+    echo -ne "\e[0m"
+}
+
+
+updateVSCodeSetting() {
+    local key="$1"
+    local value="$2"
+    local settings_path="$HOME/.config/Code/User/settings.json"
+
+    [ ! -f "$settings_path" ] && echo "{}" > "$settings_path"
+
+    if [[ "$value" =~ ^(true|false|[0-9]+)$ ]]; then
+        json_value="$value"
+    else
+        json_value="\"$value\""
+    fi
+
+    tmp=$(mktemp)
+    jq --arg key "$key" --argjson val "$json_value" '. + {($key): $val}' "$settings_path" > "$tmp" && mv "$tmp" "$settings_path"
+}
+
+backupVSCodeSettings() {
+    local settings="$HOME/.config/Code/User/settings.json"
+    local backup_base="${settings}.bak"
+    local backup="$backup_base"
+
+    if [ ! -f "$settings" ]; then
+        return 1
+    fi
+
+    echo "Making backup of your VSCode Config !"
+
+    local i=1
+    while [ -f "$backup" ]; do
+        backup="${backup_base}.${i}"
+        ((i++))
+    done
+
+    cp "$settings" "$backup"
 }
 
 echo "Languages/tools to install";
 checkInstalled "jq";
 checkInstalled "git";
 checkInstalled "php";
-checkInstalled "php8.4-mysql";
-checkInstalled "php8.4-mbstring";
-checkInstalled "php8.4-curl";
-checkInstalled "php8.4-xml";
 checkInstalled "composer"
 checkInstalled "sqlite3";
 checkInstalled "nodejs";
@@ -88,34 +122,71 @@ checkInstalled "easytag";
 checkInstalled "asunder";
 echo
 
-isInstalled 'code';
-if [ "$?" == "1" ]
-then
-    echo "Checking code extensions..."
-    installCodeExtention "amiralizadeh9480.laravel-extra-intellisense"
-    installCodeExtention "bmewburn.vscode-intelephense-client"
-    installCodeExtention "bradlc.vscode-tailwindcss"
-    installCodeExtention "eamodio.gitlens"
-    installCodeExtention "github.github-vscode-theme"
-    installCodeExtention "gruntfuggly.todo-tree"
-    installCodeExtention "irongeek.vscode-env"
-    installCodeExtention "johnpapa.vscode-peacock"
-    installCodeExtention "mechatroner.rainbow-csv"
-    installCodeExtention "mhutchie.git-graph"
-    installCodeExtention "ms-azuretools.vscode-docker"
-    installCodeExtention "ms-python.debugpy"
-    installCodeExtention "ms-python.python"
-    installCodeExtention "ms-python.vscode-pylance"
-    installCodeExtention "ms-vscode-remote.remote-containers"
-    installCodeExtention "mujichok.vscode-project-name-in-statusbar"
-    installCodeExtention "pkief.material-icon-theme"
-    installCodeExtention "shardulm94.trailing-spaces"
-    installCodeExtention "streetsidesoftware.code-spell-checker"
-    installCodeExtention "usernamehw.errorlens"
-    installCodeExtention "visualstudioexptteam.intellicode-api-usage-examples"
-    installCodeExtention "visualstudioexptteam.vscodeintellicode"
-    installCodeExtention "vue.volar"
-    installCodeExtention "yoavbls.pretty-ts-errors"
-    installCodeExtention "zhuangtongfa.material-theme"
+
+if isInstalled 'code'; then
+
+    read -p "Install VSCode Extensions ? (y/n) " confirm
     echo
+
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+
+        echo "Checking code extensions..."
+        installCodeExtention "adpyke.vscode-sql-formatter"
+        installCodeExtention "antfu.goto-alias"
+        installCodeExtention "bmewburn.vscode-intelephense-client"
+        installCodeExtention "bradlc.vscode-tailwindcss"
+        installCodeExtention "dbaeumer.vscode-eslint"
+        installCodeExtention "eamodio.gitlens"
+        installCodeExtention "github.copilot"
+        installCodeExtention "github.copilot-chat"
+        installCodeExtention "github.github-vscode-theme"
+        installCodeExtention "gruntfuggly.todo-tree"
+        installCodeExtention "irongeek.vscode-env"
+        installCodeExtention "johnpapa.vscode-peacock"
+        installCodeExtention "mechatroner.rainbow-csv"
+        installCodeExtention "mhutchie.git-graph"
+        installCodeExtention "ms-azuretools.vscode-docker"
+        installCodeExtention "ms-python.debugpy"
+        installCodeExtention "ms-python.python"
+        installCodeExtention "ms-python.vscode-pylance"
+        installCodeExtention "ms-vscode-remote.remote-containers"
+        installCodeExtention "mujichok.vscode-project-name-in-statusbar"
+        installCodeExtention "nuxt.mdc"
+        installCodeExtention "nuxtr.nuxt-vscode-extentions"
+        installCodeExtention "nuxtr.nuxtr-vscode"
+        installCodeExtention "pkief.material-icon-theme"
+        installCodeExtention "shardulm94.trailing-spaces"
+        installCodeExtention "usernamehw.errorlens"
+        installCodeExtention "visualstudioexptteam.intellicode-api-usage-examples"
+        installCodeExtention "visualstudioexptteam.vscodeintellicode"
+        installCodeExtention "vue.volar"
+        installCodeExtention "xabikos.javascriptsnippets"
+        installCodeExtention "yoavbls.pretty-ts-errors"
+        installCodeExtention "zhuangtongfa.material-theme"
+
+        echo
+    fi
+
+
+    read -p "Apply custom VSCode config ? (y/n) " confirm
+    echo
+
+    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+        backupVSCodeSettings
+        updateVSCodeSetting "workbench.colorTheme" "GitHub Light"
+        updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"
+        updateVSCodeSetting "editor.smoothScrolling" true
+        updateVSCodeSetting "editor.cursorSmoothCaretAnimation" "on"
+        updateVSCodeSetting "workbench.list.smoothScrolling" true
+        updateVSCodeSetting "terminal.integrated.smoothScrolling" true
+        updateVSCodeSetting "editor.cursorBlinking" "smooth"
+        updateVSCodeSetting "editor.fontFamily" "'JetBrains Mono', 'Droid Sans Mono', 'monospace', monospace"
+        updateVSCodeSetting "terminal.integrated.fontLigatures.enabled" true
+        updateVSCodeSetting "editor.fontLigatures" true
+        updateVSCodeSetting "window.zoomLevel" 1
+        updateVSCodeSetting "workbench.externalBrowser" "firefox"
+        updateVSCodeSetting "git.blame.statusBarItem.enabled" false
+        updateVSCodeSetting "git.blame.editorDecoration.enabled" false
+        echo "VSCode configuration edited !"
+    fi
 fi

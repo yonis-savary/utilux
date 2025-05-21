@@ -23,4 +23,4 @@ then
 fi
 
 echo "Linking symlink $binName to $targetBinName"
-cp "$binName" "$targetBinName"
+ln -s "$binName" "$targetBinName"

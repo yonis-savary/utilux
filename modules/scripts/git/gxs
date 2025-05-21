@@ -1,9 +1,0 @@
-#!/bin/bash
-stash_name="$1"
-
-if [ -z "$stash_name" ]
-then
-    git stash
-else
-    git stash -m "$stash_name"
-fi

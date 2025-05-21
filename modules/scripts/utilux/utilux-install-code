@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ -f "./code.deb" ]
-then 
+then
     rm code.deb
-fi 
+fi
 
 wget "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" -O code.deb
 
