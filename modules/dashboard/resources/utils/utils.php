@@ -22,13 +22,20 @@ function cache(string $key, callable $valueGetter, int $timeToLive = 300)
         unlink($file);
     }
 
-    $value = ($valueGetter)();
-    file_put_contents($file, json_encode([
-        'expires_at' => time() + $timeToLive,
-        'created_at' => time(),
-        'content' => serialize($value)
-    ]));
-    return $value;
+    try
+    {
+        $value = ($valueGetter)();
+        file_put_contents($file, json_encode([
+            'expires_at' => time() + $timeToLive,
+            'created_at' => time(),
+            'content' => serialize($value)
+        ]));
+        return $value;
+    }
+    catch (Throwable $err)
+    {
+        return null;
+    }
 }
 
 function getCacheTimestamps(string $key)
@@ -67,7 +74,7 @@ function clearCacheButton(string $cacheKey)
 
 function config(?string $key = null)
 {
-    $config = $GLOBALS['dash_config'] ??= json_decode(file_get_contents(__DIR__ . '/../../config.json'), true, 512, JSON_THROW_ON_ERROR);
+    $config = $GLOBALS['dash_config'] ??= json_decode(file_get_contents(getenv('UTILUX_DASHBOARD_CONFIG_FILE')), true, 512, JSON_THROW_ON_ERROR);
     return $key ? $config[$key] : $config;
 }
 
