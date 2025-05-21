@@ -28,6 +28,7 @@ utilux-ssh            # SSH Key utilities
 utilux-update         # Utilux self update
 
 dx   # alias for docker compose
+dxb  # docker compose build
 dxu  # docker compose up -d
 dxd  # docker compose down
 dxr  # docker compose restart
@@ -42,7 +43,7 @@ gxap         # ammend and push
 gxb          # print current branch name
 gxb+ [name]  # create a new branch tracking current one
 gxbf [name]  # change current branch upstream
-gxc          # git checkout
+gxc          # alias for git checkout
 gxd          # show short diff message
 gxf          # fetch prune
 gxi          # git initialize/reset, cleanup your git repository
