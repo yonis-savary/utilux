@@ -5,7 +5,7 @@ this repository holds every scripts/informations/tools needed to make my optimal
 ## How to install
 
 ```bash
-git clone https://github.com/YonisSavary/utilux ~/utilux && bash ~/utilux/install
+git clone https://github.com/yonis-savary/utilux ~/utilux && bash ~/utilux/install
 ```
 
 Configuration
@@ -18,14 +18,14 @@ utilux-config
 ### Commands
 
 ```bash
-utilux-install [FILE] # Install a file in a special directory in your $PATH
+utilux-install [FILE]    # Copy a file in your $PATH
 utilux-install-ln [FILE] # Link a file to your $PATH
-utilux-install-code   # (re)install last visual studio code version
-utilux-lf [DIRECTORY] # Recursively convert CRLF to LF inside a directory (. by default)
-utilux-setup          # Indicate which needed packages are missing (also install usual VSCode extensions / configuration)
-utilux-share [FILE]   # Start a web server that can serve files
-utilux-ssh            # SSH Key utilities
-utilux-update         # Utilux self update
+utilux-install-code      # (re)install last visual studio code version
+utilux-lf [DIRECTORY]    # Recursively convert CRLF to LF inside a directory (. by default)
+utilux-setup             # Indicate which needed packages are missing (also install usual VSCode extensions / configuration)
+utilux-share [FILE]      # Start a web server that can serve files
+utilux-ssh               # SSH Key utilities
+utilux-update            # Utilux self update
 
 dx   # alias for docker compose
 dxb  # docker compose build
@@ -38,19 +38,19 @@ dxl  # docker compose logs
 dxe  # docker compose exec
 
 gx           # help script for every gx* scripts
-gxa          # commit ammend (no edit)
-gxap         # ammend and push
-gxb          # print current branch name
-gxb+ [name]  # create a new branch tracking current one
-gxbf [name]  # change current branch upstream
-gxc          # alias for git checkout
-gxd          # show short diff message
-gxf          # fetch prune
-gxi          # git initialize/reset, cleanup your git repository
-gxp          # push force with lease
-gxpm         # purge merged branches (force)
-gxr          # pull rebase
-gxrc         # rebase continue
+gxa          # commit Ammend (no edit)
+gxap         # Ammend and Push
+gxb          # print current Branch name
+gxb+ [name]  # create a new Branch tracking current one
+gxbf [name]  # change current Branch upstream (followed branch)
+gxc          # alias for git Checkout
+gxd          # show short Diff message
+gxf          # Fetch prune
+gxi          # git Initialize/reset, cleanup your git repository
+gxp          # push Force with lease
+gxpm         # Purge Merged branches (force)
+gxr          # pull Rebase
+gxrc         # Rebase Continue
 ```
 
 
