@@ -95,6 +95,7 @@ backupVSCodeSettings() {
 echo "Languages/tools to install";
 checkInstalled "jq";
 checkInstalled "git";
+checkInstalled "curl";
 checkInstalled "php";
 checkInstalled "composer"
 checkInstalled "sqlite3";
@@ -145,6 +146,7 @@ if isInstalled 'code'; then
         installCodeExtention "johnpapa.vscode-peacock"
         installCodeExtention "mechatroner.rainbow-csv"
         installCodeExtention "mhutchie.git-graph"
+        installCodeExtention "miguelsolorio.min-theme"
         installCodeExtention "ms-azuretools.vscode-docker"
         installCodeExtention "ms-python.debugpy"
         installCodeExtention "ms-python.python"
@@ -173,7 +175,7 @@ if isInstalled 'code'; then
 
     if [[ "$confirm" =~ ^[Yy]$ ]]; then
         backupVSCodeSettings
-        updateVSCodeSetting "workbench.colorTheme" "GitHub Light"
+        updateVSCodeSetting "workbench.colorTheme" "Min Dark"
         updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"
         updateVSCodeSetting "editor.smoothScrolling" true
         updateVSCodeSetting "editor.cursorSmoothCaretAnimation" "on"

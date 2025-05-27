@@ -18,14 +18,14 @@ utilux-config
 ### Commands
 
 ```bash
-utilux-install [FILE]    # Copy a file in your $PATH
-utilux-install-ln [FILE] # Link a file to your $PATH
-utilux-install-code      # (re)install last visual studio code version
-utilux-lf [DIRECTORY]    # Recursively convert CRLF to LF inside a directory (. by default)
-utilux-setup             # Indicate which needed packages are missing (also install usual VSCode extensions / configuration)
-utilux-share [FILE]      # Start a web server that can serve files
-utilux-ssh               # SSH Key utilities
-utilux-update            # Utilux self update
+utilux-install [FILE|URL] # Copy/Download a file in your $PATH
+utilux-install-ln [FILE]  # Link a file to your $PATH
+utilux-install-code       # (re)install last visual studio code version
+utilux-lf [DIRECTORY]     # Recursively convert CRLF to LF inside a directory (. by default)
+utilux-setup              # Indicate which needed packages are missing (also install usual VSCode extensions / configuration)
+utilux-share [FILE]       # Start a web server that can serve files
+utilux-ssh                # SSH Key utilities
+utilux-update             # Utilux self update
 
 dx   # alias for docker compose
 dxb  # docker compose build

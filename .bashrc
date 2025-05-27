@@ -8,6 +8,9 @@ export PATH="$PATH:$UTILUX_BIN_PATH"
 export UTILUX_CONFIG_PATH="$HOME/.config/utilux"
 mkdir -p "$UTILUX_CONFIG_PATH" 2>/dev/null
 
+if [ ! -d "$UTILUX_BIN_PATH" ]; then 
+    mkdir "$UTILUX_BIN_PATH"
+fi
 
 # Custom prompt
 PS1='\[\e[92;1m\]\W\[\e[0m\]\$'
