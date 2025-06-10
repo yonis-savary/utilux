@@ -5,19 +5,14 @@
     },
     "services": {
         "gitlab": {
-            "_how_to": "https://YOUR_GITLAB_HOST/-/user_settings/personal_access_tokens",
+            "_how_to": "first configure your jira credentials with utilux-config",
             "enabled": true,
-            "view": "resources/modules/gitlab_merge_requests/view.php",
-            "host": "x",
-            "token": "x"
+            "view": "resources/modules/gitlab_merge_requests/view.php"
         },
         "jira": {
-            "_how_to": "https://id.atlassian.com/manage-profile/security/api-tokens",
+            "_how_to": "first configure your jira credentials with utilux-config",
             "enabled": true,
-            "view": "resources/modules/jira_my_work/view.php",
-            "host": "https://YOUR-ORGANISATION.atlassian.net/rest/api/3",
-            "email": "x",
-            "token": "x"
+            "view": "resources/modules/jira_my_work/view.php"
         },
         "git": {
             "enabled": true,
@@ -35,6 +30,9 @@
             "view": "resources/modules/jira_gitlab_merger/view.php"
         }
     },
+    "available_blocks": [
+        "jira_gitlab_merger"
+    ],
     "blocks": [
         "jira",
         "gitlab",

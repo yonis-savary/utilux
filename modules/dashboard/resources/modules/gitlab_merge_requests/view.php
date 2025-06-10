@@ -2,14 +2,18 @@
 
 function gitlabCurl(string $url, array $getParams = [], array $portParams = [])
 {
-    $gitlabService = service('gitlab');
+    $host = env('UTILUX_GITLAB_HOST');
+    $token = env('UTILUX_GITLAB_TOKEN');
 
-    $serviceURL = $gitlabService['host'] ?? null;
-    $url = $serviceURL . $url;
+    if (!($host && $token))
+    {
+        stdlog('Please configure your gitlab credentials with utilux-config');
+        return;
+    }
 
-    return curl($url, $getParams, $portParams, [
-        'PRIVATE-TOKEN' => $gitlabService['token']
-    ]);
+    $url = $host . $url;
+
+    return curl($url, $getParams, $portParams, ['PRIVATE-TOKEN' => $token]);
 }
 
 list($mergeRequests, $pipelines, $approvals) = cache(

@@ -1,6 +1,28 @@
 #!/bin/bash
 
-#export UTILUX_DASHBOARD_PORT="9999"
+####### Common #######
+# Used by multiple utilux tools (gxb+, dashboard...)
+
+# Your organization jira host name (with api suffix such as '/rest/api/3')
 #export UTILUX_JIRA_HOST="x"
+
+# Email of your Jira account
 #export UTILUX_JIRA_EMAIL="x"
+
+# Your api jira token, which can be generated at
+# https://id.atlassian.com/manage-profile/security/api-tokens
 #export UTILUX_JIRA_TOKEN="x"
+
+# Your gitlab host (with api suffix such as "/api/v4")
+#export UTILUX_GITLAB_HOST="x/api/v4"
+
+# Can be configured at
+# https://YOUR_GITLAB_HOST/-/user_settings/personal_access_tokens
+#export UTILUX_GITLAB_TOKEN="x"
+
+
+
+####### Dashboard #######
+
+# Used to change port of utilux dashboard (9999 by default)
+#export UTILUX_DASHBOARD_PORT="9999"

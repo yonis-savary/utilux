@@ -2,14 +2,19 @@
 
 function jiraCurl(string $url, array $getParams = [], array $portParams = [])
 {
-    $jiraService = service('jira');
+    $host = env('UTILUX_JIRA_HOST');
+    $username = env('UTILUX_JIRA_EMAIL');
+    $password = env('UTILUX_JIRA_TOKEN');
 
-    $serviceURL = env('UTILUX_JIRA_HOST', $jiraService['host']) ?? null;
-    $url = $serviceURL . $url;
+    if (!($username && $password && $host))
+    {
+        stdlog("Please configure your jira credentials with utilux-config");
+        return [];
+    }
 
-    return curl($url, $getParams, $portParams, [], function (&$curl) use (&$jiraService) {
-        $username = env('UTILUX_JIRA_EMAIL', $jiraService['email']);
-        $password = env('UTILUX_JIRA_TOKEN', $jiraService['token']);
+    $url = $host . $url;
+
+    return curl($url, $getParams, $portParams, [], function (&$curl) use ($username, $password) {
         curl_setopt($curl, CURLOPT_USERPWD, "$username:$password");
     });
 }

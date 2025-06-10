@@ -23,7 +23,6 @@ if (!is_file($tailwind)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="/resources/assets/tailwind.js"></script>
     <title>Dashboard</title>
 </head>
 
@@ -81,11 +80,8 @@ if (!is_file($tailwind)) {
         .slot:empty {
             display: none;
         }
-
-        .page-background-overlay {
-            transition: all 2000ms ease;
-        }
     </style>
+    <script src="/resources/assets/tailwind.js"></script>
     <div class="page-background-overlay"
         style="
         <?php if ($background = config('style')['background'] ?? false) {
@@ -94,7 +90,7 @@ if (!is_file($tailwind)) {
             else if (is_file($background))
                 echo "background-image: url(/resources/actions/get-background.php)";
         } ?>
-        "></div>
+    "></div>
     <div class="<?= config('style')['page-content-style'] ?? '' ?> p-5 gap-6 page-container">
         <?php
         foreach (config('blocks') as $service) {
@@ -106,21 +102,19 @@ if (!is_file($tailwind)) {
             </div>
         <?php } ?>
     </div>
-</body>
 
-<script>
-    setTimeout(() => location.reload(), 60 * 1000 * 6)
-
-    document.querySelectorAll('script,style').forEach(x => {
-        document.body.appendChild(x);
-    })
-
-    const randomElement = (arr) => arr[Math.round(Math.random() * (arr.length - 1))];
-</script>
-<?php if (!config('style')['background'] ?? false) { ?>
     <script>
-        let background = document.querySelector('.page-background-overlay');
-        const setNewBackground = () => {
+        setTimeout(() => location.reload(), 60 * 1000 * 6)
+
+        document.querySelectorAll('script,style').forEach(x => {
+            document.body.appendChild(x);
+        })
+
+        const randomElement = (arr) => arr[Math.round(Math.random() * (arr.length - 1))];
+    </script>
+    <?php if (!config('style')['background'] ?? false) { ?>
+        <script>
+            let background = document.querySelector('.page-background-overlay');
             let type = randomElement(['linear-gradient', 'radial-gradient'])
 
             let hue = Math.round(Math.random() * 360);
@@ -134,11 +128,9 @@ if (!is_file($tailwind)) {
                 `${type}(${direction}, ${startColor}, ${endColor})`
 
             background.style.background = gradient
-        }
+        </script>
+    <?php } ?>
 
-        setNewBackground();
-        setInterval(setNewBackground, 1000 * 60 * 15);
-    </script>
-<?php } ?>
+</body>
 
 </html>
