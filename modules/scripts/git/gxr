@@ -1,14 +1,34 @@
 #!/bin/bash
 
 followed_branch="$1"
+auto_yes=false
+
+# Parsing arguments
+for arg in "$@"; do
+  case $arg in
+    -y|--yes)
+      auto_yes=true
+      ;;
+    *)
+      followed_branch="$arg"
+      ;;
+  esac
+done
+
+
 if [ -z "$followed_branch" ]; then 
     followed_branch="develop"
 fi
 
-echo "About to execute : git pull --rebase origin $followed_branch"
-read -p "Proceed ? " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-    git pull --rebase origin $followed_branch
+if [ "$auto_yes" != true ]; then
+    echo "About to execute : git pull --rebase origin $followed_branch"
+    read -p "Proceed ? " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Aborted."
+        exit 1
+    fi
 fi
+
+echo "Proceeding with: git pull --rebase origin $followed_branch"
+git pull --rebase origin "$followed_branch"
