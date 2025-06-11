@@ -1,7 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 
 to_convert="$1"
-if [ -z $to_convert ]; then to_convert=$(realpath .); fi
+if [ -z $to_convert ]; then
+    to_convert=$(realpath .);
+fi
 
 if [ ! -d $to_convert ]
 then

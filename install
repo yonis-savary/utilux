@@ -7,7 +7,11 @@ then
   exit 1
 fi
 
-SHELL_NAME=$(basename "$SHELL")
+echo ""
+echo "--- Utilux : bash/zsh utilities ---"
+echo ""
+
+SHELL_NAME=$(ps -hp $$ | awk '{print $5}')
 
 if [ "$SHELL_NAME" = "zsh" ]
 then
@@ -34,5 +38,6 @@ echo "Installing utilux in $RC_FILE"
   echo ""
 } >> "$RC_FILE"
 
-echo "Utilux installed in your $RC_FILE"
-echo "Please relog in your session to fully enable it"
+source "$HOME/.zshrc"
+
+echo "Utilux installed in your $RC_FILE !"

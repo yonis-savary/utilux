@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 followed_branch="$1"
 auto_yes=false
@@ -24,7 +24,7 @@ if [ "$auto_yes" != true ]; then
     echo "About to execute : git pull --rebase origin $followed_branch"
     read -p "Proceed ? " -n 1 -r
     echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    if ! echo "$REPLY" | grep -E '^[Yy]$' > /dev/null; then
         echo "Aborted."
         exit 1
     fi

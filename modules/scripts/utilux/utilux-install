@@ -1,8 +1,8 @@
 binName="$1"
 installName="$2"
 
-if [[ $binName == http* ]]; then
 
+if echo "$REPLY" | grep -E '^http' > /dev/null; then
     if [ -z "$installName" ]; then 
         installName=$(basename "$binName")
         installName=${installName%%.*}

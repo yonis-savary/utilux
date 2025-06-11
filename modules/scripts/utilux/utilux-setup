@@ -1,32 +1,32 @@
-#!/bin/bash
+#!/bin/sh
 
 installCodeExtention()
 {
-    local packageName="$1"
-    local prettyName="${packageName##*.}"
+    packageName="$1"
+    prettyName="${packageName##*.}"
 
-    if [[ -z "$packageName" ]]; then
-        echo -e "\e[31m[ERROR]\e[0m No package name provided."
+    if [ -z "$packageName" ]; then
+        echo "[ERROR] No package name provided."
         return 1
     fi
 
-    local codeOutput
+    codeOutput
     if ! codeOutput=$(code --install-extension "$packageName" 2>&1); then
-        echo -e "\e[31m[FAILED]\e[0m Failed to install $prettyName:"
+        echo "[FAILED] Failed to install $prettyName:"
         echo "$codeOutput"
         return 1
     fi
 
     if echo "$codeOutput" | grep -q "already installed"; then
-        echo -e " - \e[33m[ALREADY]\e[0m $prettyName"
+        echo " - [EXISTING] $prettyName"
     else
-        echo -e " - \e[32m[INSTALLED]\e[0m $prettyName"
+        echo " - [INSTALLED] $prettyName"
     fi
 }
 
 isInstalled()
 {
-    local package="$1"
+    package="$1"
 
     if dpkg -s "$package" >/dev/null 2>&1; then
         return 0 
@@ -40,29 +40,29 @@ isInstalled()
 }
 
 checkInstalled() {
-    local package="$1"
+    package="$1"
 
     if isInstalled "$package"; then
-        echo -e " - \e[32m[OK]\e[0m $package"
+        echo " - [OK] $package"
     else
         if apt-cache show "$package" >/dev/null 2>&1; then
-            echo -e " - \e[31m[MISSING]\e[0m $package (→ sudo apt-get install $package)"
+            echo " - [MISSING] $package (→ sudo apt-get install $package)"
         else
-            echo -e " - \e[31m[MISSING]\e[0m $package (→ manual installation required)"
+            echo " - [MISSING] $package (→ manual installation required)"
         fi
     fi
-    echo -ne "\e[0m"
 }
 
 
 updateVSCodeSetting() {
-    local key="$1"
-    local value="$2"
-    local settings_path="$HOME/.config/Code/User/settings.json"
+    key="$1"
+    value="$2"
+    settings_path="$HOME/.config/Code/User/settings.json"
 
     [ ! -f "$settings_path" ] && echo "{}" > "$settings_path"
 
-    if [[ "$value" =~ ^(true|false|[0-9]+)$ ]]; then
+
+    if echo "$value" | grep -E '^(true|false|[0-9]+)$' > /dev/null; then
         json_value="$value"
     else
         json_value="\"$value\""
@@ -73,9 +73,9 @@ updateVSCodeSetting() {
 }
 
 backupVSCodeSettings() {
-    local settings="$HOME/.config/Code/User/settings.json"
-    local backup_base="${settings}.bak"
-    local backup="$backup_base"
+    settings="$HOME/.config/Code/User/settings.json"
+    backup_base="${settings}.bak"
+    backup="$backup_base"
 
     if [ ! -f "$settings" ]; then
         return 1
@@ -83,7 +83,7 @@ backupVSCodeSettings() {
 
     echo "Making backup of your VSCode Config !"
 
-    local i=1
+    i=1
     while [ -f "$backup" ]; do
         backup="${backup_base}.${i}"
         ((i++))
@@ -129,8 +129,7 @@ if isInstalled 'code'; then
     read -p "Install VSCode Extensions ? (y/n) " confirm
     echo
 
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
-
+    if echo "$confirm" | grep -E '^[Yy]$' > /dev/null; then
         echo "Checking code extensions..."
         installCodeExtention "adpyke.vscode-sql-formatter"
         installCodeExtention "antfu.goto-alias"
@@ -173,7 +172,7 @@ if isInstalled 'code'; then
     read -p "Apply custom VSCode config ? (y/n) " confirm
     echo
 
-    if [[ "$confirm" =~ ^[Yy]$ ]]; then
+    if echo "$confirm" | grep -E '^[Yy]$' > /dev/null; then
         backupVSCodeSettings
         updateVSCodeSetting "workbench.colorTheme" "Min Dark"
         updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"

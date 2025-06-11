@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 server_path=$(realpath ~/file-share-server)
 

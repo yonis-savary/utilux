@@ -20,6 +20,8 @@
 # https://YOUR_GITLAB_HOST/-/user_settings/personal_access_tokens
 #export UTILUX_GITLAB_TOKEN="x"
 
+# Allow utilux to change your terminal prompt (false by default)
+#export UTILUX_ALLOW_PROMPT_CHANGE="true"
 
 
 ####### Dashboard #######

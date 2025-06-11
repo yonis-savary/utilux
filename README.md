@@ -33,7 +33,7 @@ This repository gathers scripts, tools, to make my optimal linux setup. (Support
 Install utilux in one command:
 
 ```bash
-git clone https://github.com/yonis-savary/utilux ~/utilux && bash ~/utilux/install
+git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
 ```
 
 After installation, please restart your session

@@ -17,19 +17,29 @@ export PATH
 [ -d "$UTILUX_BIN_PATH" ] || mkdir "$UTILUX_BIN_PATH"
 
 
-# Custom prompt
-if [ ! -z "$PS1" ]
-then
-    PS1='\[\e[92;1m\]\W\[\e[0m\]\$'
-fi
+SHELL_NAME=$(ps -hp $$ | awk '{print $5}')
 
-# Load setup custom shellrc file
 if [ -f "$UTILUX_PATH/.shellrc.custom" ]
 then
     . "$UTILUX_PATH/.shellrc.custom"
 else
     cp "$UTILUX_PATH/.shellrc.custom.example" "$UTILUX_PATH/.shellrc.custom"
 fi
+
+if [ ! -z "$UTILUX_ALLOW_PROMPT_CHANGE" ]
+then
+    # Custom prompt
+    if [ "$SHELL_NAME" = "bash" ]
+    then
+        PS1='\[\e[92;1m\]\W\[\e[0m\]\$'
+    fi
+
+    if [ "$SHELL_NAME" = "zsh" ]
+    then
+        PROMPT='%{$fg[green]%}%~%{$reset_color%}\$'
+    fi
+fi
+
 
 alias utilux-config="nano $UTILUX_PATH/.shellrc.custom"
 

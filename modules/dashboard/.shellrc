@@ -16,16 +16,27 @@ export UTILUX_DASHBOARD_CONFIG_FILE
 
 alias utilux-dashboard-config="nano $UTILUX_DASHBOARD_CONFIG_FILE"
 
-
 if [ "0" = "$IS_LISTENING" ]
 then
-    if [ ! -z "$(which logger) "] 
+    logger_path="$(which logger)"
+    if [ ! -z "logger_path" ]
     then
         logger "utilux-dashboard: launching php server on $LISTENING_URL"
     fi
-    original="$(pwd)"
-    cd "$SCRIPT_DIR"
-    nohup php -S "$LISTENING_URL" > "$SCRIPT_DIR/server.log" 2>&1 &
-    cd "$original"
+
+    PHP_PATH=$(command -v php)
+    if [ -n "$PHP_PATH" ]; then
+        original="$(pwd)"
+        cd "$SCRIPT_DIR"
+        nohup "$PHP_PATH" -S "$LISTENING_URL" > "$SCRIPT_DIR/server.log" 2>&1 &
+        cd "$original"
+    elif
+        if [ ! -z "logger_path" ]
+        then
+            logger "utilux-dashboard: Could not launch utilux-dashboard PHP not found"
+        else
+            echo "utilux-dashboard: Could not launch utilux-dashboard PHP not found"
+        fi
+    fi
 fi
 

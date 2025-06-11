@@ -1,9 +1,10 @@
-#!/bin/bash
+#!/bin/sh
 
 protected_branches="master|main|develop"
 merged_branches=$(git branch --merged | grep -vE "\*|$protected_branches" | sed 's/^ *//')
 
-if [[ -z "$merged_branches" ]]; then
+if [ -z "$merged_branches" ]
+then
   echo "✅ No merged branches to delete."
   exit 0
 fi
@@ -12,12 +13,13 @@ echo "⚠️ The following branches are merged and will be force-deleted:"
 echo "$merged_branches"
 echo
 
-if [[ "$1" == "--force" || "$1" == "-y" ]]; then
+if [ "$1" == "--force" -a "$1" == "-y" ]
+then
   echo "$merged_branches" | xargs -n 1 git branch -D
 else
   read -p "Proceed with deletion ? [y/N]: " -n 1 -r
   echo
-  if [[ $REPLY =~ ^[Yy]$ ]]; then
+  if echo "$REPLY" | grep -E '^[Yy]$' > /dev/null; then
     echo "$merged_branches" | xargs -n 1 git branch -D
   else
     echo "❌ Aborted."

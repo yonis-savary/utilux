@@ -5,6 +5,7 @@ sudo apt-get install \
     sqlite3 \
     ffmpeg \
     curl \
+    iproute2 \
     net-tools
 
 # Desktop Software
