@@ -1,36 +1,40 @@
-#!/bin/bash
+#!/bin/sh
 
-if [ "$EUID" -eq 0 ]
-  then echo "Please do not run this script as root"
-  exit
+# Empêche l'exécution en tant que root
+if [ "$EUID" -eq 0 ]; then
+  echo "Please do not run this script as root"
+  exit 1
 fi
 
+SHELL_NAME=$(basename "$SHELL")
 
-home=$(realpath ~)
-
-bashrc_path="$home/.bashrc"
-
-if [ ! -f "$bashrc_path" ]
-then
-    echo "Creating bashrc file"
-    touch $bashrc_path
+if [[ "$SHELL_NAME" == "zsh" ]]; then
+  RC_FILE="$HOME/.zshrc"
+elif [[ "$SHELL_NAME" == "bash" ]]; then
+  RC_FILE="$HOME/.bashrc"
 else
-    echo "bashrc exists."
+  echo "Unsupported shell: $SHELL_NAME"
+  exit 1
 fi
 
-utiluxIsInstalled=$(cat "$bashrc_path" | grep -c -e "utilux")
-if [ "$utiluxIsInstalled" = "1" ]
-then
-    echo "Utilux is already called by your bashrc file"
-    exit
+if [ ! -f "$RC_FILE" ]; then
+  echo "Creating $RC_FILE"
+  touch "$RC_FILE"
+else
+  echo "$RC_FILE exists."
 fi
 
+if grep -q "utilux" "$RC_FILE"; then
+  echo "Utilux is already called by your $RC_FILE"
+  exit 0
+fi
 
-echo "Installing utilux in .bashrc"
+echo "Installing utilux in $RC_FILE"
+{
+  echo "# utilux rc file"
+  echo ". ~/utilux/.shellrc"
+  echo ""
+} >> "$RC_FILE"
 
-echo "" >> $bashrc_path
-echo ". ~/utilux/.bashrc" >> $bashrc_path
-echo "" >> $bashrc_path
-
-echo "utilux installed in your bashrc file"
-echo "please relog in your session to fully enable it"
+echo "Utilux installed in your $RC_FILE"
+echo "Please relog in your session to fully enable it"

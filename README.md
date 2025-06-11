@@ -1,6 +1,6 @@
 # utilux: Linux/Bash Utilities 🚀
 
-This repository gathers scripts, tools, to make my optimal linux setup.
+This repository gathers scripts, tools, to make my optimal linux setup. (Supports Bash & Zsh)
 
 ## Features
 
