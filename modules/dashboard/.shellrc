@@ -19,7 +19,10 @@ alias utilux-dashboard-config="nano $UTILUX_DASHBOARD_CONFIG_FILE"
 
 if [ "0" = "$IS_LISTENING" ]
 then
-    logger "utilux-dashboard: launching php server on $LISTENING_URL"
+    if [ ! -z "$(which logger) "] 
+    then
+        logger "utilux-dashboard: launching php server on $LISTENING_URL"
+    fi
     original="$(pwd)"
     cd "$SCRIPT_DIR"
     nohup php -S "$LISTENING_URL" > "$SCRIPT_DIR/server.log" 2>&1 &

@@ -1,32 +1,30 @@
 #!/bin/sh
 
 # Empêche l'exécution en tant que root
-if [ "$EUID" -eq 0 ]; then
+if [ "$EUID" = "0" ]
+then
   echo "Please do not run this script as root"
   exit 1
 fi
 
 SHELL_NAME=$(basename "$SHELL")
 
-if [[ "$SHELL_NAME" == "zsh" ]]; then
+if [ "$SHELL_NAME" = "zsh" ]
+then
   RC_FILE="$HOME/.zshrc"
-elif [[ "$SHELL_NAME" == "bash" ]]; then
+elif [ "$SHELL_NAME" = "bash" ]
+then
   RC_FILE="$HOME/.bashrc"
 else
   echo "Unsupported shell: $SHELL_NAME"
   exit 1
 fi
 
-if [ ! -f "$RC_FILE" ]; then
-  echo "Creating $RC_FILE"
-  touch "$RC_FILE"
-else
-  echo "$RC_FILE exists."
-fi
-
-if grep -q "utilux" "$RC_FILE"; then
-  echo "Utilux is already called by your $RC_FILE"
-  exit 0
+if [ -f "$RC_FILE" ]; then
+  if grep -q "utilux" "$RC_FILE"; then
+    echo "Utilux is already installed (called by $RC_FILE)"
+    exit 0
+  fi
 fi
 
 echo "Installing utilux in $RC_FILE"
