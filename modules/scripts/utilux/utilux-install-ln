@@ -1,3 +1,5 @@
+#!/bin/sh
+
 binName="$1"
 
 if [ ! -f "$binName" ]

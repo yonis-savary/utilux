@@ -40,7 +40,7 @@ newgrp docker
 chmod 666 /var/run/docker.sock
 
 # PHP 8.4
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.4)"
+/bin/bash -c "$(curl -fsSL https://php.new/install/linux)"
 
 # Visual Studio Code
 utilux-install-code

@@ -10,7 +10,6 @@ installCodeExtention()
         return 1
     fi
 
-    codeOutput
     if ! codeOutput=$(code --install-extension "$packageName" 2>&1); then
         echo "[FAILED] Failed to install $prettyName:"
         echo "$codeOutput"

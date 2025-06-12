@@ -17,9 +17,10 @@ if [ "$1" == "--force" -a "$1" == "-y" ]
 then
   echo "$merged_branches" | xargs -n 1 git branch -D
 else
-  read -p "Proceed with deletion ? [y/N]: " -n 1 -r
+  printf "Proceed with deletion ? [y/N]"
+  read -r answer
   echo
-  if echo "$REPLY" | grep -E '^[Yy]$' > /dev/null; then
+  if echo "$answer" | grep -E '^[Yy]$' > /dev/null; then
     echo "$merged_branches" | xargs -n 1 git branch -D
   else
     echo "❌ Aborted."

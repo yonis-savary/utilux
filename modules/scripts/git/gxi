@@ -6,10 +6,11 @@ set -euo pipefail
 # Couleurs pour un affichage stylé
 
 echo "⚠️  Warning ! This command will perform a git reset --hard"
-read -p "Proceed ? [y/N]:" -n 1 -r
+printf "Proceed ? [y/N]"
+read -r answer
 echo
 
-if ! echo "$REPLY" | grep -E '^[Yy]$' > /dev/null; then
+if ! echo "$answer" | grep -E '^[Yy]$' > /dev/null; then
     echo "❌ Aborted."
     exit 1
 fi

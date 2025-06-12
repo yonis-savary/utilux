@@ -2,7 +2,7 @@ binName="$1"
 installName="$2"
 
 
-if echo "$REPLY" | grep -E '^http' > /dev/null; then
+if echo "$binName" | grep -E '^http' > /dev/null; then
     if [ -z "$installName" ]; then 
         installName=$(basename "$binName")
         installName=${installName%%.*}

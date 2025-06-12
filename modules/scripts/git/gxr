@@ -22,9 +22,10 @@ fi
 
 if [ "$auto_yes" != true ]; then
     echo "About to execute : git pull --rebase origin $followed_branch"
-    read -p "Proceed ? " -n 1 -r
+    printf "Proceed ? [Y/n] "
+    read -r answer
     echo
-    if ! echo "$REPLY" | grep -E '^[Yy]$' > /dev/null; then
+    if ! echo "$answer" | grep -E '^[Yy]$' > /dev/null; then
         echo "Aborted."
         exit 1
     fi
