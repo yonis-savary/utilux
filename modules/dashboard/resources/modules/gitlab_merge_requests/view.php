@@ -14,7 +14,6 @@ function gitlabCurl(string $url, array $getParams = [], array $portParams = [])
     $url = $host . $url;
 
     $res = curl($url, $getParams, $portParams, ['PRIVATE-TOKEN' => $token]);
-    stdlog(print_r([$res, $host, $token], true));
     return $res;
 }
 
