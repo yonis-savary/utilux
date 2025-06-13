@@ -1,4 +1,5 @@
 #!/bin/sh
+
 SCRIPT_DIR="$1"
 
 DOCKER_SCRIPTS="$SCRIPT_DIR/docker"

@@ -1,6 +1,7 @@
+#!/bin/sh
+
 binName="$1"
 installName="$2"
-
 
 if echo "$binName" | grep -E '^http' > /dev/null; then
     if [ -z "$installName" ]; then 

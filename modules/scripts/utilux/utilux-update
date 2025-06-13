@@ -1,4 +1,5 @@
 #!/bin/sh
+
 cd $UTILUX_PATH && \
     git pull && \
     echo "Utilux updated !"
