@@ -1,16 +1,18 @@
 #!/bin/sh
 
 UTILUX_PATH="$HOME/utilux"
-export UTILUX_PATH
 
-UTILUX_SCRIPT="$UTILUX_PATH/.shellrc"
-UTILUX_BIN_PATH="$UTILUX_PATH/bin"
 UTILUX_CONFIG_PATH="$HOME/.config/utilux"
+UTILUX_SCRIPT="$UTILUX_PATH/.shellrc"
+UTILUX_USER_RC="$UTILUX_CONFIG_PATH/utilux-config"
+
+UTILUX_BIN_PATH="$UTILUX_PATH/bin"
 PATH="$PATH:$UTILUX_BIN_PATH"
 
 export UTILUX_PATH
 export UTILUX_BIN_PATH
 export UTILUX_CONFIG_PATH
+export UTILUX_USER_RC
 export PATH
 
 [ -d "$UTILUX_CONFIG_PATH" ] || mkdir -p "$UTILUX_CONFIG_PATH"
@@ -19,23 +21,19 @@ export PATH
 
 SHELL_NAME=$(ps -hp $$ | awk '{print $5}')
 
-if [ -f "$UTILUX_PATH/.shellrc.custom" ]
+if [ -f "$UTILUX_USER_RC" ]
 then
-    . "$UTILUX_PATH/.shellrc.custom"
+    . "$UTILUX_USER_RC"
 else
-    cp "$UTILUX_PATH/.shellrc.custom.example" "$UTILUX_PATH/.shellrc.custom"
+    cp "$UTILUX_PATH/.shellrc.custom.example" "$UTILUX_USER_RC"
 fi
 
 if [ ! -z "$UTILUX_ALLOW_PROMPT_CHANGE" ]
 then
     # Custom prompt
-    if [ "$SHELL_NAME" = "bash" ]
-    then
+    if [ "$SHELL_NAME" = "bash" ]; then
         PS1='\[\e[92;1m\]\W\[\e[0m\]\$'
-    fi
-
-    if [ "$SHELL_NAME" = "zsh" ]
-    then
+    elif [ "$SHELL_NAME" = "zsh" ]; then
         PROMPT='%{$fg[green]%}%~%{$reset_color%}\$'
     fi
 fi

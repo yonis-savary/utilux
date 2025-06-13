@@ -40,7 +40,7 @@ After installation, please restart your session
 
 **Configuration:**
 ```bash
-utilux-config
+utilux-config # (OR) nano ~/.config/utilux/utilux-config
 ```
 
 
