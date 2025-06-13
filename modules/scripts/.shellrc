@@ -9,6 +9,8 @@ if ! echo "$PATH" | grep -q "$DOCKER_SCRIPTS"; then
     export PATH="$PATH:$DOCKER_SCRIPTS:$GIT_SCRIPTS:$UTILUX_SCRIPTS"
 fi
 
+source "$SCRIPT_DIR/.shellrc_comp"
+
 alias dx="docker compose"
 alias dxr="docker compose restart"
 alias dxl="docker compose logs"

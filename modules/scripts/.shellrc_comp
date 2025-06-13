@@ -1,0 +1,17 @@
+#!/bin/sh
+
+_utilux_git_branches_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local opts=$(git for-each-ref --format='%(refname:short)' refs/heads/)
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
+complete -F _utilux_git_branches_autocomplete gxc
+complete -F _utilux_git_branches_autocomplete gxbf
+complete -F _utilux_git_branches_autocomplete gxr
+
+complete -F _comp_complete_longopt utilux-install
+complete -F _comp_complete_longopt utilux-install-ln
+complete -F _comp_complete_longopt utilux-lf
+complete -F _comp_complete_longopt utilux-share

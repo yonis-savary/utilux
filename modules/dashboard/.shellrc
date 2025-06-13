@@ -5,7 +5,6 @@ export SCRIPT_DIR
 
 PORT="${UTILUX_DASHBOARD_PORT:-9999}"
 LISTENING_URL="127.0.0.1:$PORT"
-IS_LISTENING="$(ss -tuln | awk '{print $5}' | grep -E "$LISTENING_URL" -c)"
 
 EXAMPLE_CONFIG_FILE="$SCRIPT_DIR/config.example.json"
 
@@ -15,29 +14,4 @@ export UTILUX_DASHBOARD_CONFIG_FILE
 [ -f "$UTILUX_DASHBOARD_CONFIG_FILE" ] || cp "$EXAMPLE_CONFIG_FILE" "$UTILUX_DASHBOARD_CONFIG_FILE"
 
 alias utilux-dashboard-config="nano $UTILUX_DASHBOARD_CONFIG_FILE"
-
-if [ "0" = "$IS_LISTENING" ]
-then
-    logger_path="$(which logger)"
-    if [ -n "$logger_path" ]
-    then
-        logger "utilux-dashboard: launching php server on $LISTENING_URL"
-    fi
-
-    PHP_PATH=$(command -v php)
-    if [ -n "$PHP_PATH" ]
-    then
-        original="$(pwd)"
-        cd "$SCRIPT_DIR"
-        nohup "$PHP_PATH" -S "$LISTENING_URL" > "$SCRIPT_DIR/server.log" 2>&1 &
-        cd "$original"
-    else
-        if [ -n "$logger_path" ]
-        then
-            logger "utilux-dashboard: Could not launch utilux-dashboard PHP not found"
-        else
-            echo "utilux-dashboard: Could not launch utilux-dashboard PHP not found"
-        fi
-    fi
-fi
-
+alias utilux-dashboard="cd \"$SCRIPT_DIR\" && php -S $LISTENING_URL"
