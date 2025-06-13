@@ -25,8 +25,7 @@ sudo apt-get install \
     nodejs \
     npm
 
-#https://github.com/yonis-savary/utilux
-git clone https://github.com/YonisSavary/utilux ~/utilux && bash ~/utilux/install
+git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
 
 # Docker
 curl -fsSL https://get.docker.com -o install-docker.sh

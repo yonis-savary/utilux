@@ -13,7 +13,9 @@ function gitlabCurl(string $url, array $getParams = [], array $portParams = [])
 
     $url = $host . $url;
 
-    return curl($url, $getParams, $portParams, ['PRIVATE-TOKEN' => $token]);
+    $res = curl($url, $getParams, $portParams, ['PRIVATE-TOKEN' => $token]);
+    stdlog(print_r([$res, $host, $token], true));
+    return $res;
 }
 
 list($mergeRequests, $pipelines, $approvals) = cache(

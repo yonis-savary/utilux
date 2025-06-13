@@ -48,7 +48,7 @@ utilux-config
 
 1. Remove the `~/utilux` directory
 3. Remove `~/.config/utilux` directory
-2. Delete the line `. ~/utilux/.bashrc` from your `.bashrc` file
+2. Delete the line `. ~/utilux/.shellrc` from your `.bashrc`/`.zshrc` file
 
 ## 🛠️ Script Module
 
