@@ -10,6 +10,7 @@ _utilux_git_branches_autocomplete() {
 complete -F _utilux_git_branches_autocomplete gxc
 complete -F _utilux_git_branches_autocomplete gxbf
 complete -F _utilux_git_branches_autocomplete gxr
+complete -F _utilux_git_branches_autocomplete gxl
 
 complete -F _comp_complete_longopt utilux-install
 complete -F _comp_complete_longopt utilux-install-ln

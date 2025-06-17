@@ -1,2 +1,2 @@
 #!/bin/sh
-git branch "$(gxb)" --set-upstream-to "$1"
+git branch "$(gxb)" --set-upstream-to $(gxl "$1")

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-followed_branch="$1"
+followed_branch=$(gxl "$1")
 auto_yes=false
 
 for arg in "$@"; do
@@ -9,7 +9,7 @@ for arg in "$@"; do
       auto_yes=true
       ;;
     *)
-      followed_branch="$arg"
+      followed_branch=$(gxl "$arg")
       ;;
   esac
 done

@@ -82,6 +82,7 @@ gxc                             # Alias for git checkout
 gxd                             # Show short diff message
 gxf                             # Fetch & prune
 gxi                             # Git initialize/reset, cleanup repo
+gxl                             # Git lookup, look for a branch name
 gxp                             # Push (force with lease)
 gxpm                            # Purge merged branches (force)
 gxr [target_branch] [-y|--yes]  # Pull rebase
