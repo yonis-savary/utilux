@@ -3,7 +3,6 @@
 followed_branch="$1"
 auto_yes=false
 
-# Parsing arguments
 for arg in "$@"; do
   case $arg in
     -y|--yes)
@@ -17,18 +16,14 @@ done
 
 
 if [ -z "$followed_branch" ]; then 
-    followed_branch="develop"
+	followed_branch="develop"
 fi
 
 if [ "$auto_yes" != true ]; then
-    echo "About to execute : git pull --rebase origin $followed_branch"
-    printf "Proceed ? [Y/n] "
-    read -r answer
-    echo
-    if ! echo "$answer" | grep -E '^[Yy]$' > /dev/null; then
-        echo "Aborted."
-        exit 1
-    fi
+	if ! utilux-prompt --prompt "About to execute : git pull --rebase origin $followed_branch\n\nProceed ?"; then
+		echo "Aborted."
+		exit 1
+	fi
 fi
 
 echo "Proceeding with: git pull --rebase origin $followed_branch"

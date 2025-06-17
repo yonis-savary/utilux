@@ -9,16 +9,10 @@ then
   exit 0
 fi
 
-echo "⚠️ The following branches are merged and will be force-deleted:"
-echo "$merged_branches"
-echo
-
 if [ "$1" != "--force" -a "$1" != "-y" ]
 then
-  printf "Proceed with deletion ? [y/N]"
-  read -r answer
-  echo
-  if ! echo "$answer" | grep -q -E '^[Yy]$'; then
+  if ! utilux-prompt --prompt "⚠️ The following branches are merged and will be force-deleted:\n$merged_branches\n\nProceed with deletion ?"; then 
+    echo "⚠️ The following branches are merged and will be force-deleted:\n\n$merged_branches\n\nProceed with deletion ?"
     echo "❌ Aborted."
     exit 0
   fi

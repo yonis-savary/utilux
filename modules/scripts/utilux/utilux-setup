@@ -125,10 +125,7 @@ echo
 
 if isInstalled 'code'; then
 
-    read -p "Install VSCode Extensions ? (y/n) " confirm
-    echo
-
-    if echo "$confirm" | grep -E '^[Yy]$' > /dev/null; then
+    if utilux-prompt --prompt "Install VSCode Extensions"; then
         echo "Checking code extensions..."
         installCodeExtention "adpyke.vscode-sql-formatter"
         installCodeExtention "antfu.goto-alias"
@@ -167,11 +164,7 @@ if isInstalled 'code'; then
         echo
     fi
 
-
-    read -p "Apply custom VSCode config ? (y/n) " confirm
-    echo
-
-    if echo "$confirm" | grep -E '^[Yy]$' > /dev/null; then
+    if utilux-prompt --prompt "Apply custom VSCode config ?"; then
         backupVSCodeSettings
         updateVSCodeSetting "workbench.colorTheme" "Min Dark"
         updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"

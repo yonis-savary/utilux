@@ -2,12 +2,11 @@
 
 SCRIPT_DIR="$1"
 
-DOCKER_SCRIPTS="$SCRIPT_DIR/docker"
-GIT_SCRIPTS="$SCRIPT_DIR/git"
-UTILUX_SCRIPTS="$SCRIPT_DIR/utilux"
-
-if ! echo "$PATH" | grep -q "$DOCKER_SCRIPTS"; then
-    export PATH="$PATH:$DOCKER_SCRIPTS:$GIT_SCRIPTS:$UTILUX_SCRIPTS"
+if ! echo "$PATH" | grep -q "$SCRIPT_DIR/docker"; then
+    export PATH="$PATH:$SCRIPT_DIR/docker"
+    export PATH="$PATH:$SCRIPT_DIR/git"
+    export PATH="$PATH:$SCRIPT_DIR/utilux"
+    export PATH="$PATH:$SCRIPT_DIR/utilux/utils"
 fi
 
 source "$SCRIPT_DIR/.shellrc_comp"

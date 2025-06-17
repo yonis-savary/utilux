@@ -51,12 +51,6 @@ sudo apt-get install \
 # Non-Apt Software #
 ####################
 
-# Opera
-# Set opera as default web browser (after installation)
-# xdg-settings set default-web-browser opera.desktop
-curl https://download5.operacdn.com/ftp/pub/opera/desktop/119.0.5497.88/linux/opera-stable_119.0.5497.88_amd64.deb -o opera.deb
-sudo apt-get install ./opera.deb
-rm opera.deb
 
 
 # NVM (Node Version Manager) Script
@@ -84,12 +78,18 @@ chmod 666 /var/run/docker.sock
 git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
 
 
-# Visual Studio Code
-utilux-install-code
-
 # Check setup - VSC Extensions/Settings
 utilux-setup
 
+# Visual Studio Code
+utilux-install-code
+
+# Opera
+# Set opera as default web browser (after installation): xdg-settings set default-web-browser opera.desktop
+utilux-install "https://download5.operacdn.com/ftp/pub/opera/desktop/119.0.5497.88/linux/opera-stable_119.0.5497.88_amd64.deb" opera.deb
+
+# Bruno (Postman Alternative)
+utilux-install "https://github.com/usebruno/bruno/releases/download/v2.5.0/bruno_2.5.0_amd64_linux.deb" bruno.deb
 
 # PHP-CS-FIXER
 utilux-install https://cs.symfony.com/download/php-cs-fixer-v3.phar php-cs-fixer

@@ -1,16 +1,8 @@
 #!/bin/sh
-# git init - make your projet fresh to start something
 
 set -euo pipefail
 
-# Couleurs pour un affichage stylé
-
-echo "⚠️  Warning ! This command will perform a git reset --hard"
-printf "Proceed ? [y/N]"
-read -r answer
-echo
-
-if ! echo "$answer" | grep -E '^[Yy]$' > /dev/null; then
+if ! utilux-prompt --prompt "⚠️  Warning ! This command will perform a git reset --hard, continue ?"; then 
     echo "❌ Aborted."
     exit 1
 fi
@@ -29,9 +21,9 @@ git for-each-ref --format='%(refname:short)' refs/heads | while read branch ; do
 
     if git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
         git branch --set-upstream-to="origin/$branch" "$branch"
-        echo "🔗 Upstream defined for ${branch} → origin/${branch}"
+        echo "🔗 Bound ${branch} to origin/${branch}"
     else
-        echo "⚠️  No remote branch for ${branch}"
+        echo "⚠️  No remote : ${branch}"
     fi
 
 done

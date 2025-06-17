@@ -11,10 +11,7 @@ then
     exit 1
 fi
 
-read -p "Do you really want to convert [$to_convert] ? [y/n] " user_input
-
-if [ ! "$user_input" == "y" ]
-then
+if ! utilux-prompt --prompt "Do you really want to convert [$to_convert] ? "; then
     echo "Bye!"
     exit 0
 fi

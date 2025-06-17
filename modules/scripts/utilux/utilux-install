@@ -3,55 +3,69 @@
 binName="$1"
 installName="$2"
 
-if echo "$binName" | grep -E '^http' > /dev/null; then
-    if [ -z "$installName" ]; then 
-        installName=$(basename "$binName")
-        installName=${installName%%.*}
-        echo "Using automatic name : $installName"
+is_url() {
+    printf "%s\n" "$1" | grep -q '^http'
+}
+
+strip_ext() {
+    name=$(basename "$1")
+    printf "%s\n" "${name%%.*}"
+}
+
+is_deb_file() {
+    ar t "$1" 2>/dev/null | grep -q 'debian-binary'
+}
+
+if is_url "$binName"; then
+    if [ -z "$installName" ]; then
+        installName=$(strip_ext "$binName")
+        echo "Using automatic name: $installName"
     fi
 
-    targetBinName="$UTILUX_BIN_PATH/$installName"
-    if [ -f "$targetBinName" ]
-    then
-        echo "[$targetBinName] already exists !"
+    localBinName="./$installName"
+    echo "Downloading $binName to $localBinName"
+    curl -fsSL "$binName" -o "$localBinName" || {
+        echo "Download failed."
         exit 1
+    }
+
+    if is_deb_file "$localBinName"; then
+        echo ".deb file detected! Installing $localBinName"
+        sudo apt-get install -y "./$localBinName"
+    else
+        targetBinName="$UTILUX_BIN_PATH/$installName"
+        if [ -f "$targetBinName" ]; then
+            echo "[$targetBinName] already exists!"
+            exit 1
+        fi
+
+        echo "Installing binary to $targetBinName"
+        chmod +x "$localBinName"
+        mv "$localBinName" "$targetBinName"
     fi
-
-    echo "Downloading $binName to $targetBinName"
-
-    curl $binName -o $targetBinName
-    chmod +x $targetBinName
     exit 0
 fi
 
-if [ ! -f "$binName" ]
-then
-    echo "Cannot install, [$binName] is not a file"
+
+if [ ! -f "$binName" ]; then
+    echo "Cannot install: [$binName] is not a valid file"
     exit 1
 fi
 
-
-binName="$(realpath "$1")"
-
-if [ ! -f "$binName" ]
-then
-    echo "Cannot install, [$binName] is not a file"
-    exit 1
-fi
-
+binPath="$(realpath "$binName")"
 
 if [ -z "$installName" ]; then 
-    installName=$(basename "$binName")
+    installName=$(basename "$binPath")
 fi
 
 
-targetBinName="$UTILUX_BIN_PATH/$(basename $installName)"
-if [ -f "$targetBinName" ]
-then
-    echo "[$targetBinName] already exists !"
+targetBinName="$UTILUX_BIN_PATH/$installName"
+
+if [ -f "$targetBinName" ]; then
+    echo "[$targetBinName] already exists!"
     exit 1
 fi
 
-echo "Copying $binName to $targetBinName"
-cp "$binName" "$targetBinName"
+echo "Copying $binPath to $targetBinName"
+cp "$binPath" "$targetBinName"
 chmod +x "$targetBinName"

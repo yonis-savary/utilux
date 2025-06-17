@@ -1,0 +1,41 @@
+#!/bin/sh
+prompt="Continue ? (y/N)"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --prompt|-p)
+            shift || { echo "Option --prompt requiert un argument" >&2; exit 2; }
+            prompt=$1
+            ;;
+        --help|-h)
+            echo "Usage : $0 [--prompt \"Question ?\"]" >&2
+            exit 0
+            ;;
+        *)  echo "Option inconnue : $1" >&2; exit 2 ;;
+    esac
+    shift
+done
+
+say_yes() { exit 0; }
+say_no()  { exit 1; }
+
+if command -v whiptail >/dev/null 2>&1; then
+    num_lines=$(printf "%s\n" "$prompt" | wc -l)
+    height=$((num_lines + 10))
+    width=70
+
+    if whiptail --yesno "$prompt" $height $width; then
+        say_yes
+    else
+        say_no
+    fi
+fi
+
+printf "%s" "$prompt "
+read answer
+
+if echo "$answer" | grep -Eq '^[Yy]$'; then
+    say_yes
+else
+    say_no
+fi
