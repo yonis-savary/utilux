@@ -2,7 +2,6 @@
     <img src="./img/utilux-128.png" width="96" height="96" alt="Resound logo">
 </p>
 
-
 # utilux: Linux/Bash Utilities 🚀
 
 This repository gathers scripts, tools, to make my optimal linux setup. (Supports Bash & Zsh)
@@ -13,22 +12,22 @@ This repository gathers scripts, tools, to make my optimal linux setup. (Support
   Track your current work, pending tickets, merge requests, and local branches in one place.
 
 - **Git Aliases (`gx`):**
-    - `gxap` : Amend (no-edit) and Push (force with lease)
-    - `gxf` : Fetch all & prune
-    - `gxb+` : Create a new branch (with Jira issue support, e.g. `gxb+ APP-3290`)
-    - ...and more!
+  - `gxap` : Amend (no-edit) and Push (force with lease)
+  - `gxf` : Fetch all & prune
+  - `gxb+` : Create a new branch (with Jira issue support, e.g. `gxb+ APP-3290`)
+  - ...and more!
 
 - **Docker Compose Aliases (`dx`):**
-    - `dxu` : `docker compose up -d`
-    - `dxdu` : `docker compose down && docker compose up -d`
-    - `dxe [process] [command]` : Exec into a process
-    - ...and more!
+  - `dxu` : `docker compose up -d`
+  - `dxdu` : `docker compose down && docker compose up -d`
+  - `dxe [process] [command]` : Exec into a process
+  - ...and more!
 
 - **Utilux Tools (`utilux-`):**
-    - `utilux-install [file|url]` : Install a binary in your `$PATH` (Support url for binaries and deb files)
-    - `utilux-share [file]` : Start a local Python server to share a file
-    - `utilux-ssh` : Manage local SSH keys
-    - ...and more!
+  - `utilux-install [file|url]` : Install a binary in your `$PATH` (Support url for binaries and deb files)
+  - `utilux-share [file]` : Start a local Python server to share a file
+  - `utilux-ssh` : Manage local SSH keys
+  - ...and more!
 
 - Autocompletion with tab for most commands !
 
@@ -43,16 +42,16 @@ git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/ins
 After installation, please restart your session
 
 **Configuration:**
+
 ```bash
 utilux-config # (OR) nano ~/.config/utilux/utilux-config
 ```
 
-
 ## ❌ Uninstall
 
 1. Remove the `~/utilux` directory
-3. Remove `~/.config/utilux` directory
-2. Delete the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
+2. Remove `~/.config/utilux` directory
+3. Delete the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
 
 ## 🛠️ Script Module
 
@@ -93,37 +92,40 @@ gxr [target_branch] [-y|--yes]  # Pull rebase
 gxrc                            # Rebase continue
 ```
 
-
 ## 📊 Dashboard Module
 
 A configurable gitlab/jira dashboard (starts automatically at `127.0.0.1:9999`, you can change the port with `UTILUX_DASHBOARD_PORT`)
 
-**Starting dashboard**
+Starting dashboard:
+
 ```bash
 utilux-dashboard
 ```
 
-**Configuration:**
+Configuration:
+
 ```bash
 utilux-dashboard-config
 ```
 
-**Dashboard shows:**
+Dashboard shows:
+
 - Your pending Jira tickets (token required)
 - Your pending GitLab merge requests (token required)
 - Your local branches in configured directories
-
 
 ## 🗄️ dbwand Module (WIP)
 
 A PHP-based database utility to fetch and manipulate data locally.
 
 **Configuration:**
+
 ```bash
 utilux-dbwand-config
 ```
 
 **Example configuration:**
+
 ```json
 {
     "connections": {
@@ -134,6 +136,7 @@ utilux-dbwand-config
 ```
 
 **Example usage:**
+
 ```bash
 dbwand
 connect my-second-app
@@ -145,7 +148,6 @@ show 0-99 --json
 template INSERT INTO contact_client (contact_id) VALUES (:id)
 ```
 
-
 ## 📚 Resources & Tools
 
 - [ANSI Terminal Codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
@@ -156,10 +158,3 @@ template INSERT INTO contact_client (contact_id) VALUES (:id)
 - [DevURLs Aggregator](https://devurls.com/)
 - [Bartosz Ciechanowski Blog](https://ciechanow.ski/)
 - [UXPin Blog](https://www.uxpin.com/studio/blog/)
-
-
-
-
-
-
-
