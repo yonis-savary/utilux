@@ -22,7 +22,7 @@ list($mergeRequests, $pipelines, $approvals) = cache(
     function() {
 
         $userId = gitlabCurl('/user')['id'];
-        $mergeRequests = gitlabCurl('/merge_requests', ['assignee_id' => $userId, 'state' => 'opened']);
+        $mergeRequests = gitlabCurl('/merge_requests', ['assignee_id' => $userId, 'state' => 'opened', 'scope' => 'all']);
 
         $status = [];
         $approvals=[];
