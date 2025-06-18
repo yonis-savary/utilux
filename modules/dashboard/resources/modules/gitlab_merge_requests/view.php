@@ -20,7 +20,10 @@ function gitlabCurl(string $url, array $getParams = [], array $portParams = [])
 list($mergeRequests, $pipelines, $approvals) = cache(
     'gitlab-merge-requests',
     function() {
-        $mergeRequests = gitlabCurl('/merge_requests', ['author_username' => 'yonis.savary', 'state' => 'opened']);
+
+        $userId = gitlabCurl('/user')['id'];
+        $mergeRequests = gitlabCurl('/merge_requests', ['assignee_id' => $userId, 'state' => 'opened']);
+
         $status = [];
         $approvals=[];
         foreach ($mergeRequests as $mr)
