@@ -15,6 +15,10 @@ if (!is_file($tailwind)) {
     file_put_contents($tailwind, file_get_contents('https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4'));
 }
 
+$favicon = cache('favicon', function(){
+    return "data:image/png;base64," . base64_encode(file_get_contents('../../img/utilux-64.png'));
+}, 3600);
+
 ?>
 
 <!DOCTYPE html>
@@ -23,6 +27,7 @@ if (!is_file($tailwind)) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="<?= $favicon ?>">
     <title>Dashboard</title>
 </head>
 

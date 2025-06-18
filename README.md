@@ -1,3 +1,8 @@
+<p align="center">
+    <img src="./img/utilux-128.png" width="96" height="96" alt="Resound logo">
+</p>
+
+
 # utilux: Linux/Bash Utilities 🚀
 
 This repository gathers scripts, tools, to make my optimal linux setup. (Supports Bash & Zsh)
@@ -10,14 +15,12 @@ This repository gathers scripts, tools, to make my optimal linux setup. (Support
 - **Git Aliases (`gx`):**
     - `gxap` : Amend (no-edit) and Push (force with lease)
     - `gxf` : Fetch all & prune
-    - `gxb` : Show current branch
     - `gxb+` : Create a new branch (with Jira issue support, e.g. `gxb+ APP-3290`)
     - ...and more!
 
 - **Docker Compose Aliases (`dx`):**
     - `dxu` : `docker compose up -d`
     - `dxdu` : `docker compose down && docker compose up -d`
-    - `dxl [process]` : Show logs
     - `dxe [process] [command]` : Exec into a process
     - ...and more!
 
