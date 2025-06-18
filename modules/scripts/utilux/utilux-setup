@@ -125,7 +125,7 @@ echo
 
 if isInstalled 'code'; then
 
-    if utilux-prompt --prompt "Install VSCode Extensions"; then
+    if utilux-prompt --prompt "Install Visual Studio Code extensions ?"; then
         echo "Checking code extensions..."
         installCodeExtention "adpyke.vscode-sql-formatter"
         installCodeExtention "antfu.goto-alias"
@@ -164,7 +164,7 @@ if isInstalled 'code'; then
         echo
     fi
 
-    if utilux-prompt --prompt "Apply custom VSCode config ?"; then
+    if utilux-prompt --prompt "Apply custom Visual Studio Code config ?"; then
         backupVSCodeSettings
         updateVSCodeSetting "workbench.colorTheme" "Min Dark"
         updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"

@@ -21,12 +21,13 @@ This repository gathers scripts, tools, to make my optimal linux setup. (Support
     - `dxe [process] [command]` : Exec into a process
     - ...and more!
 
-- **Utilux Tools:**
-    - `utilux-install [file]` : Install a binary in your `$PATH`
+- **Utilux Tools (`utilux-`):**
+    - `utilux-install [file|url]` : Install a binary in your `$PATH` (Support url for binaries and deb files)
     - `utilux-share [file]` : Start a local Python server to share a file
     - `utilux-ssh` : Manage local SSH keys
     - ...and more!
 
+- Autocompletion with tab for most commands !
 
 ## 🚀 Quick Start
 
@@ -48,12 +49,12 @@ utilux-config # (OR) nano ~/.config/utilux/utilux-config
 
 1. Remove the `~/utilux` directory
 3. Remove `~/.config/utilux` directory
-2. Delete the line `. ~/utilux/.shellrc` from your `.bashrc`/`.zshrc` file
+2. Delete the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
 
 ## 🛠️ Script Module
 
 ```bash
-utilux-install [FILE|URL] # Copy/Download a file into your $PATH
+utilux-install [FILE|URL] # Copy/Download a file into your $PATH (Supports URL to binaries and deb files)
 utilux-install-ln [FILE]  # Link a file into your $PATH
 utilux-install-code       # (Re)install the latest Visual Studio Code version
 utilux-lf [DIRECTORY]     # Recursively convert CRLF to LF (default: current dir)
@@ -93,6 +94,11 @@ gxrc                            # Rebase continue
 ## 📊 Dashboard Module
 
 A configurable gitlab/jira dashboard (starts automatically at `127.0.0.1:9999`, you can change the port with `UTILUX_DASHBOARD_PORT`)
+
+**Starting dashboard**
+```bash
+utilux-dashboard
+```
 
 **Configuration:**
 ```bash

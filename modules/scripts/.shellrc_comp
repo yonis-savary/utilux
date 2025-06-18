@@ -7,6 +7,13 @@ _utilux_git_branches_autocomplete() {
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
 
+_docker_compose_services_list_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local opts=$(docker compose ps --services 2>/dev/null)
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
 complete -F _utilux_git_branches_autocomplete gxc
 complete -F _utilux_git_branches_autocomplete gxbf
 complete -F _utilux_git_branches_autocomplete gxr
@@ -16,3 +23,7 @@ complete -F _comp_complete_longopt utilux-install
 complete -F _comp_complete_longopt utilux-install-ln
 complete -F _comp_complete_longopt utilux-lf
 complete -F _comp_complete_longopt utilux-share
+
+complete -F _docker_compose_services_list_autocomplete dxl
+complete -F _docker_compose_services_list_autocomplete dxe
+complete -F _docker_compose_services_list_autocomplete dxr

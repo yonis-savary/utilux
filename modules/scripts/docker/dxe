@@ -1,0 +1,10 @@
+#!/bin/bash
+
+service="$1"
+command="$2"
+
+if [ -z "$command" ]; then
+    command="bash"
+fi
+
+docker compose exec $service $command
