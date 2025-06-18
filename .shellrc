@@ -38,8 +38,7 @@ then
     fi
 fi
 
-
-alias utilux-config="nano $UTILUX_PATH/.shellrc.custom"
+alias utilux-config="nano $UTILUX_USER_RC"
 
 MODULES_PATH="$UTILUX_PATH/modules"
 for file in "$MODULES_PATH"/*; do
