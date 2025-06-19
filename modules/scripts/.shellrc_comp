@@ -14,6 +14,23 @@ _docker_compose_services_list_autocomplete() {
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
 
+
+_utilux_ssh_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local opts=""
+
+    case $COMP_CWORD in
+        1)
+            opts="add help list delete"
+            ;;
+        *)
+            opts=$(ls -1 ~/.ssh/* | grep -E "\.pub$" | sed 's/.pub//g' | sed -e 's/.*\///g')
+            ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
 complete -F _utilux_git_branches_autocomplete gxc
 complete -F _utilux_git_branches_autocomplete gxbf
 complete -F _utilux_git_branches_autocomplete gxr
@@ -23,7 +40,10 @@ complete -F _comp_complete_longopt utilux-install
 complete -F _comp_complete_longopt utilux-install-ln
 complete -F _comp_complete_longopt utilux-lf
 complete -F _comp_complete_longopt utilux-share
+complete -F _utilux_ssh_autocomplete utilux-ssh
 
 complete -F _docker_compose_services_list_autocomplete dxl
 complete -F _docker_compose_services_list_autocomplete dxe
 complete -F _docker_compose_services_list_autocomplete dxr
+
+
