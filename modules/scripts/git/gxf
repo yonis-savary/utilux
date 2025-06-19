@@ -1,2 +1,2 @@
 #!/bin/sh
-git fetch --all --prune
+git fetch --all --prune && echo "✅ Git fetch done."
