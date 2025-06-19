@@ -1,9 +1,15 @@
 #!/bin/sh
 
-protected_branches="master|main|develop"
-merged_branches=$(git branch --merged | grep -vE "\*|$protected_branches" | sed 's/^ *//')
+branches_to_delete=$(
+  git for-each-ref --format='%(refname:short)' refs/heads |
+  while IFS= read -r branch; do
+    if ! git show-ref --verify --quiet "refs/remotes/origin/$branch"; then
+      echo "$branch"
+    fi
+  done
+)
 
-if [ -z "$merged_branches" ]
+if [ -z "$branches_to_delete" ]
 then
   echo "✅ No merged branches to delete."
   exit 0
@@ -11,11 +17,11 @@ fi
 
 if [ "$1" != "--force" -a "$1" != "-y" ]
 then
-  if ! utilux-prompt --prompt "⚠️ The following branches are merged and will be force-deleted:\n$merged_branches\n\nProceed with deletion ?"; then 
-    echo "⚠️ The following branches are merged and will be force-deleted:\n\n$merged_branches\n\nProceed with deletion ?"
+  if ! utilux-prompt --prompt "⚠️ The following branches are merged and will be force-deleted:\n$branches_to_delete\n\nProceed with deletion ?"; then 
+    echo "⚠️ The following branches are merged and will be force-deleted:\n\n$branches_to_delete\n\nProceed with deletion ?"
     echo "❌ Aborted."
     exit 0
   fi
 fi
 
-echo "$merged_branches" | xargs -n 1 git branch -D
+echo "$branches_to_delete" | xargs -n 1 git branch -D

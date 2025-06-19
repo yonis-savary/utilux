@@ -75,7 +75,7 @@ chmod 666 /var/run/docker.sock
 /bin/bash -c "$(curl -fsSL https://php.new/install/linux)"
 
 
-# Utilux
+# Utilux (May need relog)
 git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
 
 
