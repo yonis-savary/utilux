@@ -20,6 +20,7 @@ sudo apt-get install \
     curl \
     iproute2 \
     net-tools \
+    sshfs \
     htop
 
 

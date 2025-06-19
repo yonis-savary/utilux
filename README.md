@@ -148,6 +148,10 @@ show 0-99 --json
 template INSERT INTO contact_client (contact_id) VALUES (:id)
 ```
 
+## Advanced Setup 
+
+- [Mount Remote SSH Directory](./docs/remote_sshfs.md)
+
 ## 📚 Resources & Tools
 
 - [ANSI Terminal Codes](https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797)
