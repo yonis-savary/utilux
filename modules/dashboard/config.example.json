@@ -1,30 +1,41 @@
 {
     "style": {
-        "background": "/home/foo/Pictures/my-super-background.jpg",
+        "_": [
+            "You can change background to set a custom background behind your dashboard (give it a local file path)",
+            "page-content-style is a collection of tailwind classes defining content (blocks) display attributes"
+        ],
+        "background": null,
         "page-content-style": "grid grid-cols-3"
     },
     "services": {
+        "_": [
+            "Please don't forget to configure your credentials with utilux-config",
+            "Each elements in services defines how a module behave",
+            "You can dis/enable them in blocks at the end of this configuration"
+        ],
         "gitlab": {
-            "_how_to": "first configure your jira credentials with utilux-config",
             "enabled": true,
             "view": "resources/modules/gitlab_merge_requests/view.php"
         },
         "jira": {
-            "_how_to": "first configure your jira credentials with utilux-config",
             "enabled": true,
             "view": "resources/modules/jira_my_work/view.php"
         },
         "git": {
+            "_": [
+                "You can put your repositories path in 'repositories' so the git module",
+                "will analyse them"
+            ],
             "enabled": true,
             "view": "resources/modules/git_branches/view.php",
             "repositories": [
-                "/home/foo/Desktop/bar",
-                "/home/foo/Desktop/zim"
             ]
         },
         "jira_gitlab_merger": {
-            "_why": "Merge your Jira Issues and Gitlab merge requests display",
-            "_why_reorder": "Reorder your issues to display issues with MR first",
+            "_": [
+                "This module can be used to merge your Jira Issues and Gitlab merge requests on the dashboard",
+                "Set reorder to true to display issues with merge requests first"
+            ],
             "enabled": true,
             "reorder": true,
             "view": "resources/modules/jira_gitlab_merger/view.php"
