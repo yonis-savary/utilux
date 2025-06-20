@@ -31,9 +31,11 @@ fi
 if [ ! -z "$UTILUX_ALLOW_PROMPT_CHANGE" ]
 then
     # Custom prompt
-    if [ "$SHELL_NAME" = "bash" ]; then
+    if [ "$SHELL_NAME" = "bash" ]
+    then
         PS1='\[\e[92;1m\]\W\[\e[0m\]\$'
-    elif [ "$SHELL_NAME" = "zsh" ]; then
+    elif [ "$SHELL_NAME" = "zsh" ]
+    then
         PROMPT='%{$fg[green]%}%~%{$reset_color%}\$'
     fi
 fi

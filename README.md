@@ -33,7 +33,7 @@ utilux-config # (OR) nano ~/.config/utilux/utilux-config
 
 ## Dashboard configuration
 
-> Requirements: PHP, Composer
+> Requirements: PHP 8
 
 Utilux's dashboard shows you:
 
@@ -74,7 +74,7 @@ The most interesting feature of utilux is not its dashboard, it is its collectio
 
 
 > [!IMPORTANT]
-> Autocompletion with tab for most commands !
+> Autocompletion works for most commands ! gx will look for branch names, dx will look for service names...etc
 
 Here is a detailed version of every utilux command:
 
@@ -86,7 +86,7 @@ utilux-lf [DIRECTORY]     # Recursively convert CRLF to LF (default: current dir
 utilux-setup              # Check/install required packages & VSCode extensions
 utilux-share [FILE]       # Start a web server to share files
 utilux-ssh                # SSH key utilities
-utilux-update             # Self-update utilux
+utilux-update             # utilux self-update script
 
 dx                      # alias for docker compose
 dxb                     # docker compose build
