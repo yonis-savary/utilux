@@ -6,8 +6,7 @@ function jiraCurl(string $url, array $getParams = [], array $portParams = [])
     $username = env('UTILUX_JIRA_EMAIL');
     $password = env('UTILUX_JIRA_TOKEN');
 
-    if (!($username && $password && $host))
-    {
+    if (!($username && $password && $host)) {
         stdlog("Please configure your jira credentials with utilux-config");
         return [];
     }
@@ -19,10 +18,34 @@ function jiraCurl(string $url, array $getParams = [], array $portParams = [])
     });
 }
 
+function getJiraIssueLink($issue)
+{
+    return preg_replace('/\\/rest.+/', '', env('UTILUX_JIRA_HOST', service('jira')['host'] ?? false)) . '/browse/' . $issue['key'];
+}
+
 $myWork = cache(
     'jira-my-work',
-    fn() => jiraCurl('/search/jql', ['fields' => 'status,summary', 'jql' => 'assignee = currentUser() AND status NOT IN (Annule, Annulé, Clôturé, Done, Finished, "Résolu Automatiquement", Terminé) ORDER BY priority DESC, created DESC'])['issues']
+    fn() => jiraCurl('/search/jql', ['fields' => 'status,summary,parent', 'jql' => 'assignee = currentUser() AND status NOT IN (Annule, Annulé, Clôturé, Done, Finished, "Résolu Automatiquement", Terminé) ORDER BY priority DESC, created DESC'])['issues']
 );
+
+
+$groupedMyWork = [];
+
+
+foreach ($myWork as $issue) {
+    $parent = $issue['fields']['parent'] ?? [];
+    $parentKey = $parent['key'] ?? '???';
+    $groupedMyWork[$parentKey] ??= [
+        'parent' => $parent,
+        'issues' => []
+    ];
+
+    $groupedMyWork[$parentKey]['issues'][] = $issue;
+}
+
+$groupedMyWork = array_values($groupedMyWork);
+
+stdlog(print_r($groupedMyWork, true));
 ?>
 
 <style>
@@ -50,9 +73,12 @@ $myWork = cache(
         white-space: nowrap;
     }
 
-    .issue-status 
-    {
+    .issue-status {
         white-space: nowrap;
+    }
+
+    .parent-title {
+        margin: 1em 0;
     }
 </style>
 
@@ -64,20 +90,40 @@ $myWork = cache(
     </div>
 
     <?php
-    usort($myWork, fn($a, $b) => $a['key'] > $b['key'] ? 1:-1);
-    foreach ($myWork as $issue) { ?>
-        <div class="flex flex-col jira" issue="<?= $issue['key'] ?>">
-            <a href="<?= preg_replace('/\\/rest.+/', '', env('UTILUX_JIRA_HOST', service('jira')['host'] ?? false)) . '/browse/' . $issue['key']  ?>" class="flex flex-col card" target='_blank'>
-                <div class="flex flex-row items-center">
-                    <p class="issue-title" title="<?= $issue['fields']['summary'] ?>">
-                        <b><?= $issue['key'] ?></b> - <?= $issue['fields']['summary'] ?>
-                    </p>
-                    <small class="issue issue-status ml-auto <?= $issue['fields']['status']['statusCategory']['colorName'] ?>">
-                        <?= $issue['fields']['status']['name'] ?>
-                    </small>
-                </div>
-            </a>
-            <div class="slot"></div>
+    usort($groupedMyWork, fn($a, $b) => ($a['parent']['key'] ?? '???') > ($b['parent']['key'] ?? '???') ? 1 : -1);
+    foreach ($groupedMyWork as $group) { ?>
+        <div class="flex flex-col jira-parent">
+            <?php if ($group['parent']['key'] ?? false) { ?>
+                <a 
+                    href="<?= getJiraIssueLink($group['parent']) ?>"
+                    class="parent-title" 
+                    title="<?= $group['parent']['fields']['summary'] ?>"
+                >
+                    <b><?= $group['parent']['key'] ?></b> - <?= $group['parent']['fields']['summary'] ?>
+                </a>
+            <?php } ?>
+            <div class="flex flex-col gap-2">
+
+                <?php
+                $issues = $group['issues'];
+                usort($issues, fn($a, $b) => $a['key'] > $b['key'] ? 1 : -1);
+                foreach ($issues as $issue) { ?>
+                    <div class="flex flex-col jira" issue="<?= $issue['key'] ?>">
+                        <a href="<?= getJiraIssueLink($issue)  ?>" class="flex flex-col card" target='_blank'>
+                            <div class="flex flex-row items-center">
+                                <p class="issue-title" title="<?= $issue['fields']['summary'] ?>">
+                                    <b><?= $issue['key'] ?></b> - <?= $issue['fields']['summary'] ?>
+                                </p>
+                                <small class="issue issue-status ml-auto <?= $issue['fields']['status']['statusCategory']['colorName'] ?>">
+                                    <?= $issue['fields']['status']['name'] ?>
+                                </small>
+                            </div>
+                        </a>
+                        <div class="slot"></div>
+                    </div>
+                <?php } ?>
+            </div>
         </div>
+
     <?php } ?>
 </div>

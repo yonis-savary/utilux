@@ -29,20 +29,4 @@
     })();
 
     document.getElementById('jira-issue-list').querySelector('.clear-cache-button').href += ',gitlab-merge-requests'
-
-    <?php if (service('jira_gitlab_merger')['reorder'] ?? false) { ?>
-
-        let issues = Array.from(document.querySelectorAll('.jira'));
-
-        issues.sort((a, b) => {
-            if (a.getAttribute('has_merge_requests') != b.getAttribute('has_merge_requests'))
-                return a.getAttribute('has_merge_requests') ? -1 : 1
-
-            return a.getAttribute('issue') > b.getAttribute('issue') ? 1 : -1
-        })
-
-        let issueList = document.getElementById('jira-issue-list');
-        issues.forEach(x => issueList.appendChild(x))
-
-    <?php } ?>
 </script>

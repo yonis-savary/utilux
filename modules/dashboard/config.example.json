@@ -33,11 +33,9 @@
         },
         "jira_gitlab_merger": {
             "_": [
-                "This module can be used to merge your Jira Issues and Gitlab merge requests on the dashboard",
-                "Set reorder to true to display issues with merge requests first"
+                "This module can be used to merge your Jira Issues and Gitlab merge requests on the dashboard"
             ],
             "enabled": true,
-            "reorder": true,
             "view": "resources/modules/jira_gitlab_merger/view.php"
         }
     },
