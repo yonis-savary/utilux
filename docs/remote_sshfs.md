@@ -16,7 +16,10 @@ fusermount -u /mnt/my-vps.com
 echo "user_allow_other" | sudo tee -a /etc/fuse.conf
 
 # In /etc/fstab
-user@my-vps.com:/home/dist-user /mnt/my-vps.com fuse.sshfs _netdev,IdentityFile=/home/local-user/.ssh/my-vps.com,users,idmap=user,allow_other,default_permissions 0 0
+# Warning: please verify your uid/gid values
+# uid=$(id -u)
+# gid=$(id -g)
+user@my-vps.com:/home/dist-user /mnt/my-vps.com fuse.sshfs _netdev,IdentityFile=/home/local-user/.ssh/my-vps.com,users,idmap=user,allow_other,default_permissions,uid=1000,gid=1000 0 0
 
 # Check fstab syntax file
 sudo findmnt --verify
