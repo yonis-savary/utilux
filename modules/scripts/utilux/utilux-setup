@@ -138,6 +138,7 @@ if isInstalled 'code'; then
         installCodeExtention "github.copilot-chat"
         installCodeExtention "github.github-vscode-theme"
         installCodeExtention "gruntfuggly.todo-tree"
+        installCodeExtention "hallerpatrick.solarized-autumn"
         installCodeExtention "irongeek.vscode-env"
         installCodeExtention "johnpapa.vscode-peacock"
         installCodeExtention "mechatroner.rainbow-csv"
@@ -161,13 +162,12 @@ if isInstalled 'code'; then
         installCodeExtention "xabikos.javascriptsnippets"
         installCodeExtention "yoavbls.pretty-ts-errors"
         installCodeExtention "zhuangtongfa.material-theme"
-
         echo
     fi
 
     if utilux-prompt --prompt "Apply custom Visual Studio Code config ?"; then
         backupVSCodeSettings
-        updateVSCodeSetting "workbench.colorTheme" "Min Dark"
+        updateVSCodeSetting "workbench.colorTheme" "Solarized Autumn"
         updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"
         updateVSCodeSetting "editor.smoothScrolling" true
         updateVSCodeSetting "editor.cursorSmoothCaretAnimation" "on"

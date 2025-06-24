@@ -79,6 +79,15 @@ chmod 666 /var/run/docker.sock
 git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
 
 
+# Lua scripting language
+curl -L -R -O https://www.lua.org/ftp/lua-5.4.8.tar.gz
+tar zxf lua-5.4.8.tar.gz
+cd lua-5.4.8
+make all test
+# If everything is good 
+# sude make install
+
+
 # Check setup - VSC Extensions/Settings
 utilux-setup
 
