@@ -45,7 +45,6 @@ foreach ($myWork as $issue) {
 
 $groupedMyWork = array_values($groupedMyWork);
 
-stdlog(print_r($groupedMyWork, true));
 ?>
 
 <style>
