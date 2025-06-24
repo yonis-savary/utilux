@@ -125,6 +125,8 @@ echo
 
 if isInstalled 'code'; then
 
+    # Regenerate with
+    # code --list-extensions | awk '{print "installCodeExtension \"" $1 "\""}'
     if utilux-prompt --prompt "Install Visual Studio Code extensions ?"; then
         echo "Checking code extensions..."
         installCodeExtention "adpyke.vscode-sql-formatter"
@@ -165,9 +167,17 @@ if isInstalled 'code'; then
         echo
     fi
 
+    # Regenerate with
+    # cat .config/Code/User/settings.json \
+    # | grep -E "^  \".+" \
+    # | sed 's/  "//g' \
+    # | sed 's/": /\t/g' \
+    # | sed 's/,$//g' \
+    # | grep -v -E "{$" \
+    # | awk -F '\t' '{print "updateVSCodeSetting \"" $1 "\" " $2}'
+
     if utilux-prompt --prompt "Apply custom Visual Studio Code config ?"; then
         backupVSCodeSettings
-        updateVSCodeSetting "workbench.colorTheme" "Solarized Autumn"
         updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"
         updateVSCodeSetting "editor.smoothScrolling" true
         updateVSCodeSetting "editor.cursorSmoothCaretAnimation" "on"
@@ -178,8 +188,15 @@ if isInstalled 'code'; then
         updateVSCodeSetting "terminal.integrated.fontLigatures.enabled" true
         updateVSCodeSetting "editor.fontLigatures" true
         updateVSCodeSetting "window.zoomLevel" 1
+        updateVSCodeSetting "workbench.externalBrowser" "opera"
         updateVSCodeSetting "git.blame.statusBarItem.enabled" false
         updateVSCodeSetting "git.blame.editorDecoration.enabled" false
+        updateVSCodeSetting "workbench.colorTheme" "Solarized Autumn"
+        updateVSCodeSetting "workbench.editor.empty.hint" "hidden"
+        updateVSCodeSetting "git.confirmSync" false
+        updateVSCodeSetting "gitlens.graph.scrollMarkers.enabled" false
+        updateVSCodeSetting "gitlens.graph.avatars" false
+        updateVSCodeSetting "diffEditor.ignoreTrimWhitespace" false
         echo "VSCode configuration edited !"
     fi
 fi
