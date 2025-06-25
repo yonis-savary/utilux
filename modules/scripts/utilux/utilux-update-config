@@ -1,0 +1,49 @@
+#!/bin/sh
+
+backupUtiluxUserConfig() {
+    file_to_backup="$UTILUX_USER_RC"
+    if [ ! -f "$file_to_backup" ]; then
+        echo "Could not make a backup of $file_to_backup"
+        exit 1
+    fi
+
+    backup_base="${file_to_backup}.bak"
+    backup="$backup_base"
+
+    echo "Making backup of your utilux Config !"
+
+    i=1
+    while [ -f "$backup" ]; do
+        backup="${backup_base}.${i}"
+        i=$(expr "$i" + 1)
+    done
+
+    echo "Writing to $backup"
+    cp "$file_to_backup" "$backup"
+}
+
+backupUtiluxUserConfig
+
+echo ""
+tmpOutput=$(mktemp)
+
+while IFS= read -r line; do
+
+    if echo "$line" | grep -q -E "^#export"; then 
+        variable_name=$(echo "$line" | cut -d' ' -f2 | cut -d'=' -f1)
+        variable_value=$(eval "echo \"\$$variable_name\"")
+
+        if [ ! -z "$variable_value" ]; then
+            echo "= Retrieving $variable_name"
+            line="export $variable_name=\"$variable_value\""
+        else
+            echo "+ Undefined/New variable $variable_name"
+        fi
+    fi
+
+    #echo "$line"
+    echo "$line" >> $tmpOutput
+done < "$UTILUX_PATH/.shellrc.custom.example"
+
+echo "Overwriting $UTILUX_USER_RC"
+mv "$tmpOutput" "$UTILUX_USER_RC"

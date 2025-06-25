@@ -1,6 +1,9 @@
 # Setup a local directory to ssh directory
 
 ```bash
+# Install sshfs first
+sudo apt-get install sshfs
+
 # Add a ssh key
 utilux-ssh a my-vps.com
 ssh-copy-id -i ~/.ssh/my-vps.com.pub user@my-vps.com

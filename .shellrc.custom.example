@@ -3,12 +3,21 @@
 # This file holds the common configuration for utilux
 # Remove the '#' before a line to un-comment it
 
+# This file can be automatically updated with new content
+# To do so, launch utilux-update-config
+
 #   ___________________________
 # _/ Core - Utilux core config \_
 
 # Allow utilux to change your terminal prompt (false by default)
 #export UTILUX_ALLOW_PROMPT_CHANGE="true"
 
+
+#   _________
+# _/ Scripts \_
+
+# If set to true, gxc will perform a dxd before checking out a branch and dxu after
+#export UTILUX_GXC_CAN_USE_DOCKER="true"
 
 #   ___________
 # _/ Dashboard \_

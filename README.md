@@ -87,6 +87,7 @@ utilux-setup              # Check/install required packages & VSCode extensions
 utilux-share [FILE]       # Start a web server to share files
 utilux-ssh                # SSH key utilities
 utilux-update             # utilux self-update script
+utilux-update-config      # update your utilux configuration with latest changes
 
 dx                      # alias for docker compose
 dxb                     # docker compose build

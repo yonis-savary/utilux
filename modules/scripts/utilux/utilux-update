@@ -3,3 +3,5 @@
 cd $UTILUX_PATH && \
     git pull && \
     echo "Utilux updated !"
+
+utilux-prompt --prompt "Launch utilux-update-config ?" && utilux-update-config
