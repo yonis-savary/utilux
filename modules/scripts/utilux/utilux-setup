@@ -85,7 +85,7 @@ backupVSCodeSettings() {
     i=1
     while [ -f "$backup" ]; do
         backup="${backup_base}.${i}"
-        ((i++))
+        i=$(expr "$i" + 1)
     done
 
     cp "$settings" "$backup"
