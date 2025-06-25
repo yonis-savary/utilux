@@ -1,13 +1,14 @@
 <script>
     document.querySelectorAll('.jira[issue],.jira-parent[issue]').forEach(jiraSection => {
-        console.log(jiraSection)
         let issue = jiraSection.getAttribute('issue')
         let mergeSections = Array.from(document.querySelectorAll(`.merge-request[issue='${issue}']`))
         if (!mergeSections.length)
             return;
 
+        const isParentIssue = jiraSection.classList.contains('jira-parent');
+
         mergeSections.forEach(mergeSection => {
-            if (mergeSections.length === 1)
+            if (!isParentIssue)
                 mergeSection.querySelector('.title')?.remove()
 
             mergeSection.querySelectorAll('svg').forEach(svg => {
@@ -15,7 +16,11 @@
                 svg.setAttribute('width', Math.floor(parseInt(svg.getAttribute('width')) * 0.8));
             })
 
-            mergeSection.style.setProperty('--size', "18px");
+            console.log(jiraSection, jiraSection.classList.contains('jira-parent'))
+
+            if (!isParentIssue)
+                mergeSection.style.setProperty('--size', "18px");
+
             mergeSection.style.setProperty('padding', '.5em 1em')
             jiraSection.querySelector('.slot').appendChild(mergeSection);
         })

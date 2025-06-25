@@ -75,7 +75,13 @@ $colors = [
     </div>
 
     <?php foreach ($mergeRequests as $mr) { ?>
-        <a href="<?= $mr['web_url'] ?>" class="flex flex-col card merge-request" target='_blank' issue="<?= preg_replace("~.+, ?~", "", $mr['title']) ?>">
+        <a 
+            href="<?= $mr['web_url'] ?>" 
+            class="flex flex-col card merge-request" 
+            target='_blank' 
+            issue="<?= preg_replace("~.+, ?~", "", $mr['title']) ?>"
+            title="<?= $mr['title'] ?>"
+        >
             <div class="flex items-center gap-2">
                 <div class="flex flex-col flex-grow-1">
                     <b class="title"><?= $mr['title'] ?></b>

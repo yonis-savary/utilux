@@ -21,11 +21,14 @@ $repositories = cache('git-branches', function () {
             'name' => basename($repository),
             'directory' => $repository,
             'checked_out_branch' => $currentBranch,
-            'branches' => $branches
+            'branches' => array_diff($branches, ['main', 'develop', 'master'])
         ];
 
         $repositoriesData[] = $repoData;
     }
+
+    usort($repositoriesData, fn($a, $b) =>  count($a['branches']) < count($b['branches']) ? 1:-1);
+
     return $repositoriesData;
 });
 
@@ -53,31 +56,32 @@ function supportIssueNameInBranchName(string $branch)
         <?= clearCacheButton('git-branches') ?>
     </div>
 
-    <?php foreach ($repositories as $repo) {
-        if (!count(array_diff($repo['branches'], ['main', 'develop', 'master'])))
-            continue;
-    ?>
-        <div class="flex flex-col card">
-            <div class="flex items-center gap-5 justify-between">
-                <b><?= $repo['name'] ?></b>
-                <a href="/resources/actions/open-code.php?directory=<?= urlencode($repo['directory']) ?>">
-                    <small class="flex flex-row gap-3">
-                        <?= $repo['directory'] ?>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-symlink" viewBox="0 0 16 16">
-                            <path d="m11.798 8.271-3.182 1.97c-.27.166-.616-.036-.616-.372V9.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742"/>
-                            <path d="m.5 3 .04.87a2 2 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2m.694 2.09A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09l-.636 7a1 1 0 0 1-.996.91H2.826a1 1 0 0 1-.995-.91zM6.172 2a1 1 0 0 1 .707.293L7.586 3H2.19q-.362.002-.683.12L1.5 2.98a1 1 0 0 1 1-.98z"/>
-                        </svg>
-                    </small>
-                </a>
+    <?php foreach ($repositories as $repo) { ?>
+        <?php if (count($repo['branches'])) { ?>
+            <div class="flex flex-col card">
+                <div class="flex items-center gap-5 justify-between">
+                    <b><?= $repo['name'] ?></b>
+                    <a href="/resources/actions/open-code.php?directory=<?= urlencode($repo['directory']) ?>">
+                        <small class="flex flex-row gap-3">
+                            <?= $repo['directory'] ?>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-symlink" viewBox="0 0 16 16">
+                                <path d="m11.798 8.271-3.182 1.97c-.27.166-.616-.036-.616-.372V9.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742"/>
+                                <path d="m.5 3 .04.87a2 2 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2m.694 2.09A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09l-.636 7a1 1 0 0 1-.996.91H2.826a1 1 0 0 1-.995-.91zM6.172 2a1 1 0 0 1 .707.293L7.586 3H2.19q-.362.002-.683.12L1.5 2.98a1 1 0 0 1 1-.98z"/>
+                            </svg>
+                        </small>
+                    </a>
+                </div>
+                <details <?= count($repo['branches']) > 2 ? 'open' : '' ?>>
+                    <summary>Local Branches (<?= count($repo['branches']) ?>)</summary>
+                    <ul class="list-disc pl-5">
+                        <?php foreach ($repo['branches'] as $branch) { ?>
+                            <li class="<?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>"><?= supportIssueNameInBranchName($branch) ?></li>
+                        <?php } ?>
+                    </ul>
+                </details>
             </div>
-            <details <?= count($repo['branches']) > 2 ? 'open' : '' ?>>
-                <summary>Local Branches (<?= count($repo['branches']) ?>)</summary>
-                <ul class="list-disc pl-5">
-                    <?php foreach ($repo['branches'] as $branch) { ?>
-                        <li class="<?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>"><?= supportIssueNameInBranchName($branch) ?></li>
-                    <?php } ?>
-                </ul>
-            </details>
-        </div>
+        <?php } else { ?>
+            <span><?= $repo['name'] ?> : No feature/fix branches</span>
+        <?php } ?>
     <?php } ?>
 </div>
