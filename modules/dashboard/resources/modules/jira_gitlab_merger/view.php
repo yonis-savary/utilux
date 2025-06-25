@@ -1,5 +1,6 @@
 <script>
-    document.querySelectorAll('.jira[issue]').forEach(jiraSection => {
+    document.querySelectorAll('.jira[issue],.jira-parent[issue]').forEach(jiraSection => {
+        console.log(jiraSection)
         let issue = jiraSection.getAttribute('issue')
         let mergeSections = Array.from(document.querySelectorAll(`.merge-request[issue='${issue}']`))
         if (!mergeSections.length)
@@ -7,7 +8,7 @@
 
         mergeSections.forEach(mergeSection => {
             if (mergeSections.length === 1)
-                mergeSection.querySelector('.title').remove()
+                mergeSection.querySelector('.title')?.remove()
 
             mergeSection.querySelectorAll('svg').forEach(svg => {
                 svg.setAttribute('height', Math.floor(parseInt(svg.getAttribute('height')) * 0.8));

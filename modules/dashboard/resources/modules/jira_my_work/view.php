@@ -79,6 +79,14 @@ $groupedMyWork = array_values($groupedMyWork);
     .parent-title {
         margin: 1em 0;
     }
+
+    .jira-parent > .slot:empty {
+        display: none;
+    }
+    .jira-parent > .slot {
+        padding-bottom: 1em;   
+    }
+
 </style>
 
 <div class="flex flex-col gap-4" id="jira-issue-list">
@@ -91,7 +99,7 @@ $groupedMyWork = array_values($groupedMyWork);
     <?php
     usort($groupedMyWork, fn($a, $b) => ($a['parent']['key'] ?? '???') > ($b['parent']['key'] ?? '???') ? 1 : -1);
     foreach ($groupedMyWork as $group) { ?>
-        <div class="flex flex-col jira-parent">
+        <div class="flex flex-col jira-parent" issue="<?= $group['parent']['key'] ?? '?' ?>">
             <?php if ($group['parent']['key'] ?? false) { ?>
                 <a 
                     href="<?= getJiraIssueLink($group['parent']) ?>"
@@ -101,6 +109,7 @@ $groupedMyWork = array_values($groupedMyWork);
                     <b><?= $group['parent']['key'] ?></b> - <?= $group['parent']['fields']['summary'] ?>
                 </a>
             <?php } ?>
+            <div class="slot"></div>
             <div class="flex flex-col gap-2">
 
                 <?php
