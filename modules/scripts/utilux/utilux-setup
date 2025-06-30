@@ -1,6 +1,6 @@
 #!/bin/sh
 
-installCodeExtention()
+installCodeExtension()
 {
     packageName="$1"
     prettyName="${packageName##*.}"
@@ -129,41 +129,41 @@ if isInstalled 'code'; then
     # code --list-extensions | awk '{print "installCodeExtension \"" $1 "\""}'
     if utilux-prompt --prompt "Install Visual Studio Code extensions ?"; then
         echo "Checking code extensions..."
-        installCodeExtention "adpyke.vscode-sql-formatter"
-        installCodeExtention "antfu.goto-alias"
-        installCodeExtention "bmewburn.vscode-intelephense-client"
-        installCodeExtention "bradlc.vscode-tailwindcss"
-        installCodeExtention "davidanson.vscode-markdownlint"
-        installCodeExtention "dbaeumer.vscode-eslint"
-        installCodeExtention "eamodio.gitlens"
-        installCodeExtention "github.copilot"
-        installCodeExtention "github.copilot-chat"
-        installCodeExtention "github.github-vscode-theme"
-        installCodeExtention "gruntfuggly.todo-tree"
-        installCodeExtention "hallerpatrick.solarized-autumn"
-        installCodeExtention "irongeek.vscode-env"
-        installCodeExtention "johnpapa.vscode-peacock"
-        installCodeExtention "mechatroner.rainbow-csv"
-        installCodeExtention "mhutchie.git-graph"
-        installCodeExtention "miguelsolorio.min-theme"
-        installCodeExtention "ms-azuretools.vscode-containers"
-        installCodeExtention "ms-python.debugpy"
-        installCodeExtention "ms-python.python"
-        installCodeExtention "ms-python.vscode-pylance"
-        installCodeExtention "ms-vscode-remote.remote-containers"
-        installCodeExtention "mujichok.vscode-project-name-in-statusbar"
-        installCodeExtention "nuxt.mdc"
-        installCodeExtention "nuxtr.nuxt-vscode-extentions"
-        installCodeExtention "nuxtr.nuxtr-vscode"
-        installCodeExtention "pkief.material-icon-theme"
-        installCodeExtention "shardulm94.trailing-spaces"
-        installCodeExtention "usernamehw.errorlens"
-        installCodeExtention "visualstudioexptteam.intellicode-api-usage-examples"
-        installCodeExtention "visualstudioexptteam.vscodeintellicode"
-        installCodeExtention "vue.volar"
-        installCodeExtention "xabikos.javascriptsnippets"
-        installCodeExtention "yoavbls.pretty-ts-errors"
-        installCodeExtention "zhuangtongfa.material-theme"
+        installCodeExtension "adpyke.vscode-sql-formatter"
+        installCodeExtension "antfu.goto-alias"
+        installCodeExtension "bmewburn.vscode-intelephense-client"
+        installCodeExtension "bradlc.vscode-tailwindcss"
+        installCodeExtension "davidanson.vscode-markdownlint"
+        installCodeExtension "dbaeumer.vscode-eslint"
+        installCodeExtension "github.copilot"
+        installCodeExtension "github.copilot-chat"
+        installCodeExtension "github.github-vscode-theme"
+        installCodeExtension "gruntfuggly.todo-tree"
+        installCodeExtension "hallerpatrick.solarized-autumn"
+        installCodeExtension "irongeek.vscode-env"
+        installCodeExtension "johnpapa.vscode-peacock"
+        installCodeExtension "mechatroner.rainbow-csv"
+        installCodeExtension "mhutchie.git-graph"
+        installCodeExtension "miguelsolorio.min-theme"
+        installCodeExtension "ms-azuretools.vscode-containers"
+        installCodeExtension "ms-python.debugpy"
+        installCodeExtension "ms-python.python"
+        installCodeExtension "ms-python.vscode-pylance"
+        installCodeExtension "ms-vscode-remote.remote-containers"
+        installCodeExtension "mujichok.vscode-project-name-in-statusbar"
+        installCodeExtension "nuxt.mdc"
+        installCodeExtension "nuxtr.nuxt-vscode-extentions"
+        installCodeExtension "nuxtr.nuxtr-vscode"
+        installCodeExtension "pkief.material-icon-theme"
+        installCodeExtension "shardulm94.trailing-spaces"
+        installCodeExtension "usernamehw.errorlens"
+        installCodeExtension "visualstudioexptteam.intellicode-api-usage-examples"
+        installCodeExtension "visualstudioexptteam.vscodeintellicode"
+        installCodeExtension "vue.volar"
+        installCodeExtension "waderyan.gitblame"
+        installCodeExtension "xabikos.javascriptsnippets"
+        installCodeExtension "yoavbls.pretty-ts-errors"
+        installCodeExtension "zhuangtongfa.material-theme"
         echo
     fi
 
@@ -197,6 +197,13 @@ if isInstalled 'code'; then
         updateVSCodeSetting "gitlens.graph.scrollMarkers.enabled" false
         updateVSCodeSetting "gitlens.graph.avatars" false
         updateVSCodeSetting "diffEditor.ignoreTrimWhitespace" false
+        updateVSCodeSetting "breadcrumbs.symbolPath" "off"
+        updateVSCodeSetting "workbench.editor.pinnedTabsOnSeparateRow" true
+        updateVSCodeSetting "workbench.editor.highlightModifiedTabs" true
+        updateVSCodeSetting "breadcrumbs.icons" false
+        updateVSCodeSetting "editor.fontSize" 12
+        updateVSCodeSetting "terminal.integrated.fontSize" 11
+
         echo "VSCode configuration edited !"
     fi
 fi
