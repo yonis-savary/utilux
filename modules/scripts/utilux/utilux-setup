@@ -91,6 +91,43 @@ backupVSCodeSettings() {
     cp "$settings" "$backup"
 }
 
+
+register_new_gnome_keyboard_shortcut()
+{
+    binding_identifier="$1"
+    binding_name="$2"
+    binding_command="$3"
+    binding_binding="$4"
+
+    echo "Making new shortcut with"
+    echo " - identifier: $binding_identifier"
+    echo " - name: $binding_name"
+    echo " - command: $binding_command"
+    echo " - binding: $binding_binding"
+
+    existing=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
+
+    new_binding="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/$binding_identifier/"
+    escaped_new_binding=$(echo "$new_binding" | sed 's/\//\\\//g' )
+
+    if echo "$existing" | grep -q "$new_binding"; then
+        echo "$binding_identifier is already present in your system, overwriting it..."
+    else
+        echo "Adding the shortcut to gsettings"
+        if [ "$existing" = "@as []" ]; then
+            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$new_binding']"
+        else
+            updated=$(echo "$existing" | sed "s/]$/, '$escaped_new_binding']/g")
+            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$updated"
+        fi
+
+    fi
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$new_binding name "$binding_name"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$new_binding command "$binding_command"
+    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$new_binding binding "$binding_binding"
+
+}
+
 echo "Languages/tools to install";
 checkInstalled "jq";
 checkInstalled "git";
@@ -205,5 +242,15 @@ if isInstalled 'code'; then
         updateVSCodeSetting "terminal.integrated.fontSize" 11
 
         echo "VSCode configuration edited !"
+    fi
+fi
+
+
+
+if isInstalled 'gsettings'; then
+    if utilux-prompt --prompt "Install custom keyboard shortcuts ?"; then
+        register_new_gnome_keyboard_shortcut "utilux-opera" "Utilux - Launch Opera" "opera" "<Super>W"
+        register_new_gnome_keyboard_shortcut "utilux-home" "Utilux - Home folder" "nautilus -w '$HOME'" "<Super>F"
+        register_new_gnome_keyboard_shortcut "utilux-terminal" "Utilux - Terminal" "gnome-terminal" "<Super>T"
     fi
 fi

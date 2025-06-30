@@ -116,6 +116,13 @@ gxr [target_branch] [-y|--yes]  # Pull rebase
 gxrc                            # Rebase continue
 ```
 
+### Custom GNOME Shortcuts
+
+`utilux-setup` can create some custome keyboard for GNOME environments, which are
+  - Launch Opera (Web) : <kbd>Super</kbd> + <kbd>W</kbd>
+  - Launch Terminal (Terminal) : <kbd>Super</kbd> + <kbd>T</kbd>
+  - Open Home Folder (Files) : <kbd>Super</kbd> + <kbd>F</kbd>
+
 ## dbwand Module (WIP)
 
 > [!CAUTION]
