@@ -37,6 +37,14 @@
             ],
             "enabled": true,
             "view": "resources/modules/jira_gitlab_merger/view.php"
+        },
+        "notes": {
+            "_": [
+                "This module allows you to take simple and quick notes in a text file through the dashboard"
+            ],
+            "enabled": true,
+            "path": "/some/path/file.txt",
+            "view": "resources/modules/notes/view.php"
         }
     },
     "available_blocks": [
