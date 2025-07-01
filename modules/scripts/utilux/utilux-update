@@ -5,3 +5,4 @@ cd $UTILUX_PATH && \
     echo "Utilux updated !"
 
 utilux-prompt --prompt "Launch utilux-update-config ?" && utilux-update-config
+utilux-prompt --prompt "Launch utilux-setup ?" && utilux-setup
