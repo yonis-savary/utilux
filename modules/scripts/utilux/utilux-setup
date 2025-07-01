@@ -225,7 +225,7 @@ if isInstalled 'code'; then
         updateVSCodeSetting "terminal.integrated.fontLigatures.enabled" true
         updateVSCodeSetting "editor.fontLigatures" true
         updateVSCodeSetting "window.zoomLevel" 1
-        updateVSCodeSetting "workbench.externalBrowser" "opera"
+        updateVSCodeSetting "workbench.externalBrowser" "firefox"
         updateVSCodeSetting "git.blame.statusBarItem.enabled" false
         updateVSCodeSetting "git.blame.editorDecoration.enabled" false
         updateVSCodeSetting "workbench.colorTheme" "Solarized Autumn"
@@ -249,8 +249,8 @@ fi
 
 if isInstalled 'gsettings'; then
     if utilux-prompt --prompt "Install custom keyboard shortcuts ?"; then
-        register_new_gnome_keyboard_shortcut "utilux-opera" "Utilux - Launch Opera" "opera" "<Super>W"
-        register_new_gnome_keyboard_shortcut "utilux-home" "Utilux - Home folder" "nautilus -w '$HOME'" "<Super>F"
-        register_new_gnome_keyboard_shortcut "utilux-terminal" "Utilux - Terminal" "gnome-terminal" "<Super>T"
+        register_new_gnome_keyboard_shortcut "utilux-browser" "Utilux - Launch Browser" "xdg-open about:blank" "<Ctrl><Alt>F"
+        register_new_gnome_keyboard_shortcut "utilux-home" "Utilux - Home folder" "nautilus -w '$HOME'" "<Ctrl><Alt>E"
+        register_new_gnome_keyboard_shortcut "utilux-terminal" "Utilux - Terminal" "gnome-terminal" "<Ctrl><Alt>T"
     fi
 fi
