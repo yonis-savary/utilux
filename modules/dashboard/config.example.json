@@ -29,6 +29,11 @@
             "enabled": true,
             "view": "resources/modules/git_branches/view.php",
             "repositories": [
+            ],
+            "ignore_branches": [
+                "main",
+                "master",
+                "develop"
             ]
         },
         "jira_gitlab_merger": {

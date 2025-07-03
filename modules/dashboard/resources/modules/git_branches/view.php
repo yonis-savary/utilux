@@ -4,24 +4,33 @@ $repositories = cache('git-branches', function () {
     $repositoriesData = [];
 
     $repositories = service('git')['repositories'];
+    $branchesToIgnores = service('git')['ignore_branches'] ?? [];
     foreach ($repositories as $repository) {
 
         $currentBranch = null;
         $branches = command("git branch", $repository);
         $branches = explode("\n", $branches);
-        $branches = array_map(function ($branch) use (&$currentBranch) {
+        $branches = array_filter(array_map(function ($branch) use (&$currentBranch) {
             $cleanBranchName = trim(preg_replace('/^[* ]+/', '', $branch));
             if (str_starts_with($branch, '*'))
                 $currentBranch = $cleanBranchName;
             return $cleanBranchName;
-        }, $branches);
-        $branches = array_values(array_filter(array_diff($branches, ['main', 'master'])));
+        }, $branches));
+
+        $hasUnstagedFiles = command("git status --short | grep -v -E \"^ +\?.+$\"", $repository);
+        $unpushedBranches = command("git log --branches --not --remotes --decorate=short --pretty=format:'%D' | sed 's/^HEAD -> //g' | sort -u", $repository) ?? '';
+
+        $needPush = $unpushedBranches || $hasUnstagedFiles;
+        $unpushedBranches = explode("\n", $unpushedBranches);
 
         $repoData = [
             'name' => basename($repository),
             'directory' => $repository,
             'checked_out_branch' => $currentBranch,
-            'branches' => array_diff($branches, ['main', 'develop', 'master'])
+            'need_push' => $needPush,
+            'unstaged_files' => $hasUnstagedFiles,
+            'unpushed_branches' => $unpushedBranches,
+            'branches' => array_diff($branches, $branchesToIgnores)
         ];
 
         $repositoriesData[] = $repoData;
@@ -75,14 +84,27 @@ function supportIssueNameInBranchName(string $branch)
                     <summary>Local Branches (<?= count($repo['branches']) ?>)</summary>
                     <ul class="list-disc pl-5">
                         <?php foreach ($repo['branches'] as $branch) { ?>
-                            <li class="<?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>"><?= supportIssueNameInBranchName($branch) ?></li>
+                            <li class="<?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>">
+                                <?= in_array($branch, $repo['unpushed_branches']) ? "*": "" ?>
+                                <?= supportIssueNameInBranchName($branch) ?>
+                            </li>
                         <?php } ?>
                     </ul>
                 </details>
+                <?php if ($unstagedFiles = $repo['unstaged_files']) { ?>
+                    <b class="pt-5">
+                        Has unstaged files : 
+                        <ul>
+                            <?php foreach (explode("\n", $unstagedFiles) as $file) { ?>
+                                <li><?= $file ?></li>
+                            <?php } ?>
+                        </ul>
+                    </b>
+                <?php } ?>
             </div>
         <?php } else { ?>
             <div class="flex items-center gap-5 justify-between">
-                <span><?= $repo['name'] ?> : No feature/fix branches</span>
+                <span><?= $repo['name'] ?> <?= $repo['need_push'] ? '(Need push)': '' ?> : No feature/fix branches</span>
                 <a href="/resources/actions/open-code.php?directory=<?= urlencode($repo['directory']) ?>">
                     <small class="flex flex-row gap-3">
                         <?= $repo['directory'] ?>

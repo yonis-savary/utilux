@@ -7,10 +7,8 @@ then
     can_use_docker="1"
 fi
 
-[ "$can_use_docker" = "1" ] && echo "Shutting down docker services" && dxd >/dev/null 2>&1
-
 branch_name=$(gxl "$1")
 shift
 git checkout "$branch_name" "$@"
 
-[ "$can_use_docker" = "1" ] && echo "Starting docker services" && dxu >/dev/null 2>&1
+[ "$can_use_docker" = "1" ] && dxu
