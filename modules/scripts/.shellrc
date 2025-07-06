@@ -13,4 +13,4 @@ source "$SCRIPT_DIR/.shellrc_comp"
 
 alias dx="docker compose"
 alias dxr="docker compose restart"
-alias dxl="docker compose logs"
+alias dxl="docker compose logs --follow"
