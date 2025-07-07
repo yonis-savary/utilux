@@ -88,15 +88,17 @@ utilux-share [FILE]       # Start a web server to share files
 utilux-ssh                # SSH key utilities
 utilux-update             # utilux self-update script
 utilux-update-config      # update your utilux configuration with latest changes
+utilux-mount-ssh          # wizard to mount a ssh directory into your fstab
 
 dx                      # alias for docker compose
 dxb                     # docker compose build
 dxu                     # docker compose up -d
 dxd                     # docker compose down
-dxr [service]           # docker compose restart
 dxdu                    # dxd && dxu
+dxr [service]           # docker compose restart
+dxsp                    # docker system prune -a
 dxp                     # docker compose ps
-dxl [service]           # docker compose logs
+dxl [service]           # docker compose logs --follow
 dxe [service] [program] # docker compose exec
 
 gx                              # Help for all gx* scripts
