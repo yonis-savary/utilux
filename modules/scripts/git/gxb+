@@ -15,11 +15,13 @@ if echo "$branch_name" | grep -E "$ticket_regex" > /dev/null; then
             --header 'Accept: application/json'
         )
 
+
         branch_type="feat"
-        issue_type=$(echo "$output" | jq '.fields.issueType.name' -r )
-        if [ "$(echo "$issue_type" | grep -ciE "bug" )" ]
-        then
+        issue_type=$(echo "$output" | jq '.fields.issuetype.name' -r )
+        if echo "$issue_type" | grep -qiE "bug"; then
             branch_type="fix"
+        elif echo "$issue_type" | grep -qiE "epic"; then
+            branch_type="epic"
         fi
 
         title=$(
@@ -32,7 +34,8 @@ if echo "$branch_name" | grep -E "$ticket_regex" > /dev/null; then
             perl -pe "s/[^0-9a-z]/ /g" | \
             perl -pe "s/^\s|\s+\$//g" | \
             perl -pe "s/\b\w{,3}\b//g" | \
-            perl -pe "s/ +/-/g"
+            perl -pe "s/ +/-/g" | \
+            perl -pe "s/^\-+|\-+$//g"
         )
         branch_name="$branch_type/$branch_name/$title"
     else
