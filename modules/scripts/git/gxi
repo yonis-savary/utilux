@@ -11,7 +11,7 @@ echo
 echo "🧹 Cleaning up your repo..."
 git reset --hard
 git clean -fd
-
+gxpm
 
 echo
 echo "📥 Retrieving missing work (1/2)..."
@@ -39,7 +39,7 @@ echo "📥 Retrieving missing work (2/2)..."
 original_branch=$(gxb)
 git for-each-ref --format='%(refname:short)' refs/heads | while read branch ; do
     git checkout "$branch" >/dev/null
-    git pull >/dev/null
+    git pull >/dev/null && echo "Branch pulled successfuly"
 done
 git checkout "$original_branch"
 
