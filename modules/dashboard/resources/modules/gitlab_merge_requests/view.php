@@ -95,6 +95,7 @@ $colors = [
                         <?= $mr['source_branch'] ?> → <?= $mr['target_branch'] ?>
                     </small>
                 </div>
+                <small><?= $mr['references']['full'] ?></small>
                 <div class="flex">
                     <?php foreach (($approvals[$mr['iid']] ?? []) as $approver) { ?>
                         <img class="approver-avatar" src="<?= $approver['user']['avatar_url'] ?>" title="Approved by <?= $approver['user']['name'] ?>">
