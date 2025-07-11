@@ -9,6 +9,8 @@ branches_to_delete=$(
   done
 )
 
+gxf
+
 if [ -z "$branches_to_delete" ]
 then
   echo "✅ No merged branches to delete."
