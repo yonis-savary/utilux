@@ -1,0 +1,480 @@
+#!/bin/sh
+
+gxt_find()
+{
+    gxt list -l | grep "$1" | head -n1
+}
+
+gxt_find_help()
+{
+    echo "gxt find - Print the absolute path to a clone repository"
+    echo ""
+    echo "Usage   : gxt find <keyword> [-h|--help]"
+    echo "Example : gxt find my-projet"
+    echo ""
+    echo " -h | --help     Print this help message"
+}
+
+
+
+
+
+
+
+
+
+
+
+gxt_pretty_list()
+{
+    escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
+    relative_directories=$(gxt list -l | sed "s/$escaped_repo_path\///g" )
+
+    last_origin=""
+    last_author=""
+    last_repo=""
+
+    for directory in $relative_directories; do
+
+        slashes_count=$(echo "$directory" | grep -o "\/" | wc -l)
+        tree_size=$(($slashes_count + 1))
+
+        this_repo=""
+        if [ "$tree_size" = "3" ]
+        then
+            this_origin=$(echo "$directory" | cut -d/ -f 1)
+            this_author=$(echo "$directory" | cut -d/ -f 2)
+            this_repo=$(echo "$directory" | cut -d/ -f 3)
+        elif [ "$tree_size" = "2" ]
+        then
+            this_origin=""
+            this_author=$(echo "$directory" | cut -d/ -f 1)
+            this_repo=$(echo "$directory" | cut -d/ -f 2)
+        elif [ "$tree_size" = "1" ]
+        then
+            this_origin=""
+            this_author=""
+            this_repo=$(echo "$directory" | cut -d/ -f 1)
+        fi
+
+        if [ ! "$this_origin" = "$last_origin" ]; then
+            last_origin="$this_origin"
+            echo "- $this_origin:"
+        fi
+
+        if [ ! "$this_author" = "$last_author" ]; then
+            last_author="$this_author"
+            echo "    - $this_author:"
+        fi
+
+        if [ ! -z "$last_origin" ]; then
+            printf "    "
+        fi
+
+        if [ ! -z "$last_author" ]; then
+            printf "    "
+        fi
+
+        if [ -z "$this_repo" ]; then
+            echo "- $directory"
+        else
+            echo "- $this_repo"
+        fi
+    done
+}
+
+gxt_list()
+{
+    list_mode="pretty"
+    path_mode="absolute"
+
+    for arg in "$@"; do 
+        case "$1" in
+            --list|-l)
+                list_mode="list"
+                shift
+                ;;
+            --relative|-r)
+                path_mode="relative"
+                shift
+                ;;
+        esac
+    done
+
+    if [ "$list_mode" = "pretty" ]; then
+        gxt_pretty_list
+    elif [ "$list_mode" = "list" ]; then
+
+        absolutes=$(find "$gxt_repos_path" -type d -iname ".git" | sed 's/\/.git//g' | sort)
+
+        if [ "$path_mode" = "relative" ]; then
+            escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
+            echo "$absolutes" | sed "s/$escaped_repo_path\///g" | sort
+        else
+            echo "$absolutes"
+        fi
+    fi
+
+}
+
+
+gxt_list_help()
+{
+    echo "gxt list - Print cloned repositories"
+    echo "By default, print your directories in a tree structure (host/author/repo)"
+    echo ""
+    echo "Usage : gxt list [-l|--list] [-r|--relative] [-h|--help]"
+    echo ""
+    echo " -l | --list     Print absolutes repositories path in your system (1 per line, useful for scripting)"
+    echo " -r | --relative Print relatives repositories path in your system (must be used with -l, is ignored otherwise)"
+    echo " -h | --help     Print this help message"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+gxt_clone()
+{
+    for url in "$@"; do
+        url="$1"
+        shift
+        target_directory=""
+        if echo "$url" | grep -qE "^.+@.+:.+\/.+$"; then
+            echo "SSH Url detected !"
+            target_directory=$(echo "$url" | sed -E 's/.+@|\.git//g' | sed -E 's/:/\//g')
+        elif echo "$url" | grep -qE "^http.*$"; then
+            echo "HTTP Url detected !"
+            target_directory=$(echo "$url" | sed -E 's/.+\/\/|\.git//g')
+        else
+            echo "Unrecognized format, letting git decide the target directory"
+        fi
+
+        if [ -z "$target_directory" ]; then
+            current_path=$(pwd)
+            cd "$gxt_repos_path"
+            git clone "$url"
+            cd "$current_path"
+        else
+            target_directory="$gxt_repos_path/$target_directory"
+            echo "Cloning to $target_directory"
+            git clone "$url" "$target_directory"
+        fi
+    done
+
+}
+
+
+gxt_clone_help()
+{
+    echo "gxt clone - Clone one or more repositories in your system"
+    echo ""
+    echo "Usage   : gxt clone [url...url-n] [-h|--help]"
+    echo "Example : gxt clone git@github.com:twbs/icons.git"
+    echo ""
+    echo "This command uses git so its supports SSH and HTTP urls"
+    echo "You can give this command multiples url at once"
+    echo ""
+    echo " -h | --help     Print this help message"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+gxt_fetch()
+{
+    escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
+
+    current_path=$(pwd)
+    repositories=$(gxt list -l)
+    repositories_count=$(echo "$repositories" | wc -l)
+    i="1"
+    for directory in $repositories; do
+        relative_directory=$(echo "$directory" | sed "s/$escaped_repo_path\///g" )
+        echo "($i/$repositories_count) Moving to $relative_directory"
+        cd "$directory"
+        gxf
+        i=$(($i + 1))
+    done
+    cd "$current_path"
+}
+
+gxt_fetch_help()
+{
+    echo "gxt fetch - Fetch changes in all of your repositories"
+    echo ""
+    echo "Usage   : gxt fetch [-h|--help]"
+    echo ""
+    echo "This command simply go through your cloned repositories and execute the gxf script"
+    echo "(which is a git fetch --prune --all)"
+    echo ""
+    echo " -h | --help     Print this help message"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+gxt_explore()
+{
+    project="$1"
+
+    if [ -z "$project" ]; then 
+        nohup nautilus -w "$gxt_repos_path" &
+    else 
+        projet_path=$(gxt find "$project")
+        if [ -z "$projet_path" ]; then 
+            echo "No repo found for keyword $project, opening root directory"
+            gxl list
+            nohup nautilus -w "$gxt_repos_path" &
+        else
+            nohup nautilus -w "$projet_path" &
+        fi
+    fi
+
+}
+
+
+gxt_explore_help()
+{
+    echo "gxt explore - Open the directory containing your repositories"
+    echo ""
+    echo "Usage   : gxt explore [-h|--help]"
+    echo ""
+    echo " -h | --help     Print this help message"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+gxt_code()
+{
+    project="$1"
+
+    if [ -z "$project" ]; then 
+        echo "This subcommand needs a repo name"
+        exit 1
+    else
+        projet_path=$(gxt find "$project")
+        if [ -z "$projet_path" ]; then
+            echo "No repo found for keyword $project, opening root directory"
+            exit 1
+        else
+            code "$projet_path"
+        fi
+    fi
+
+}
+
+
+gxt_code_help()
+{
+    echo "gxt code - Open Visual Studio Code for one of your repositories"
+    echo ""
+    echo "Usage   : gxt code <repo-name> [-h|--help]"
+    echo ""
+    echo " -h | --help     Print this help message"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+gxt_desktop()
+{
+    project="$1"
+
+    allow_overwrite="0"
+
+    for arg in "$@"; do
+        case "$arg" in 
+            -o|--overwrite)
+                allow_overwrite="1"
+            ;;
+        esac
+    done
+
+    if [ -z "$project" ]; then
+        echo "This subcommand needs a repo name"
+        exit 1
+    else
+        projet_path=$(gxt find "$project")
+        if [ -z "$projet_path" ]; then
+            echo "No repo found for keyword $project, opening root directory"
+            exit 1
+        fi
+    fi
+
+    repo_basename=$(basename $projet_path)
+    desktop_name="$repo_basename.code.desktop"
+    echo "Making a shortcut desktop named $desktop_name"
+
+
+    desktop=$(xdg-user-dir DESKTOP)
+    desktop_shortcut_path="$desktop/$desktop_name"
+    if [ -f "$desktop_shortcut_path" ]; then 
+        if [ "$allow_overwrite" = "0" ]; then 
+            echo "A file named $desktop_shortcut_path already exists"
+            echo "Use -o|--overwrite to overwrite it"
+            exit 1
+        fi
+    fi
+
+    echo "[Desktop Entry]" > $desktop_shortcut_path
+    echo "Name=$repo_basename" >> $desktop_shortcut_path
+    echo "Comment=Open $repo_basename repository in VS Code" >> $desktop_shortcut_path
+    echo "Exec=code $projet_path" >> $desktop_shortcut_path
+    echo "Icon=vscode" >> $desktop_shortcut_path
+    echo "Terminal=false" >> $desktop_shortcut_path
+    echo "Type=Application" >> $desktop_shortcut_path
+    echo "Categories=Development;IDE;" >> $desktop_shortcut_path
+
+    chmod +x $desktop_shortcut_path
+}
+
+
+gxt_desktop_help()
+{
+    echo "gxt desktop - Create a Visual Studio Code desktop shortcut for one of your repository"
+    echo ""
+    echo "Usage   : gxt desktop <repo-name> [-h|--help] [-o|--overwrite]"
+    echo "Example : gxt desktop my-projet"
+    echo "          gxt desktop author/my-projet"
+    echo ""
+    echo " -h | --help       Print this help message"
+    echo " -o | --overwrite  Overwrite any existing desktop shortcut"
+}
+
+
+
+
+
+
+
+gxt_user_command="$1"
+gxt_appdata_path="$UTILUX_APPDATA_PATH/gxt"
+gxt_repos_path="$gxt_appdata_path/repositories"
+
+[ -d "$gxt_appdata_path" ] || mkdir -p "$gxt_appdata_path"
+[ -d "$gxt_repos_path" ] || mkdir -p "$gxt_repos_path"
+
+help()
+{
+    echo "gxt - git utils terminal"
+    echo ""
+    echo "Available subcommands"
+    echo " - help                 Print this help message"
+    echo " - list                 List every cloned repository"
+    echo " - clone <SSH|HTTP-URL> Clone a repository"
+    echo " - fetch                Fetch every repository changes"
+    echo " - explore <repo>       Open file explorer in repos directory"
+    echo " - desktop <repo>       Create a VSCode desktop shortcut for one "
+    echo " - find <repo>          Find the absolute path of a repository"
+
+    echo "(Tip: you can use --help with any of these subcommands)"
+}
+
+if [ -z "$gxt_user_command" ]; then
+    echo "Please use a subcommand name after gxt"
+    help
+    exit 1
+fi
+
+HELP_MODE="0"
+for arg in "$@"; do
+    if [ "$arg" = "--help" -o "$arg" = "-h" ]; then
+        HELP_MODE="1"
+    fi
+done
+
+case "$gxt_user_command" in
+    list)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_list_help ) || gxt_list "$@"
+        ;;
+    clone)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_clone_help ) || gxt_clone "$@"
+        ;;
+    fetch)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_fetch_help ) || gxt_fetch "$@"
+        ;;
+    help)
+        help
+        ;;
+    explore)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_explore_help ) || gxt_explore "$@"
+        ;;
+    code)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_code_help ) || gxt_code "$@"
+        ;;
+    desktop)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_desktop_help ) || gxt_desktop "$@"
+        ;;
+    find)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_find_help ) || gxt_find "$@"
+        ;;
+    *)
+        echo "Unrecognized subcommand $gxt_user_command"
+        help
+        exit 1
+        ;;
+esac

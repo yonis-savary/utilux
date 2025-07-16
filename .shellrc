@@ -3,6 +3,7 @@
 UTILUX_PATH="$HOME/utilux"
 
 UTILUX_CONFIG_PATH="$HOME/.config/utilux"
+UTILUX_APPDATA_PATH="$HOME/.local/share/utilux"
 UTILUX_SCRIPT="$UTILUX_PATH/.shellrc"
 UTILUX_USER_RC="$UTILUX_CONFIG_PATH/utilux-config"
 
@@ -13,10 +14,12 @@ export UTILUX_PATH
 export UTILUX_BIN_PATH
 export UTILUX_CONFIG_PATH
 export UTILUX_USER_RC
+export UTILUX_APPDATA_PATH
 export PATH
 
 [ -d "$UTILUX_CONFIG_PATH" ] || mkdir -p "$UTILUX_CONFIG_PATH"
 [ -d "$UTILUX_BIN_PATH" ] || mkdir "$UTILUX_BIN_PATH"
+[ -d "$UTILUX_APPDATA_PATH" ] || mkdir "$UTILUX_APPDATA_PATH"
 
 
 SHELL_NAME=$(ps -hp $$ | awk '{print $5}')

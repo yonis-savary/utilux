@@ -29,6 +29,7 @@ utilux-config # (OR) nano ~/.config/utilux/utilux-config
 
 1. Remove the `~/utilux` directory
 2. Remove `~/.config/utilux` directory
+2. Remove `~/.local/share/utilux` directory (Warning: delete all your utilux command data, such as your repositories if you're using `gxt`)
 3. Delete the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
 
 ## Dashboard configuration
