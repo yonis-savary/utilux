@@ -31,6 +31,30 @@ _utilux_ssh_autocomplete() {
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
 }
 
+
+_utilux_gxt_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local opts=""
+
+    relatives=$(gxt list -l -r)
+    hostless=$(echo "$relatives" | sed "s/[^\/]*\///")
+    repoonly=$(echo "$relatives" | sed "s/.*\///")
+    all=$(echo "$relatives" "$hostless" "$repoonly")
+
+    case $COMP_CWORD in
+        1)
+            opts="help list clone fetch explore"
+            ;;
+        *)
+            opts="$all"
+            ;;
+    esac
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
+
+
 complete -F _utilux_git_branches_autocomplete gxc
 complete -F _utilux_git_branches_autocomplete gxbf
 complete -F _utilux_git_branches_autocomplete gxr
@@ -45,5 +69,7 @@ complete -F _utilux_ssh_autocomplete utilux-ssh
 complete -F _docker_compose_services_list_autocomplete dxl
 complete -F _docker_compose_services_list_autocomplete dxe
 complete -F _docker_compose_services_list_autocomplete dxr
+
+complete -F _utilux_gxt_autocomplete gxt
 
 
