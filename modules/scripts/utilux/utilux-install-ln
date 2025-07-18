@@ -24,5 +24,5 @@ then
     exit 1
 fi
 
-echo "Linking symlink $binName to $targetBinName"
+echo "Linking symlink $targetBinName to $binName"
 ln -s "$binName" "$targetBinName"
