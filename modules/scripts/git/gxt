@@ -30,6 +30,7 @@ gxt_pretty_list()
     escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
     relative_directories=$(gxt list -l | sed "s/$escaped_repo_path\///g" )
 
+    last_group=""
     last_origin=""
     last_author=""
     last_repo=""
@@ -40,21 +41,34 @@ gxt_pretty_list()
         tree_size=$(($slashes_count + 1))
 
         this_repo=""
-        if [ "$tree_size" = "3" ]
+        if [ "$tree_size" = "4" ]
         then
+            this_origin=$(echo "$directory" | cut -d/ -f 1)
+            this_group=$(echo "$directory" | cut -d/ -f 2)
+            this_author=$(echo "$directory" | cut -d/ -f 3)
+            this_repo=$(echo "$directory" | cut -d/ -f 4)
+        elif [ "$tree_size" = "3" ]
+        then
+            this_group=""
             this_origin=$(echo "$directory" | cut -d/ -f 1)
             this_author=$(echo "$directory" | cut -d/ -f 2)
             this_repo=$(echo "$directory" | cut -d/ -f 3)
         elif [ "$tree_size" = "2" ]
         then
+            this_group=""
             this_origin=""
             this_author=$(echo "$directory" | cut -d/ -f 1)
             this_repo=$(echo "$directory" | cut -d/ -f 2)
         elif [ "$tree_size" = "1" ]
         then
+            this_group=""
             this_origin=""
             this_author=""
             this_repo=$(echo "$directory" | cut -d/ -f 1)
+        fi
+
+        if [ ! "$this_group" = "$last_group" ]; then
+            last_group="$this_group"
         fi
 
         if [ ! "$this_origin" = "$last_origin" ]; then
@@ -63,8 +77,14 @@ gxt_pretty_list()
         fi
 
         if [ ! "$this_author" = "$last_author" ]; then
+
             last_author="$this_author"
-            echo "    - $this_author:"
+            if [ ! -z "$last_group" ]; then 
+                echo "    - $last_group => $this_author:"
+            else 
+                echo "    - $this_author:"
+            fi
+
         fi
 
         if [ ! -z "$last_origin" ]; then
@@ -105,7 +125,7 @@ gxt_list()
         gxt_pretty_list
     elif [ "$list_mode" = "list" ]; then
 
-        absolutes=$(find "$gxt_repos_path" -type d -iname ".git" | sed 's/\/.git//g' | sort)
+        absolutes=$(find "$gxt_repos_path" -maxdepth 5 -type d -iname ".git" | sed 's/\/.git//g' | sort)
 
         if [ "$path_mode" = "relative" ]; then
             escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
