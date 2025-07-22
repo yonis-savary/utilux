@@ -266,15 +266,15 @@ gxt_explore()
     project="$1"
 
     if [ -z "$project" ]; then 
-        nohup nautilus -w "$gxt_repos_path" &
+        nohup nautilus -w "$gxt_repos_path" > /dev/null 2>&1 &
     else 
         projet_path=$(gxt find "$project")
         if [ -z "$projet_path" ]; then 
             echo "No repo found for keyword $project, opening root directory"
             gxl list
-            nohup nautilus -w "$gxt_repos_path" &
+            nohup nautilus -w "$gxt_repos_path" > /dev/null 2>&1 &
         else
-            nohup nautilus -w "$projet_path" &
+            nohup nautilus -w "$projet_path" > /dev/null 2>&1 &
         fi
     fi
 

@@ -160,4 +160,4 @@ echo "Mount point added to your fstab file"
 
 sudo mount "$local_path"
 
-nohup nautilus -w "$local_path" &
+nohup nautilus -w "$local_path" > /dev/null 2>&1 &
