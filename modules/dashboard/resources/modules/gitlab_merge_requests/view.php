@@ -46,15 +46,15 @@ list($mergeRequests, $pipelines, $approvals) = cache(
 );
 
 $status = [
-    'success' => 'passed !' ,
-    'failed' => 'failed !',
-    'running' => ' is running !'
+    'success' => 'Passed' ,
+    'failed' => 'Failed',
+    'running' => 'Running'
 ];
 
 $colors = [
-    'failed' => '#ff5733',
-    'success' => '#73f99f',
-    'running' => '#00e8ff',
+    'failed' => 'white',
+    'success' => 'black',
+    'running' => 'black',
 ];
 
 ?>
@@ -66,6 +66,34 @@ $colors = [
         border-radius: 100%;
         box-shadow: 0px 0px 12px rgba(0, 255, 0);
     }
+
+    .pipeline-status {
+        padding: .25em .5em;
+        border-radius: 0px 4px 4px 0px;
+        font-size: .75em;
+        width: 6em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-left: 1em;
+        clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
+        transition: all 200ms ease;
+    }
+
+    .merge-request:hover .pipeline-status {
+        padding-left: 0em;
+        clip-path: polygon(0% 0, 100% 0, 100% 100%, 0% 100%);
+    }
+
+    .pipeline-status.failed { background: #c25252; }
+    .pipeline-status.success { background: #52c266; }
+    .pipeline-status.running { background: #528cc2; }
+
+    .merge-request-list .card {
+        padding: 0;
+    }
+
+
 </style>
 <div class="flex flex-col gap-4" id="merge-request-list">
     <div class="flex justify-between items-center">
@@ -82,8 +110,8 @@ $colors = [
             issue="<?= preg_replace("~.+, ?~", "", $mr['title']) ?>"
             title="<?= $mr['title'] ?>"
         >
-            <div class="flex items-center gap-2">
-                <div class="flex flex-col flex-grow-1">
+            <div class="flex gap-2">
+                <div class="flex flex-col flex-grow-1 py-1 px-3">
                     <b class="title"><?= $mr['title'] ?></b>
                     <small class="flex items-center gap-3">
                         <?php if ($mr['draft'] === true) {  ?>
@@ -95,7 +123,7 @@ $colors = [
                         <?= $mr['source_branch'] ?> → <?= $mr['target_branch'] ?>
                     </small>
                 </div>
-                <small><?= $mr['references']['full'] ?></small>
+                <small class="my-auto"><?= $mr['references']['full'] ?></small>
                 <div class="flex">
                     <?php foreach (($approvals[$mr['iid']] ?? []) as $approver) { ?>
                         <img class="approver-avatar" src="<?= $approver['user']['avatar_url'] ?>" title="Approved by <?= $approver['user']['name'] ?>">
@@ -103,13 +131,9 @@ $colors = [
                 </div>
                 <div class="flex">
                     <?php if ($pipeline = $pipelines[$mr['iid']][0] ?? false) { ?>
-                        <span title="Pipeline <?= $status[$pipeline['status']] ?? ": unknown status" ?>">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="<?= $colors[$pipeline['status']] ?? "#f7a900" ?>" class="bi bi-play-circle" viewBox="0 0 16 16"
-                                >
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16"/>
-                                <path d="M6.271 5.055a.5.5 0 0 1 .52.038l3.5 2.5a.5.5 0 0 1 0 .814l-3.5 2.5A.5.5 0 0 1 6 10.5v-5a.5.5 0 0 1 .271-.445"/>
-                            </svg>
-                        </span>
+                        <b class="pipeline-status <?= $pipeline['status'] ?>">
+                            <?= $status[$pipeline['status']] ?? ": unknown status" ?>
+                        </b>
                     <?php }  ?>
                 </div>
             </div>

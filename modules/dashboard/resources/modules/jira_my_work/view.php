@@ -51,9 +51,21 @@ $groupedMyWork = array_values($groupedMyWork);
     .issue {
         font-weight: bolder;
         padding: .25em .5em;
-        border-radius: 4px;
+        border-radius: 0px 4px 4px 0px;
         font-size: .75em;
-        max-width: max-content;
+        width: 10em;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 200ms ease;
+        padding-left: 2em;
+        clip-path: polygon(18% 0, 100% 0, 100% 100%, 0% 100%);
+    }
+
+
+    .jira:hover .issue {
+        padding-left: 0em;
+        clip-path: polygon(0% 0, 100% 0, 100% 100%, 0% 100%);
     }
 
     .issue.yellow {
@@ -63,13 +75,19 @@ $groupedMyWork = array_values($groupedMyWork);
 
     .issue.blue-gray {
         background: #091E42;
-        color: #44546F
+        color: #527cc2
+    }
+
+    .issue.green {
+        background: #09420d;
+        color: #4dcb57
     }
 
     .issue-title {
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        max-width: 60ch;
     }
 
     .issue-status {
@@ -84,8 +102,29 @@ $groupedMyWork = array_values($groupedMyWork);
         display: none;
     }
     .jira-parent > .slot {
-        padding-bottom: 1em;   
+        padding-bottom: 1em;
     }
+
+    .jira .card {
+        padding: 0;
+        border: none
+    }
+
+    .jira .issue-title {
+        padding: .4em 1em;
+    }
+
+    .issue-ready-for-qa {
+        opacity: .3;
+        transition: all 200ms ease;
+        
+    }
+
+    .issue-ready-for-qa a 
+    {
+        padding: .3em 1em;
+    }
+    .issue-ready-for-qa:hover { opacity: 1; }
 
 </style>
 
@@ -99,26 +138,26 @@ $groupedMyWork = array_values($groupedMyWork);
     <?php
     usort($groupedMyWork, fn($a, $b) => ($a['parent']['key'] ?? '???') > ($b['parent']['key'] ?? '???') ? 1 : -1);
     foreach ($groupedMyWork as $group) { ?>
-        <div class="flex flex-col jira-parent" issue="<?= $group['parent']['key'] ?? '?' ?>">
+        <div class="flex flex-col jira-parent issue="<?= $group['parent']['key'] ?? '?' ?>">
             <?php if ($group['parent']['key'] ?? false) { ?>
-                <a 
+                <a
                     href="<?= getJiraIssueLink($group['parent']) ?>"
-                    class="parent-title" 
+                    class="parent-title"
                     title="<?= $group['parent']['fields']['summary'] ?>"
                 >
                     <b><?= $group['parent']['key'] ?></b> - <?= $group['parent']['fields']['summary'] ?>
                 </a>
             <?php } ?>
             <div class="slot"></div>
-            <div class="flex flex-col gap-2">
+            <div class="flex flex-col gap-3">
 
                 <?php
                 $issues = $group['issues'];
                 usort($issues, fn($a, $b) => $a['key'] > $b['key'] ? 1 : -1);
                 foreach ($issues as $issue) { ?>
-                    <div class="flex flex-col jira" issue="<?= $issue['key'] ?>">
+                    <div class="flex flex-col jira issue-<?= preg_replace('~[^a-z]~','-', strtolower($issue['fields']['status']['name'])) ?> "" issue="<?= $issue['key'] ?>">
                         <a href="<?= getJiraIssueLink($issue)  ?>" class="flex flex-col card" target='_blank'>
-                            <div class="flex flex-row items-center">
+                            <div class="flex flex-row">
                                 <p class="issue-title" title="<?= $issue['fields']['summary'] ?>">
                                     <b><?= $issue['key'] ?></b> - <?= $issue['fields']['summary'] ?>
                                 </p>

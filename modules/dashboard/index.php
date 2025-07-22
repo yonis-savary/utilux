@@ -33,6 +33,10 @@ $favicon = cache('favicon', function(){
 
 <body>
     <style>
+        :root {
+            font-size: 14px;
+        }
+
         .page-background-overlay,
         .page-container {
             position: absolute;

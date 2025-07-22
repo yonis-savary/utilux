@@ -58,6 +58,18 @@ function supportIssueNameInBranchName(string $branch)
 }
 
 ?>
+
+<style>
+
+    .branch-name
+    {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        max-width: 40ch;
+    }
+
+</style>
 <div class="flex flex-col gap-4">
     <div class="flex justify-between items-center">
         <div class="text-2xl font-bold">Local Git Branches</div>
@@ -72,7 +84,6 @@ function supportIssueNameInBranchName(string $branch)
                     <b><?= $repo['name'] ?></b>
                     <a href="/resources/actions/open-code.php?directory=<?= urlencode($repo['directory']) ?>">
                         <small class="flex flex-row gap-3">
-                            <?= $repo['directory'] ?>
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-symlink" viewBox="0 0 16 16">
                                 <path d="m11.798 8.271-3.182 1.97c-.27.166-.616-.036-.616-.372V9.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742"/>
                                 <path d="m.5 3 .04.87a2 2 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2m.694 2.09A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09l-.636 7a1 1 0 0 1-.996.91H2.826a1 1 0 0 1-.995-.91zM6.172 2a1 1 0 0 1 .707.293L7.586 3H2.19q-.362.002-.683.12L1.5 2.98a1 1 0 0 1 1-.98z"/>
@@ -80,34 +91,33 @@ function supportIssueNameInBranchName(string $branch)
                         </small>
                     </a>
                 </div>
+                <?php if ($unstagedFiles = $repo['unstaged_files']) { ?>
+                <details closed class="pt-3">
+                    <summary><b class="text-red-200">Has unstaged files </b></summary>
+                    <ul>
+                        <?php foreach (explode("\n", $unstagedFiles) as $file) { ?>
+                            <li><?= $file ?></li>
+                        <?php } ?>
+                    </ul>
+                </details>
+                <?php } ?>
                 <details <?= count($repo['branches']) > 2 ? 'open' : '' ?>>
                     <summary>Local Branches (<?= count($repo['branches']) ?>)</summary>
                     <ul class="list-disc pl-5">
                         <?php foreach ($repo['branches'] as $branch) { ?>
-                            <li class="<?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>">
+                            <li class="branch-name <?= $repo['checked_out_branch'] == $branch ? 'font-bold' : '' ?>">
                                 <?= in_array($branch, $repo['unpushed_branches']) ? "*": "" ?>
                                 <?= supportIssueNameInBranchName($branch) ?>
                             </li>
                         <?php } ?>
                     </ul>
                 </details>
-                <?php if ($unstagedFiles = $repo['unstaged_files']) { ?>
-                    <b class="pt-5">
-                        Has unstaged files : 
-                        <ul>
-                            <?php foreach (explode("\n", $unstagedFiles) as $file) { ?>
-                                <li><?= $file ?></li>
-                            <?php } ?>
-                        </ul>
-                    </b>
-                <?php } ?>
             </div>
         <?php } else { ?>
             <div class="flex items-center gap-5 justify-between">
                 <span><?= $repo['name'] ?> <?= $repo['need_push'] ? '(Need push)': '' ?> : No feature/fix branches</span>
                 <a href="/resources/actions/open-code.php?directory=<?= urlencode($repo['directory']) ?>">
                     <small class="flex flex-row gap-3">
-                        <?= $repo['directory'] ?>
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-folder-symlink" viewBox="0 0 16 16">
                             <path d="m11.798 8.271-3.182 1.97c-.27.166-.616-.036-.616-.372V9.1s-2.571-.3-4 2.4c.571-4.8 3.143-4.8 4-4.8v-.769c0-.336.346-.538.616-.371l3.182 1.969c.27.166.27.576 0 .742"/>
                             <path d="m.5 3 .04.87a2 2 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14h10.348a2 2 0 0 0 1.991-1.819l.637-7A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2m.694 2.09A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09l-.636 7a1 1 0 0 1-.996.91H2.826a1 1 0 0 1-.995-.91zM6.172 2a1 1 0 0 1 .707.293L7.586 3H2.19q-.362.002-.683.12L1.5 2.98a1 1 0 0 1 1-.98z"/>

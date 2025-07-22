@@ -12,16 +12,17 @@
                 mergeSection.querySelector('.title')?.remove()
 
             mergeSection.querySelectorAll('svg').forEach(svg => {
-                svg.setAttribute('height', Math.floor(parseInt(svg.getAttribute('height')) * 0.8));
-                svg.setAttribute('width', Math.floor(parseInt(svg.getAttribute('width')) * 0.8));
+                svg.setAttribute('height', Math.floor(parseInt(svg.getAttribute('height')) * 0.6));
+                svg.setAttribute('width', Math.floor(parseInt(svg.getAttribute('width')) * 0.6));
             })
+
+            mergeSection.style.setProperty('margin-left', '1em');
 
             console.log(jiraSection, jiraSection.classList.contains('jira-parent'))
 
             if (!isParentIssue)
                 mergeSection.style.setProperty('--size', "18px");
 
-            mergeSection.style.setProperty('padding', '.5em 1em')
             jiraSection.querySelector('.slot').appendChild(mergeSection);
         })
         jiraSection.setAttribute('has_merge_requests', true)
