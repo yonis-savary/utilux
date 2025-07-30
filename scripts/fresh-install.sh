@@ -29,7 +29,7 @@ sudo apt-get install \
     filezilla \
     libreoffice \
     gimp \
-    inkscape \
+    inkscape
 
 
 # Music/Video Utilities
@@ -87,12 +87,11 @@ make all test
 # If everything is good 
 # sude make install
 
+# Visual Studio Code
+utilux-install-code
 
 # Check setup - VSC Extensions/Settings
 utilux-setup
-
-# Visual Studio Code
-utilux-install-code
 
 # Bruno (Postman Alternative)
 utilux-install "https://github.com/usebruno/bruno/releases/download/v2.5.0/bruno_2.5.0_amd64_linux.deb" bruno.deb
