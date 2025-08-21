@@ -125,7 +125,7 @@ gxt_list()
         gxt_pretty_list
     elif [ "$list_mode" = "list" ]; then
 
-        absolutes=$(find "$gxt_repos_path" -maxdepth 5 -type d -iname ".git" | sed 's/\/.git//g' | sort)
+        absolutes=$(find "$gxt_repos_path" -maxdepth 5 -type d -iname ".git" 2>/dev/null | sed 's/\/.git//g' | sort)
 
         if [ "$path_mode" = "relative" ]; then
             escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
