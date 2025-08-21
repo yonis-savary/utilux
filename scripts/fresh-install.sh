@@ -84,8 +84,7 @@ curl -L -R -O https://www.lua.org/ftp/lua-5.4.8.tar.gz
 tar zxf lua-5.4.8.tar.gz
 cd lua-5.4.8
 make all test
-# If everything is good 
-# sude make install
+# If everything is good => sudo make install
 
 # Visual Studio Code
 utilux-install-code
