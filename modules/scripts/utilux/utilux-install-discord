@@ -1,0 +1,3 @@
+#!/bin/sh
+
+utilux-install "https://discord.com/api/download/stable?platform=linux&format=deb" discord.deb
