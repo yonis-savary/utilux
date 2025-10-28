@@ -119,6 +119,10 @@ gxr [target_branch] [-y|--yes]  # Pull rebase
 gxrc                            # Rebase continue
 ```
 
+### `map` command
+
+This command can help you out while preparing some feature while coding, it has its own [documentation](./docs/map.md)
+
 ### Custom GNOME Shortcuts
 
 `utilux-setup` can create some custome keyboard for GNOME environments, which are

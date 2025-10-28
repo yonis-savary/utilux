@@ -1,0 +1,112 @@
+#!/bin/sh
+
+fill_php_content()
+{
+    file="$1"
+
+    namespace=$(dirname $file | sed 's/\//\\/g')
+    namespace="$current_namespace$namespace"
+    classname=$(basename $file | sed -E 's/\..+//')
+
+    echo "<?php" > $file
+    echo "" >> $file
+    echo "namespace $namespace;" >> $file
+    echo "" >> $file
+    echo "class $classname" >> $file
+    echo "{" >> $file
+    echo "" >> $file
+    echo "}" >> $file
+
+    echo "PHP content written in $file"
+}
+
+
+
+original_directory="$(pwd)"
+current_namespace=""
+
+while [ "$(pwd)" != "/" ]; do
+
+    if [ -f "./composer.json" ]; then
+        echo "FOUND IN $(pwd)"
+        escaped_current_path=$(pwd | sed 's/[.[\*^$/]/\\&/g')
+
+        full_relative_path=$(echo "$original_directory" | sed -E "s/$escaped_current_path//")
+        relative_path=$(dirname "$full_relative_path" | cut -d '/' -f1)
+        escaped_relative_path=$(echo "$relative_path" | sed 's/[.[\*^$/]/\\&/g')
+        namespace=$(jq '.autoload["psr-4"]' "$(pwd)/composer.json" | grep -E "$escaped_relative_path" | cut -d ':' -f1 | sed -E 's/[\{\}\"]|[[:space:]]//gi')
+        namespace="${namespace#"${namespace%%[![:space:]]*}"}"
+
+        [ -z "$namespace" ] && break;
+
+        namespace_rest=$(echo "/${full_relative_path#/*/}" | sed -E 's/^\///' | sed -E 's/\//\\/g' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
+        current_namespace="$namespace\\$namespace_rest\\"
+        break;
+    fi
+
+    cd ..
+done
+
+cd "$original_directory"
+
+tmpFile=$(mktemp)
+echo "# Map Example" >> $tmpFile
+echo "# App/blabla.txt - Creates App/ Directory and blabla.txt inside it" >> $tmpFile
+echo "# App/blabla.txt blabla2.txt - Creates blabla.txt and blabla2.txt" >> $tmpFile
+echo "# App/Directory/blabla.txt" >> $tmpFile
+echo "# ./blabla.txt - Put '.' at the start of a line to reference previous directory but don't change its value " >> $tmpFile
+echo "# -/SubDirectory/blabla.txt - Put '-' at the start of a line to reference previous directory (creates App/Directory/SubDirectory) " >> $tmpFile
+echo " " >> $tmpFile
+echo "App/Thing/Blabla.php Blabla2.php" >> $tmpFile
+echo "./SubThing2/Blabla.php" >> $tmpFile
+echo "-/SubThing/Blabla.php" >> $tmpFile
+echo "-/SubThing3/Blabla.php" >> $tmpFile
+
+editor=${EDITOR:-nano}
+$editor "$tmpFile"
+
+current_dir=$(pwd)
+last_directory=$(pwd | sed 's/[.[\*^$/]/\\&/g')
+
+cat $tmpFile | sed 's/^\s*//' | grep -E '^[^#].+'| while read line 
+do
+    if echo $line | grep -E "^\." > /dev/null; then
+        change_last_directory="0"
+    else
+        change_last_directory="1"
+    fi
+
+    line=$(echo $line | sed "s/^-/$last_directory/")
+    line=$(echo $line | sed "s/^\./$last_directory/")
+
+    directory=$(dirname "$line")
+
+    if echo $directory | grep -E "^\/" > /dev/null; then
+        directory="$current_dir/$directory"
+    fi
+
+    [ -d "$directory" ] || mkdir -p $directory
+
+    if [ "$change_last_directory" = "1" ]; then
+        last_directory=$(printf '%s' "$directory" | sed 's/[.[\*^$/]/\\&/g')
+    fi
+
+    files=$(basename "$line")
+
+    for filename in $files
+    do
+        if [ -f "$directory/$filename" ]; then
+            echo "Ignoring existing file $directory/$filename"
+        else
+            echo "Creating $directory/$filename"
+            touch "$directory/$filename"
+            case "$filename" in
+                *.php) fill_php_content "$directory/$filename" ;;
+            esac
+        fi
+
+    done
+done
+
+
+echo $fileContent
