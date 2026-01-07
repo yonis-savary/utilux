@@ -144,7 +144,7 @@ echo "Made a backup file at $backup"
 local_user_uid=$(id -u)
 local_user_gid=$(id -g)
 
-mount_entry="$remote_user@$remote_host:$target_path $local_path fuse.sshfs _netdev,IdentityFile=$ssh_key_path,users,idmap=user,allow_other,default_permissions,uid=$local_user_uid,gid=$local_user_gid 0 0"
+mount_entry="$remote_user@$remote_host:$target_path $local_path fuse.sshfs _netdev,x-systemd.automount,noatime,IdentityFile=$ssh_key_path,users,idmap=user,allow_other,default_permissions,uid=$local_user_uid,gid=$local_user_gid 0 0"
 
 
 mount_entries=$(cat <<EOF
