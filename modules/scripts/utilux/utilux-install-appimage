@@ -1,0 +1,75 @@
+#!/bin/bash
+
+appimage_file="$1"
+
+if [ -z "$appimage_file" ]; then
+    >&2 echo "Please provide a appimage name/path to the script"
+    >&2 echo "utilux-install-appimage ./SomeApp.AppImage"
+    exit 1
+fi
+
+appimage_file=$(realpath "$appimage_file")
+
+if [ ! -f "$appimage_file" ]; then 
+    >&2 echo "Given file does not exists : $appimage_file"
+    exit 1
+fi
+
+app_basename=$(basename $appimage_file)
+app_name="${app_basename%.*}"
+app_directory="$UTILUX_BIN_PATH/$app_name"
+
+echo "Installing AppImage file..."
+echo "Installing in $app_directory"
+
+[ -d $app_directory ] || mkdir "$app_directory"
+
+appimage_final_path="$app_directory/$(basename $appimage_file)"
+
+echo "Copying binary..."
+cp "$appimage_file" "$appimage_final_path"
+
+cd "$app_directory"
+
+echo "Extracting appimage infos..."
+$appimage_final_path --appimage-extract >/dev/null 2>&1
+
+squashfs_dir="$app_directory/squashfs-root"
+if [ ! -d "$squashfs_dir" ]; then 
+    >&2 echo "Could not extract appimage infos."
+    exit 1
+fi
+
+
+final_desktop_file_path="$HOME/.local/share/applications/$app_name.desktop"
+
+extracted_desktop_file=$(find $squashfs_dir/* -iname "*.desktop" | head -n1)
+if [ ! -z "$extracted_desktop_file" ]; then 
+    echo "Using extracted desktop file !"
+    cp "$extracted_desktop_file" "$final_desktop_file_path"
+else
+    echo "Making basic desktop file..."
+    echo "[Desktop Entry]" > "$final_desktop_file_path"
+    echo "Type=Application" >> "$final_desktop_file_path"
+    echo "Name=$app_name" >> "$final_desktop_file_path"
+    echo "Terminal=false" >> "$final_desktop_file_path"
+    echo "Categories=Utility;" >> "$final_desktop_file_path"
+fi
+
+echo "Cleaning desktop file..."
+
+sed -i -Ee 's/^Exec=.+//g' "$final_desktop_file_path"
+sed -i -Ee 's/^Icon=.+//g' "$final_desktop_file_path"
+sed -i -Ee 's/^StartupWMClass=.+//g' "$final_desktop_file_path"
+sed -i -Ee 's/^TryExec=.+//g' "$final_desktop_file_path"
+sed -i -Ee 's/^Name=.+//g' "$final_desktop_file_path"
+
+echo "Exec=$squashfs_dir/AppRun" >> "$final_desktop_file_path"
+echo "Icon=$squashfs_dir/.DirIcon" >> "$final_desktop_file_path"
+echo "Name=$app_name" >> "$final_desktop_file_path"
+chmod +x "$final_desktop_file_path"
+
+echo "Cleaning up directory"
+rm "$appimage_final_path"
+
+update-desktop-database ~/.local/share/applications
