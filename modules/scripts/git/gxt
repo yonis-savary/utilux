@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # ░██████████░██████░███    ░██ ░███████   
 # ░██          ░██  ░████   ░██ ░██   ░██  
@@ -41,8 +41,7 @@ gxt_find_help()
 
 gxt_pretty_list()
 {
-    escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
-    relative_directories=$(gxt list -l | sed "s/$escaped_repo_path\///g" )
+    relative_directories=$(gxt list -l | sed "s#$gxt_repos_path/##g" )
 
     last_group=""
     last_origin=""
@@ -142,8 +141,7 @@ gxt_list()
         absolutes=$(find "$gxt_repos_path" -maxdepth 5 -type d -iname ".git" 2>/dev/null | sed 's/\/.git//g' | sort)
 
         if [ "$path_mode" = "relative" ]; then
-            escaped_repo_path=$(printf '%s' "$gxt_repos_path" | sed 's/[.[\*^$/]/\\&/g')
-            echo "$absolutes" | sed "s/$escaped_repo_path\///g" | sort
+            echo "$absolutes" | sed "s#$gxt_repos_path/##g" | sort
         else
             echo "$absolutes"
         fi
@@ -458,9 +456,67 @@ gxt_desktop_help()
 
 
 
+#   ░██████   ░██████████   ░███    ░██████████░██     ░██   ░██████   
+#  ░██   ░██      ░██      ░██░██       ░██    ░██     ░██  ░██   ░██  
+# ░██             ░██     ░██  ░██      ░██    ░██     ░██ ░██         
+#  ░████████      ░██    ░█████████     ░██    ░██     ░██  ░████████  
+#         ░██     ░██    ░██    ░██     ░██    ░██     ░██         ░██ 
+#  ░██   ░██      ░██    ░██    ░██     ░██     ░██   ░██   ░██   ░██  
+#   ░██████       ░██    ░██    ░██     ░██      ░██████     ░██████   
 
+gxt_status()
+{
+    repositories=$(gxt list -l)
 
+    original_dir=$(pwd)
 
+    quick_mode="off"
+
+    for arg in "$@"; do
+        case "$1" in
+            --quick|-q)
+                quick_mode="on"
+                shift
+                ;;
+        esac
+    done
+
+    for repository in $repositories; do
+
+        relative=$(echo $repository | sed "s#$gxt_repos_path/##g")
+
+        cd "$repository"
+
+        echo "- $relative"
+        if [ "$quick_mode" = "off" ]; then
+            git fetch --all --prune >/dev/null 2>&1
+        fi
+
+        for branch in $(git branch --format="%(refname:short)"); do
+            remote_branch="origin/$branch"
+            if git show-ref --verify --quiet "refs/remotes/$remote_branch"; then
+                if ! git diff --quiet "$branch" "$remote_branch"; then
+                    echo -e "  - \033[31;1m $branch (DESYNC) \033[0m"
+                else
+                    echo -e "  - \033[32m $branch \033[0m"
+                fi
+            fi
+        done
+
+    done
+
+    cd "$original_dir"
+}
+
+gxt_status_help()
+{
+    echo "gxt status - Fetch all of your repository and print status of local branches"
+    echo ""
+    echo "Usage   : gxt status [-q|--quick]"
+    echo "Example : gxt status -q"
+    echo ""
+    echo " -q | --quick      Skip the git fetch step when checking branches"
+}
 
 
 
@@ -488,13 +544,14 @@ help()
     echo ""
     echo "Available subcommands"
     echo " - help                 Print this help message"
-    echo " - list                 List every cloned repository"
+    echo " - list [-l] [-r]       List every cloned repository"
+    echo " - status [-q]          Show status of local branches (-q to skip git fetch)"
     echo " - clone <SSH|HTTP-URL> Clone a repository"
     echo " - fetch                Fetch every repository changes"
     echo " - explore <repo>       Open file explorer in repos directory"
-    echo " - desktop <repo>       Create a VSCode desktop shortcut for one "
+    echo " - desktop <repo> [-o]  Create a VSCode desktop shortcut for one "
     echo " - find <repo>          Find the absolute path of a repository"
-
+    echo
     echo "(Tip: you can use --help with any of these subcommands)"
 }
 
@@ -542,6 +599,10 @@ case "$gxt_user_command" in
     find)
         shift
         ([ "$HELP_MODE" = "1" ] && gxt_find_help ) || gxt_find "$@"
+        ;;
+    status)
+        shift
+        ([ "$HELP_MODE" = "1" ] && gxt_status_help ) || gxt_status "$@"
         ;;
     *)
         echo "Unrecognized subcommand $gxt_user_command"
