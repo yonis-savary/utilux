@@ -7,13 +7,16 @@ if [ -f '.git/refs/heads/$branch_name' ]; then
     exit 0
 fi
 
-true_branch_name=$(git --no-pager branch  | sed -e 's/^[^a-zA-Z]*//g' | grep "$branch_name" --color=never | head -n1)
-
-if [ -z "$true_branch_name" ]; then 
-    echo $branch_name
+local_branch_name=$(git --no-pager branch  | sed -e 's/^[^a-zA-Z]*//g' | grep "$branch_name" --color=never | head -n1)
+if [ ! -z "$local_branch_name" ]; then 
+    echo $local_branch_name
     exit 0
 fi
 
-echo $true_branch_name
+remote_branch_name=$(git --no-pager branch --remote | sed -e 's~^ *origin/~~g' | grep "$branch_name" --color=never | head -n1)
+if [ ! -z "$remote_branch_name" ]; then
+    echo "$remote_branch_name"
+    exit 0
+fi
 
-
+echo $branch_name
