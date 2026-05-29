@@ -74,6 +74,8 @@ chmod 666 /var/run/docker.sock
 # PHP 8.4
 /bin/bash -c "$(curl -fsSL https://php.new/install/linux)"
 
+# Rust
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 
 # Utilux (May need relog)
 git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
