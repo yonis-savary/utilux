@@ -88,6 +88,9 @@ cd lua-5.4.8
 make all test
 # If everything is good => sudo make install
 
+# Claude Code
+curl -fsSL https://claude.ai/install.sh | bash
+
 # Visual Studio Code
 utilux-install-code
 
