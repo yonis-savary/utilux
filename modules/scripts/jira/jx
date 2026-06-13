@@ -1,0 +1,125 @@
+#!/bin/bash
+
+jx_assert_is_configured()
+{
+    if [ -z "$UTILUX_JIRA_HOST" ] || [ -z "$UTILUX_JIRA_EMAIL" ] || [ -z "$UTILUX_JIRA_TOKEN" ]; then
+        echo "Please configure your Jira connection first."
+        echo "These variables must be configured :"
+        echo " - UTILUX_JIRA_HOST"
+        echo " - UTILUX_JIRA_EMAIL"
+        echo " - UTILUX_JIRA_TOKEN"
+        echo "You can configure them through the utilux-config command"
+        echo ""
+        exit 1
+    fi
+}
+
+
+
+
+
+# ░██████████░██████████ ░██████████  ░██████  ░██     ░██
+# ░██        ░██             ░██     ░██   ░██ ░██     ░██
+# ░██        ░██             ░██    ░██        ░██     ░██
+# ░█████████ ░█████████      ░██    ░██        ░██████████
+# ░██        ░██             ░██    ░██        ░██     ░██
+# ░██        ░██             ░██     ░██   ░██ ░██     ░██
+# ░██        ░██████████     ░██      ░██████  ░██     ░██
+
+jx_fetch()
+{
+    jx_assert_is_configured
+
+    issue_key="$1"
+    if [ -z "$issue_key" ]; then
+        echo "Not enough arguments: this command needs an issue key"
+        echo ""
+        exit 1
+    fi
+
+    local auth="${UTILUX_JIRA_EMAIL}:${UTILUX_JIRA_TOKEN}"
+
+    issue=$(curl -s \
+        -u "$auth" \
+        -H "Accept: application/json" \
+        "${UTILUX_JIRA_HOST}/issue/${issue_key}")
+
+    if echo "$issue" | grep -q '"errorMessages"'; then
+        echo "$issue"
+        exit 1
+    fi
+
+    issue_type=$(echo "$issue" | jq -r '.fields.issuetype.name // ""' 2>/dev/null)
+
+    if [ "$issue_type" = "Epic" ]; then
+        children=$(curl -s \
+            -u "$auth" \
+            -H "Accept: application/json" \
+            "${UTILUX_JIRA_HOST}/search?jql=parent%3D${issue_key}&maxResults=100")
+
+        jq -n \
+            --argjson issue "$issue" \
+            --argjson children "$children" \
+            '{ issue: $issue, children: ($children.issues // []) }'
+    else
+        echo "$issue" | jq .
+    fi
+
+}
+
+jx_fetch_help()
+{
+    echo "jx fetch - Fetch a Issue content from its issue-key"
+    echo ""
+    echo "Usage   : jx fetch <ISSUE-KEY>"
+    echo "Example : jx fetch PRJCT-5002"
+    echo ""
+}
+
+
+
+
+# ░████████     ░██████     ░██████   ░██████████
+# ░██    ░██   ░██   ░██   ░██   ░██      ░██
+# ░██    ░██  ░██     ░██ ░██     ░██     ░██
+# ░████████   ░██     ░██ ░██     ░██     ░██
+# ░██     ░██ ░██     ░██ ░██     ░██     ░██
+# ░██     ░██  ░██   ░██   ░██   ░██      ░██
+# ░█████████    ░██████     ░██████       ░██
+
+jx_user_command="$1"
+
+help()
+{
+    echo "jx - jira utils terminal"
+    echo ""
+    echo "Available subcommands"
+    echo " - fetch <ISSUE-KEY>    Fetch an Issue and its content"
+    echo
+    echo "(Tip: you can use --help with any of these subcommands)"
+}
+
+if [ -z "$jx_user_command" ]; then
+    echo "Please use a subcommand name after jx"
+    help
+    exit 1
+fi
+
+HELP_MODE="0"
+for arg in "$@"; do
+    if [ "$arg" = "--help" -o "$arg" = "-h" ]; then
+        HELP_MODE="1"
+    fi
+done
+
+case "$jx_user_command" in
+    fetch)
+        shift
+        ([ "$HELP_MODE" = "1" ] && jx_fetch_help ) || jx_fetch "$@"
+        ;;
+    *)
+        echo "Unrecognized subcommand $jx_user_command"
+        help
+        exit 1
+        ;;
+esac

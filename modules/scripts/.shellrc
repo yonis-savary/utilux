@@ -5,6 +5,7 @@ SCRIPT_DIR="$1"
 if ! echo "$PATH" | grep -q "$SCRIPT_DIR/docker"; then
     export PATH="$PATH:$SCRIPT_DIR/docker"
     export PATH="$PATH:$SCRIPT_DIR/git"
+    export PATH="$PATH:$SCRIPT_DIR/jira"
     export PATH="$PATH:$SCRIPT_DIR/utilux"
     export PATH="$PATH:$SCRIPT_DIR/utilux/utils"
     export PATH="$PATH:$HOME/.local/bin"
