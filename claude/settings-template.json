@@ -1,0 +1,13 @@
+{
+  "theme": "dark",
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "<NEED_MANUAL_REPLACE_GXT_REPOS_DIRECTORY>"
+    ],
+    "allow": [
+      "Bash(jx *)",
+      "Bash(bash -i -c *)"
+    ]
+  }
+}
