@@ -103,3 +103,20 @@ utilux-install "https://github.com/usebruno/bruno/releases/download/v2.5.0/bruno
 # PHP-CS-FIXER
 utilux-install https://cs.symfony.com/download/php-cs-fixer-v3.phar php-cs-fixer
 
+
+
+# Setup Central Directory
+
+mkdir -p $HOME/central
+
+rm ~/Desktop && ln -s $HOME/central/Desktop/ Desktop
+rm ~/Documents && ln -s $HOME/central/Documents/ Documents
+rm ~/Music && ln -s $HOME/central/Music/ Music
+rm ~/Pictures && ln -s $HOME/central/Pictures/ Pictures
+
+# Copy Central directory first (do dry run for safety)
+# Then use this version only
+rsync -avh --dry-run --progress /media/path_to_media/central $HOME/central/
+
+# Re-sync from local to copy (do dry run for safety)
+rsync -avh --delete --dry-run --progress $HOME/central/ /media/path_to_media/central
