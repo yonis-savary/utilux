@@ -116,7 +116,7 @@ rm ~/Pictures && ln -s $HOME/central/Pictures/ Pictures
 
 # Copy Central directory first (do dry run for safety)
 # Then use this version only
-rsync -avh --dry-run --progress /media/path_to_media/central $HOME/central/
+rsync -avh --dry-run --progress /media/path_to_media/central/ $HOME/central/
 
 # Re-sync from local to copy (do dry run for safety)
-rsync -avh --delete --dry-run --progress $HOME/central/ /media/path_to_media/central
+rsync -avh --delete --dry-run --progress $HOME/central/ /media/path_to_media/central/
