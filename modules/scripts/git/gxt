@@ -500,6 +500,8 @@ gxt_status()
                 else
                     echo -e "  - \033[32m $branch \033[0m"
                 fi
+            else
+                echo -e "  - \033[31;1m+ (new or merged) $branch \033[0m"
             fi
         done
 
