@@ -3,6 +3,21 @@
 binName="$1"
 installName="$2"
 
+if [ -z "$binName" ]; then
+    echo "Error, this commands needs at least one parameter"
+    echo ""
+    echo "utilux-install: Utility to install deb/binary file"
+    echo "  usage: utilux-install <URL> [NAME]"
+    echo ""
+    echo "Examples:"
+    echo "  utilux-install https://cs.symfony.com/download/php-cs-fixer-v3.phar php-cs-fixer"
+    echo ""
+    echo "Some pre-configured url are supported, they can be used to install/upgrade the software"
+    echo "  Vscode  $ utilux-install code"
+    echo "  Discord $ utilux-install discord"
+    exit 0
+fi
+
 is_url() {
     printf "%s\n" "$1" | grep -q '^http'
 }
@@ -44,6 +59,16 @@ if is_url "$binName"; then
         mv "$localBinName" "$targetBinName"
     fi
     exit 0
+fi
+
+if [ "$binName" = "code" ]; then
+    utilux-install "https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64" code.deb
+    exit $?
+fi
+
+if [ "$binName" = "discord" ]; then
+    utilux-install "https://discord.com/api/download/stable?platform=linux&format=deb" discord.deb
+    exit $?
 fi
 
 
