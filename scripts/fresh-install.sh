@@ -92,7 +92,7 @@ make all test
 curl -fsSL https://claude.ai/install.sh | bash
 
 # Visual Studio Code
-utilux-install-code
+utilux-install code
 
 # Check setup - VSC Extensions/Settings
 utilux-setup

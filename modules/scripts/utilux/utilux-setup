@@ -228,7 +228,7 @@ if isInstalled 'code'; then
         updateVSCodeSetting "workbench.externalBrowser" "firefox"
         updateVSCodeSetting "git.blame.statusBarItem.enabled" false
         updateVSCodeSetting "git.blame.editorDecoration.enabled" false
-        updateVSCodeSetting "workbench.colorTheme" "Solarized Autumn"
+        updateVSCodeSetting "workbench.colorTheme" "One Dark Pro"
         updateVSCodeSetting "workbench.editor.empty.hint" "hidden"
         updateVSCodeSetting "git.confirmSync" false
         updateVSCodeSetting "gitlens.graph.scrollMarkers.enabled" false
@@ -240,6 +240,7 @@ if isInstalled 'code'; then
         updateVSCodeSetting "breadcrumbs.icons" false
         updateVSCodeSetting "editor.fontSize" 12
         updateVSCodeSetting "terminal.integrated.fontSize" 11
+        updateVSCodeSetting "explorer.compactFolders" false
 
         echo "VSCode configuration edited !"
     fi
