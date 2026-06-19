@@ -46,3 +46,14 @@
 # (Needed scope : api, read_api)
 #export UTILUX_GITLAB_TOKEN=""
 
+
+#   _______________________________________________________________________
+# _/ Central directory                                                     \_
+
+# Utility to group every important user-document in one place
+
+# Central directory (local copy path, must end with a slash)
+# export UTILUX_CENTRAL_DIR="$HOME/central/"
+
+# Central directory (backup path, must end with a slash) - Can be updated with utilux-central-backup
+# export UTILUX_CENTRAL_BACKUP_DIR="/media/$USER/backupdisk/"
