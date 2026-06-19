@@ -109,14 +109,14 @@ utilux-install https://cs.symfony.com/download/php-cs-fixer-v3.phar php-cs-fixer
 
 mkdir -p $HOME/central
 
-rm ~/Desktop && ln -s $HOME/central/Desktop/ Desktop
-rm ~/Documents && ln -s $HOME/central/Documents/ Documents
-rm ~/Music && ln -s $HOME/central/Music/ Music
-rm ~/Pictures && ln -s $HOME/central/Pictures/ Pictures
-
 # Copy Central directory first (do dry run for safety)
 # Then use this version only
 rsync -avh --dry-run --progress /media/path_to_media/central/ $HOME/central/
+
+rmdir ~/Desktop && ln -s $HOME/central/Desktop/ Desktop
+rmdir ~/Documents && ln -s $HOME/central/Documents/ Documents
+rmdir ~/Music && ln -s $HOME/central/Music/ Music
+rmdir ~/Pictures && ln -s $HOME/central/Pictures/ Pictures
 
 # Re-sync from local to copy (do dry run for safety)
 rsync -avh --delete --dry-run --progress $HOME/central/ /media/path_to_media/central/
