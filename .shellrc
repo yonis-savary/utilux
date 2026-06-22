@@ -53,3 +53,10 @@ for file in "$MODULES_PATH"/*; do
         source "$shellrc_file" "$file"
     fi
 done
+
+if [ ! -z "$XDG_DATA_DIRS" ]; then
+    LOCAL_SHARE_APP=$(realpath ~/.local/share/applications)
+    if ! echo "$XDG_DATA_DIRS" | grep -q "$LOCAL_SHARE_APP"; then
+        export XDG_DATA_DIRS="$XDG_DATA_DIRS:$LOCAL_SHARE_APP"
+    fi
+fi
