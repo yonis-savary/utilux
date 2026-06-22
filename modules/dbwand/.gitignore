@@ -1,6 +1,0 @@
-composer.phar
-/vendor/
-
-test.php
-dbwand.ini
-.phpunit.result.cache
