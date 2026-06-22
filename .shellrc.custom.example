@@ -9,7 +9,7 @@
 #   ___________________________
 # _/ Core - Utilux core config \_
 
-# Allow utilux to change your terminal prompt (false by default)
+# Use custom terminal prompt (false by default)
 #export UTILUX_ALLOW_PROMPT_CHANGE="true"
 
 
@@ -19,17 +19,12 @@
 # If set to true, gxc will perform a dxd before checking out a branch and dxu after
 #export UTILUX_GXC_CAN_USE_DOCKER="true"
 
-#   ___________
-# _/ Dashboard \_
 
-# Used to change port of utilux dashboard (9999 by default)
-#export UTILUX_DASHBOARD_PORT="9999"
+#   ______
+# _/ Jira \_
+# So far used by gxb+ and jxt scripts to fetch any issue information
 
-
-#   _____________________________________________________________________________
-# _/ Jira - So far used by the dashboard and gxb+ to fetch your work information \_
-
-# Your organization jira host name (with api suffix such as '/rest/api/3')
+# Your organization jira host name (with '/rest/api/3' suffix)
 #export UTILUX_JIRA_HOST=""
 # Email of your Jira account
 #export UTILUX_JIRA_EMAIL=""
@@ -37,23 +32,26 @@
 #export UTILUX_JIRA_TOKEN=""
 
 
-#   _______________________________________________________________________
-# _/ Gitlab - Used by the dashboard to display your current merge requests \_
+#   ________
+# _/ Gitlab \_
 
-# Your gitlab host (with api suffix such as "/api/v4")
+# Your gitlab host (with "/api/v4" suffix)
 #export UTILUX_GITLAB_HOST=""
 # Can be configured at https://YOUR_GITLAB_HOST/-/user_settings/personal_access_tokens
 # (Needed scope : api, read_api)
 #export UTILUX_GITLAB_TOKEN=""
 
 
-#   _______________________________________________________________________
-# _/ Central directory                                                     \_
+#   ___________________
+# _/ Central directory \_
 
 # Utility to group every important user-document in one place
+# Its setup can be found in scripts/fresh-install.sh
+# Only configure these variables if you wish to use 'central' directory
 
-# Central directory (local copy path, must end with a slash)
-# export UTILUX_CENTRAL_DIR="$HOME/central/"
+# Central directory (local copy path, MUST END WITH A SLASH)
+#export UTILUX_CENTRAL_DIR="$HOME/central/"
 
-# Central directory (backup path, must end with a slash) - Can be updated with utilux-central-backup
-# export UTILUX_CENTRAL_BACKUP_DIR="/media/$USER/backupdisk/"
+# Central directory (backup path, MUST END WITH A SLASH) - Can be updated with utilux-central-backup
+#export UTILUX_CENTRAL_BACKUP_DIR="/media/$USER/backupdisk/"
+

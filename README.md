@@ -2,21 +2,21 @@
     <img src="./img/utilux-128.png" width="96" height="96" alt="Resound logo">
 </p>
 
-# utilux: Posix Utilities 🚀
+# utilux: Git, Docker and Work Utilities ! 🚀
 
-This repository gathers scripts and tools to make my optimal Linux setup. (Supports Bash & Zsh)
+This repository gathers posix-compatible scripts and tools to make my optimal Linux setup. (Supports Bash & Zsh)
 
 ## Installation
 
-Install utilux in one command:
+One-liner installer:
 
 ```bash
 git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
 ```
 
-After installation, please restart your session.
+After installation, you may need to restart your terminal/session.
 
-Then, at any moment, you can configure utilux with:
+To configure utilux, launch
 
 ```bash
 utilux-config # (OR) nano ~/.config/utilux/utilux-config
@@ -29,27 +29,9 @@ utilux-config # (OR) nano ~/.config/utilux/utilux-config
 
 1. Remove the `~/utilux` directory
 2. Remove `~/.config/utilux` directory
-2. Remove `~/.local/share/utilux` directory (Warning: delete all your utilux command data, such as your repositories if you're using `gxt`)
-3. Delete the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
-
-## Dashboard configuration
-
-> Requirements: PHP 8
-
-Utilux's dashboard shows you:
-
-- Your pending Jira tickets (token required)
-- Your pending GitLab merge requests (token required)
-- Your local branches in configured directories
-
-Utilux's dashboard is configured through `utilux-dashboard-config`, then you can start it with:
-
-```bash
-utilux-dashboard
-```
-
-If all credentials in your utilux are configured, you should be able to connect to your dashboard without any
-additional configuration.
+3. Remove `~/.config/utilux-dashboard` directory
+4. Remove `~/.local/share/utilux` directory (Warning: delete all your utilux command data, such as your repositories if you're using `gxt`)
+5. Remove the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
 
 ## Utilux shortcuts/aliases
 
@@ -80,9 +62,9 @@ The most interesting feature of utilux is not its dashboard, it is its collectio
 Here is a detailed version of every utilux command:
 
 ```bash
-utilux-install [FILE|URL] # Copy/Download a file into your $PATH (Supports URL to binaries and deb files)
+# utilux global utils
+utilux-install [FILE|URL|PROGRAM] # Copy/Download a file into your $PATH (Supports URL to binaries and deb files) (Also support code & discord keywords)
 utilux-install-ln [FILE]  # Link a file into your $PATH
-utilux-install-code       # (Re)install the latest Visual Studio Code version
 utilux-lf [DIRECTORY]     # Recursively convert CRLF to LF (default: current dir)
 utilux-setup              # Check/install required packages & VSCode extensions
 utilux-share [FILE]       # Start a web server to share files
@@ -91,6 +73,7 @@ utilux-update             # utilux self-update script
 utilux-update-config      # update your utilux configuration with latest changes
 utilux-mount-ssh          # wizard to mount a ssh directory into your fstab
 
+# dx = docker compose utils
 dx                      # alias for docker compose
 dxb                     # docker compose build
 dxu                     # docker compose up -d
@@ -100,28 +83,58 @@ dxr [service]           # docker compose restart
 dxsp                    # docker system prune -a
 dxp                     # docker compose ps
 dxl [service]           # docker compose logs --follow
-dxe [service] [program] # docker compose exec
+dxe [service] {program} # docker compose exec
 
+# gx = git single-repository utils
 gx                              # Help for all gx* scripts
 gxa                             # Commit amend (no edit)
-gxap                            # Amend and push
+gxap                            # Amend and push with force
 gxb                             # Print current branch name
-gxb+ [name|jira-ticket]         # Create a new branch tracking current one
+gxb+ [name|jira-issue-key]      # Create a new branch tracking current one
 gxbf [name]                     # Change current branch upstream
 gxc                             # Alias for git checkout
 gxd                             # Show short diff message
 gxf                             # Fetch & prune
 gxi                             # Git initialize/reset, cleanup repo
-gxl                             # Git lookup, look for a branch name
+gxl [branch-name|keyword]       # Git lookup, look for a branch name
 gxp                             # Push (force with lease)
 gxpm                            # Purge merged branches (force)
 gxr [target_branch] [-y|--yes]  # Pull rebase
 gxrc                            # Rebase continue
+
+# gxt = git global utils (repos management !)
+gxt help                        # Print the manual
+gxt list [-l] [-r]              # List every cloned repository
+gxt status [-q]                 # Show status of local branches (-q to skip git fetch)
+gxt clone <SSH|HTTP-URL>        # Clone a repository
+gxt fetch                       # Fetch every repository changes
+gxt explore <repo>              # Open file explorer in repos directory
+gxt desktop <repo> [-o]         # Create a VSCode desktop shortcut for one 
+gxt find <repo>                 # Find the absolute path of a repository
+gxt code <repo>                 # Open VSCode for one repo
+# Note: repo can mean the full repository name or a part of it !
+# Also you can use --help with any of gxt subcommands, and tab for autocompletion of repos names !
+
 ```
 
-### `map` command
+## Dashboard
 
-This command can help you out while preparing some feature while coding, it has its own [documentation](./docs/map.md)
+Utilux includes an Electron App for developers, this app can help you manage your Jira Issues, Gitlab Merge Requests, Notes...etc
+
+> Requirements: Node, Npm
+
+Dashboard commands
+
+```bash
+# build (once) and launch the dashboard
+utilux-dashboard
+
+# rebuild the app
+utilux-dashboard-build
+
+# create a .desktop shortcut !
+utilux-dashboard-desktop
+```
 
 ### Custom GNOME Shortcuts
 
@@ -130,48 +143,11 @@ This command can help you out while preparing some feature while coding, it has 
   - Launch Terminal : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>
   - Open Home Folder : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>
 
-## dbwand Module (WIP)
-
-> [!CAUTION]
-> This module is still in developpement and needs to be used with caution
-
-A PHP-based database utility to fetch and manipulate data locally.
-
-**Configuration:**
-
-```bash
-utilux-dbwand-config
-```
-
-**Example configuration:**
-
-```json
-{
-    "connections": {
-        "my-first-app": "pgsql://user:password@localhost:5432/my-first-app",
-        "my-second-app": "pgsql://user:password@localhost:5432/my-first-app"
-    }
-}
-```
-
-**Example usage:**
-
-```bash
-dbwand
-connect my-second-app
-select * from contact
-only id first_name last_name is_client
-select * from dbwand where is_client = true # Use the fake `dbwand` table to filter current dataset
-remove is_client
-show 0-99 --json
-template INSERT INTO contact_client (contact_id) VALUES (:id)
-```
-
 ## Tools & Resources
 
 Utilux creation was motivated by a desire to have a unified Linux setup between all my devices.
 
 So, naturally, some notes/scripts were written here:
 
-- [Mount Remote SSH Directory](./docs/remote_sshfs.md)
 - [Fresh Linux install script](./scripts/fresh-install.sh)
+- [Mount Remote SSH Directory](./docs/remote_sshfs.md)
