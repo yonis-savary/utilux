@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
+
+  height: 100vh;
+}
+
+
+#app, .n-config-provider {
+  width: 100vw;
+  height: 100vh;
+  overflow-y: auto;
+}
+
+.n-tabs-nav-scroll-wrapper {
+  min-height: 100vh;
+  height: 100vh;
+  background: rgba(128,128,128,0.3);
+}
+
+
+.n-tabs-wrapper {
+    height: 100vh;
+}
+
+.n-tabs-wrapper > .n-tabs-tab-wrapper:nth-last-child(2) {
+    margin-top: auto;
+}
+
+.component-holder {
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+
+.jira-fg {
+  font-weight: bold;
+  filter: brightness(80%);
+}
+
+.jira-fg.dark-gray { color: #243859; }
+.jira-fg.dark-yellow { color: #FA9920; }
+.jira-fg.yellow { color: #FAC304; }
+.jira-fg.dark-blue { color: #2A53CC; }
+.jira-fg.dark-teal { color: #2AA3BF; }
+.jira-fg.green { color: #58D8A4; }
+.jira-fg.purple { color: #8677D9; }
+.jira-fg.dark-purple { color: #5244AA; }
+.jira-fg.orange { color: #FA7353; }
+.jira-fg.blue { color: #3884FF; }
+.jira-fg.teal { color: #34C7E6; }
+.jira-fg.gray { color: #6B778C; }
+.jira-fg.dark-green { color: #128759; }
+.jira-fg.dark-orange { color: #DD350D; }
+
+
+
+.jira-fg {
+  font-weight: bold;
+  filter: brightness(110%);
+}
+
+.jira-fg.dark-gray { color: #243859; }
+.jira-fg.dark-yellow { color: #FA9920; }
+.jira-fg.yellow { color: #FAC304; }
+.jira-fg.dark-blue { color: #2A53CC; }
+.jira-fg.dark-teal { color: #2AA3BF; }
+.jira-fg.green { color: #58D8A4; }
+.jira-fg.purple { color: #8677D9; }
+.jira-fg.dark-purple { color: #5244AA; }
+.jira-fg.orange { color: #FA7353; }
+.jira-fg.blue { color: #3884FF; }
+.jira-fg.teal { color: #34C7E6; }
+.jira-fg.gray { color: #6B778C; }
+.jira-fg.dark-green { color: #128759; }
+.jira-fg.dark-orange { color: #DD350D; }
+.jira-fg.blue-gray { color: #00aeff; }
+
+.jira-bg.dark-gray    { background-color: hsl(217, 42%,  20%); }
+.jira-bg.dark-yellow  { background-color: hsl(33, 96%,   20%); }
+.jira-bg.yellow       { background-color: hsl(47, 97%,   20%); }
+.jira-bg.dark-blue    { background-color: hsl(225, 66%,  20%); }
+.jira-bg.dark-teal    { background-color: hsl(191, 64%,  20%); }
+.jira-bg.green        { background-color: hsl(156, 62%,  20%); }
+.jira-bg.purple       { background-color: hsl(249, 56%,  20%); }
+.jira-bg.dark-purple  { background-color: hsl(248, 43%,  20%); }
+.jira-bg.orange       { background-color: hsl(11, 94%,   20%); }
+.jira-bg.blue         { background-color: hsl(217, 100%, 20%); }
+.jira-bg.teal         { background-color: hsl(190, 78%,  20%); }
+.jira-bg.gray         { background-color: hsl(218, 13%,  20%); }
+.jira-bg.dark-green   { background-color: hsl(156, 76%,  20%); }
+.jira-bg.dark-orange  { background-color: hsl(12, 89%,   20%); }
+.jira-bg.blue-gray    { background-color: hsl(199, 100%, 20%); }
+
+.jira-border.dark-gray { border-left: solid 3px #243859; }
+.jira-border.dark-yellow { border-left: solid 3px #FA9920; }
+.jira-border.yellow { border-left: solid 3px #FAC304; }
+.jira-border.dark-blue { border-left: solid 3px #2A53CC; }
+.jira-border.dark-teal { border-left: solid 3px #2AA3BF; }
+.jira-border.green { border-left: solid 3px #58D8A4; }
+.jira-border.purple { border-left: solid 3px #8677D9; }
+.jira-border.dark-purple { border-left: solid 3px #5244AA; }
+.jira-border.orange { border-left: solid 3px #FA7353; }
+.jira-border.blue { border-left: solid 3px #3884FF; }
+.jira-border.teal { border-left: solid 3px #34C7E6; }
+.jira-border.gray { border-left: solid 3px #6B778C; }
+.jira-border.dark-green { border-left: solid 3px #128759; }
+.jira-border.dark-orange { border-left: solid 3px #DD350D; }

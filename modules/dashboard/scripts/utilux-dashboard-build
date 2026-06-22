@@ -1,0 +1,9 @@
+#!/bin/bash
+
+
+DASHBOARD_APP_PATH="$UTILUX_PATH/modules/dashboard/app"
+
+cd "$DASHBOARD_APP_PATH"
+npm run package || exit 1
+
+

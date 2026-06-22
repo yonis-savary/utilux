@@ -1,0 +1,44 @@
+#!/bin/bash
+
+DASHBOARD_APP_PATH="$UTILUX_PATH/modules/dashboard/app"
+DASHBOARD_OUT_PATH="$DASHBOARD_APP_PATH/out"
+
+DASHBOARD_BIN_PATH=$(find "$DASHBOARD_OUT_PATH" -name utilux-dashboard)
+
+if [ -z "$DASHBOARD_BIN_PATH" ]; then 
+    echo "Could not locate utilux-dashboard binary in dashboard path"
+    exit 2
+fi
+
+DASHBOARD_DESKTOP_FILE="$DASHBOARD_OUT_PATH/utilux-dashboard.desktop"
+
+
+
+echo "[Desktop Entry]" > $DASHBOARD_DESKTOP_FILE
+echo "Name=Utilux Dashboard" >> $DASHBOARD_DESKTOP_FILE
+echo "Exec=$DASHBOARD_BIN_PATH" >> $DASHBOARD_DESKTOP_FILE
+echo "Icon=$DASHBOARD_APP_PATH/assets/img/utilux-512.png" >> $DASHBOARD_DESKTOP_FILE
+echo "Type=Application" >> $DASHBOARD_DESKTOP_FILE
+echo "Categories=Utility;" >> $DASHBOARD_DESKTOP_FILE
+echo "StartupWMClass=utilux-dashboard" >> $DASHBOARD_DESKTOP_FILE
+
+echo "Generated $DASHBOARD_DESKTOP_FILE"
+
+APP_DIR=$(realpath ~/.local/share/applications)
+
+if [ ! -d "$APP_DIR" ]; then 
+    echo "Err: $APP_DIR, directory not found"
+    exit 1
+fi
+
+USER_DESKTOP_FILE="$APP_DIR/utilux-dashboard.desktop"
+
+if [ -f "$USER_DESKTOP_FILE" ]; then 
+    echo "$USER_DESKTOP_FILE already exists"
+    exit 1
+fi
+
+echo "Copying dekstop file..."
+cp "$DASHBOARD_DESKTOP_FILE" "$USER_DESKTOP_FILE"
+
+update-desktop-database ~/.local/share/applications

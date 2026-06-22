@@ -1,0 +1,19 @@
+#!/bin/bash
+
+
+DASHBOARD_APP_PATH="$UTILUX_PATH/modules/dashboard/app"
+DASHBOARD_OUT_PATH="$DASHBOARD_APP_PATH/out"
+
+if [ ! -d "$DASHBOARD_OUT_PATH" ]; then 
+    utilux-dashboard-build || exit 1
+fi
+
+DASHBOARD_BIN_PATH=$(find "$DASHBOARD_OUT_PATH" -name utilux-dashboard)
+
+if [ -z "$DASHBOARD_BIN_PATH" ]; then 
+    echo "Could not locate utilux-dashboard binary in dashboard path"
+    exit 2
+fi
+
+$DASHBOARD_BIN_PATH
+

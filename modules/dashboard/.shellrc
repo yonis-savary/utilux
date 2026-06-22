@@ -1,17 +1,8 @@
 #!/bin/sh
 
+
 SCRIPT_DIR="$1"
-export SCRIPT_DIR
 
-PORT="${UTILUX_DASHBOARD_PORT:-9999}"
-LISTENING_URL="127.0.0.1:$PORT"
-
-EXAMPLE_CONFIG_FILE="$SCRIPT_DIR/config.example.json"
-
-UTILUX_DASHBOARD_CONFIG_FILE="$UTILUX_CONFIG_PATH/dashboard.json"
-export UTILUX_DASHBOARD_CONFIG_FILE
-
-[ -f "$UTILUX_DASHBOARD_CONFIG_FILE" ] || cp "$EXAMPLE_CONFIG_FILE" "$UTILUX_DASHBOARD_CONFIG_FILE"
-
-alias utilux-dashboard-config="nano $UTILUX_DASHBOARD_CONFIG_FILE"
-alias utilux-dashboard="cd \"$SCRIPT_DIR\" && php -S $LISTENING_URL"
+if ! echo "$PATH" | grep -q "$SCRIPT_DIR/scripts"; then
+    export PATH="$PATH:$SCRIPT_DIR/scripts"
+fi
