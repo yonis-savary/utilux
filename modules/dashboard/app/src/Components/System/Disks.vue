@@ -1,10 +1,13 @@
 <template>
     <div class="flex flex-col gap-3">
-        <div class="flex flex-row items-center gap-3">
-            <n-icon size="30">
-                <Server/>
-            </n-icon>
-            <h1 class="text-2xl">Disks</h1>
+        <div class="flex flex-row justify-between items-center">
+            <div class="flex flex-row items-center gap-3">
+                <n-icon size="30"><Server/></n-icon>
+                <h1 class="text-2xl">Disks</h1>
+            </div>
+            <n-button @click="refresh">
+                <n-icon><Refresh/></n-icon>
+            </n-button>
         </div>
     
         <div v-if="disks?.length" class="flex flex-col gap-3">
@@ -31,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { Server } from '@vicons/tabler';
+import { Refresh, Server } from '@vicons/tabler';
 import { useRefreshedRef } from '../../Helpers/useRefreshedRef';
 
 const size_kb = 1000;
@@ -43,6 +46,7 @@ const disks = useRefreshedRef(
     () => window.electronAPI.system.getDisksUsage(),
     { immediate: true, cached: true, cacheKey: 'system-disks', interval: 300_000 }
 );
+const refresh = disks.refresh;
 
 const formatBytes = (bytes: number): string => {
     if (bytes >= size_tb) return (bytes / size_tb).toFixed(1) + ' TB';

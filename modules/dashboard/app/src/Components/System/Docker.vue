@@ -1,10 +1,13 @@
 <template>
     <div class="flex flex-col gap-3">
-        <div class="flex flex-row items-center gap-3">
-            <n-icon size="30">
-                <BrandDocker/>
-            </n-icon>
-            <h1 class="text-2xl">Docker</h1>
+        <div class="flex flex-row justify-between items-center">
+            <div class="flex flex-row items-center gap-3">
+                <n-icon size="30"><BrandDocker/></n-icon>
+                <h1 class="text-2xl">Docker</h1>
+            </div>
+            <n-button @click="refresh">
+                <n-icon><Refresh/></n-icon>
+            </n-button>
         </div>
 
         <div v-if="stats" class="flex flex-col gap-2">
@@ -24,11 +27,12 @@
 </template>
 
 <script setup lang="ts">
-import { BrandDocker } from '@vicons/tabler';
+import { BrandDocker, Refresh } from '@vicons/tabler';
 import { useRefreshedRef } from '../../Helpers/useRefreshedRef';
 
 const stats = useRefreshedRef(
     () => window.electronAPI.system.getDockerStats(),
     { immediate: true, cached: true, cacheKey: 'system-docker', interval: 300_000 }
 );
+const refresh = stats.refresh;
 </script>
