@@ -34,14 +34,24 @@
 import { Server } from '@vicons/tabler';
 import { useRefreshedRef } from '../../Helpers/useRefreshedRef';
 
+const size_kb = 1000;
+const size_mb = 1000 * size_kb;
+const size_gb = 1000 * size_mb;
+const size_tb = 1000 * size_gb;
+
 const disks = useRefreshedRef(
     () => window.electronAPI.system.getDisksUsage(),
     { immediate: true, cached: true, cacheKey: 'system-disks', interval: 300_000 }
 );
 
 const formatBytes = (bytes: number): string => {
-    if (bytes >= 1_000_000_000) return (bytes / 1_000_000_000).toFixed(1) + ' Gb';
-    if (bytes >= 1_000_000) return (bytes / 1_000_000).toFixed(1) + ' Mb';
-    return (bytes / 1_000).toFixed(1) + ' Kb';
+    if (bytes >= size_tb) return (bytes / size_tb).toFixed(1) + ' TB';
+    if (bytes >= size_gb) return (bytes / size_gb).toFixed(1) + ' GB';
+    if (bytes >= size_mb) return (bytes / size_mb).toFixed(1) + ' MB';
+    return (bytes / size_kb).toFixed(1) + ' KB';
 };
 </script>
+
+
+
+
