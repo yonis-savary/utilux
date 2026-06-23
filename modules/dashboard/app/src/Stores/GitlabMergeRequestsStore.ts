@@ -1,37 +1,31 @@
 import { defineStore } from "pinia";
 import { MergeRequestsResult } from "../Types/GitlabMergeRequests";
 import { computed } from "vue";
-import { cachedRef } from "../Helpers/CachedRef";
+import { useRefreshedRef } from "../Helpers/useRefreshedRef";
 
 const api = window.electronAPI.gitlabMergeRequests;
 
 export const useGitlabMergeRequestsStore = defineStore('gitlab-mr', () => {
 
-    const data = cachedRef<MergeRequestsResult>('gitlabmergerequests');
+    const data = useRefreshedRef<MergeRequestsResult>(
+        () => api.activeMergeRequests(),
+        { immediate: true, cached: true, cacheKey: 'gitlabmergerequests', interval: 3_600_000 }
+    );
 
-    const issuesKeys = computed(() => data.value 
+    const issuesKeys = computed(() => data.value
         ? data.value.mergeRequests.map(mr => mr.title.replace(/.+, /, ''))
         : []
     );
 
-    const mergeRequestsForIssue = (key: string) => computed(() => data.value 
+    const mergeRequestsForIssue = (key: string) => computed(() => data.value
         ? data.value.mergeRequests.filter(mr => mr.title.endsWith(key))
         : []
     )
 
-    const refresh = async () => {
-        data.value = await api.activeMergeRequests()
-    }
-
-    if (!data.value?.mergeRequests)
-        refresh();
-
     return {
         data,
-        refresh,
+        refresh: data.refresh,
         mergeRequestsForIssue,
         issuesKeys
     }
 })
-
-

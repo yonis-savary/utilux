@@ -1,5 +1,5 @@
 <template>
-    <h1 class="text-3xl font-bold">Welcome.</h1>
+    <h1 class="text-3xl font-bold">Work Dashboard</h1>
 
     <div class="flex flex-row gap-3 items-center">
 

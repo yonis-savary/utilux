@@ -28,6 +28,11 @@ body {
 
 .n-tabs-wrapper > .n-tabs-tab-wrapper:nth-last-child(2) {
     margin-top: auto;
+    margin-bottom: .75em;
+}
+
+.n-tabs-wrapper > .n-tabs-tab-wrapper:nth-child(2) {
+    margin-top: .75em;
 }
 
 .component-holder {

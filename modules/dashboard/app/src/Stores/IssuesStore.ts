@@ -1,24 +1,18 @@
 import { defineStore } from "pinia";
+import { useRefreshedRef } from "../Helpers/useRefreshedRef";
 import { Issue } from "../Types/Issue";
-import { cachedRef } from "../Helpers/CachedRef";
 
 const jira = window.electronAPI.jira;
 
 export const useIssuesStore = defineStore('jira-issues', () => {
 
-    const issues = cachedRef<Issue[]>('jiraissues')
-
-    const refresh = async () => {
-        issues.value = await jira.activeIssues()
-    }
-
-    if (!issues.value) 
-        refresh();
+    const issues = useRefreshedRef<Issue[]>(
+        () => jira.activeIssues(),
+        { immediate: true, cached: true, cacheKey: 'jiraissues', interval: 3_600_000 }
+    );
 
     return {
         issues,
-        refresh
+        refresh: issues.refresh
     }
 })
-
-

@@ -13,10 +13,11 @@
                     >
                         <n-tab-pane v-for="item in items" :name="item.name">
                             <template #tab>
-                                <n-icon size="30" :component="item.icon"/>
+                                <n-divider v-if="item.name === 'divider'"/>
+                                <n-icon v-else size="30" :component="item.icon"/>
                             </template>
                             <div class="component-holder">
-                                <component key="mainComponent" :is="item.component"/>
+                                <component v-if="item.component" key="mainComponent" :is="item.component"/>
                             </div>
                         </n-tab-pane>
                     </n-tabs>
@@ -48,12 +49,18 @@
     z-index: 2;
     background: rgba(0,0,0, 0.7);
 }
+
+[data-name="divider" ] {
+    height: 1em;
+    pointer-events: none;
+}
+
 </style>
 
 <script setup lang="ts">
 import { darkTheme } from 'naive-ui'
 import { ref } from 'vue';
-import {BrandGitlab, ChartCandle, CheckupList, Folder, Home, List, Notebook} from '@vicons/tabler'
+import {BrandGitlab, ChartCandle, CheckupList, Cpu, Dashboard, DevicesPc, Folder, Gauge, Home, List, Note, Notebook} from '@vicons/tabler'
 import HomeComponent from './Components/Home.vue';
 import Issues from './Components/Issues.vue';
 import Subjects from './Components/Subjects.vue';
@@ -61,16 +68,31 @@ import Settings from './Components/Settings.vue';
 import Notes from './Components/Notes.vue';
 import GitlabMergeRequests from './Components/GitlabMergeRequests.vue';
 import Background from './Components/Background.vue';
+import SystemHome from './Components/System/Home.vue';
+import Jira from './Components/Icons/Jira.vue';
 
 const items = ref([
     {
-        name: 'home',
-        icon: Home,
+        name: 'System',
+        icon: DevicesPc,
+        component: SystemHome
+    },
+    {
+        name: 'Notes',
+        icon: Note,
+        component: Notes
+    },
+    {
+        name: 'divider',
+    },
+    {
+        name: 'work-home',
+        icon: Dashboard,
         component: HomeComponent
     },
     {
         name: 'issues',
-        icon: CheckupList,
+        icon: Jira,
         component: Issues
     },
     {
@@ -80,13 +102,8 @@ const items = ref([
     },
     {
         name: 'subjects',
-        icon: Folder,
+        icon: CheckupList,
         component: Subjects
-    },
-    {
-        name: 'Notes',
-        icon: Notebook,
-        component: Notes
     },
     {
         name: 'settings',
