@@ -19,8 +19,8 @@ export interface GxtRepository {
 }
 
 export interface ClaudeUsage {
-  session: { percent: number; resetsAt: string };
-  week: { percent: number; resetsAt: string };
+  session: { percent: number; resetsAt: string|null };
+  week: { percent: number; resetsAt: string|null };
   last24h: { requests: number; sessions: number };
   last7d: { requests: number; sessions: number };
 }

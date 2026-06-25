@@ -40,7 +40,8 @@ export const registerSystemHandlers = () => {
         execSync('docker volume ls -q 2>/dev/null | wc -l', { shell: '/bin/sh', encoding: 'utf8' }).trim()
       );
       return { runningContainers, totalVolumes };
-    } catch {
+    } catch (err) {
+      console.warn("[service docker] Error", err)
       return null;
     }
   });
@@ -65,7 +66,8 @@ export const registerSystemHandlers = () => {
             : fullPath.replace(/.+\//, ''),
         };
       });
-    } catch {
+    } catch (err) {
+      console.warn("[service gxt] Error", err)
       return [];
     }
   });
@@ -79,15 +81,20 @@ export const registerSystemHandlers = () => {
       const last24hMatch = output.match(/Last 24h\s*·\s*(\d+)\s*requests\s*·\s*(\d+)\s*sessions/);
       const last7dMatch = output.match(/Last 7d\s*·\s*(\d+)\s*requests\s*·\s*(\d+)\s*sessions/);
 
-      if (!sessionMatch || !weekMatch) return null;
+      if (!(sessionMatch || weekMatch)) return null;
 
       return {
-        session: { percent: parseInt(sessionMatch[1]), resetsAt: sessionMatch[2].trim() },
-        week: { percent: parseInt(weekMatch[1]), resetsAt: weekMatch[2].trim() },
+        session: sessionMatch
+          ? { percent: parseInt(sessionMatch[1]), resetsAt: sessionMatch[2].trim() }
+          : { percent: 0, resetsAt: null },
+        week: weekMatch
+          ? { percent: parseInt(weekMatch[1]), resetsAt: weekMatch[2].trim() }
+          : { percent: 0, resetsAt: null },
         last24h: last24hMatch ? { requests: parseInt(last24hMatch[1]), sessions: parseInt(last24hMatch[2]) } : { requests: 0, sessions: 0 },
         last7d: last7dMatch ? { requests: parseInt(last7dMatch[1]), sessions: parseInt(last7dMatch[2]) } : { requests: 0, sessions: 0 },
       };
-    } catch {
+    } catch (err) {
+      console.warn("[service Claude] Error", err)
       return null;
     }
   });

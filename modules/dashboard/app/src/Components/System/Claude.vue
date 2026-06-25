@@ -16,7 +16,7 @@
             <n-card size="small">
                 <div class="flex flex-row justify-between mb-1">
                     <span class="font-semibold">Session</span>
-                    <span class="text-xs text-gray-500">resets {{ usage.session.resetsAt }}</span>
+                    <span v-if="usage.session.resetsAt" class="text-xs text-gray-500">resets {{ usage.session.resetsAt }}</span>
                 </div>
                 <n-progress
                     type="line"
@@ -30,7 +30,7 @@
             <n-card size="small">
                 <div class="flex flex-row justify-between mb-1">
                     <span class="font-semibold">Week</span>
-                    <span class="text-xs text-gray-500">resets {{ usage.week.resetsAt }}</span>
+                    <span v-if="usage.week.resetsAt" class="text-xs text-gray-500">resets {{ usage.week.resetsAt }}</span>
                 </div>
                 <n-progress
                     type="line"
