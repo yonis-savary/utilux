@@ -1,0 +1,66 @@
+#!/bin/bash
+
+backup_source_path="$UTILUX_BACKUP_SOURCE"
+backup_target_path="$UTILUX_BACKUP_TARGET"
+
+if [ -z "$backup_source_path" ]; then
+    echo "Please configure UTILUX_BACKUP_SOURCE through the utilux-config command"
+    exit 1
+fi
+if [ -z "$backup_target_path" ]; then
+    echo "Please configure UTILUX_BACKUP_TARGET through the utilux-config command"
+    exit 1
+fi
+
+if [[ ! "$backup_source_path" == */ ]]; then
+    echo "Error : UTILUX_BACKUP_SOURCE must ends with a / (got [$backup_source_path])"
+    exit 1
+fi
+
+if [[ ! "$backup_target_path" == */ ]]; then
+    echo "Error : UTILUX_BACKUP_TARGET must ends with a / (got [$backup_target_path])"
+    exit 1
+fi
+
+if [ ! -d "$backup_source_path" ]; then
+    echo "Error : UTILUX_BACKUP_SOURCE ($backup_source_path) is not a directory !"
+    exit 1
+fi
+
+if [ ! -d "$backup_target_path" ]; then
+    echo "Error : UTILUX_BACKUP_TARGET ($backup_target_path) is not a directory !"
+    exit 1
+fi
+
+
+if [ -z "$(which rsync)" ]; then 
+    echo "Error: rsync program not found"
+    exit 2
+fi
+
+echo "This command shall be run"
+echo "  > rsync -avh --delete --dry-run --progress \"$backup_source_path\" \"$backup_target_path\""
+echo
+
+read -p "Are you sure? " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "Bye!"
+    exit 3
+fi
+
+
+echo "Running dry-run first"
+rsync -avh --delete --dry-run --progress "$backup_source_path" "$backup_target_path"
+
+read -p "Run the command without --dryrun ? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]
+then
+    rsync -avh --delete --progress "$backup_source_path" "$backup_target_path"
+    exit 0
+fi
+
+exit 3
+

@@ -43,15 +43,17 @@
 
 
 #   ___________________
-# _/ Central directory \_
+# _/ Backup directory \_
 
-# Utility to group every important user-document in one place
-# Its setup can be found in scripts/fresh-install.sh
-# Only configure these variables if you wish to use 'central' directory
+# utilux-launch-backup command can help you sync a source and a target
+# useful to sync your documents to an external disk
 
-# Central directory (local copy path, MUST END WITH A SLASH)
-#export UTILUX_CENTRAL_DIR="$HOME/central/"
+# To group all of your document in one place, see
+# https://github.com/yonis-savary/skeln
 
-# Central directory (backup path, MUST END WITH A SLASH) - Can be updated with utilux-central-backup
-#export UTILUX_CENTRAL_BACKUP_DIR="/media/$USER/backupdisk/"
+# Source directory (local copy path, MUST END WITH A SLASH)
+#export UTILUX_BACKUP_SOURCE="$HOME/central/"
+
+# Target directory (backup path, MUST END WITH A SLASH) - Can be updated with utilux-launch-backup
+#export UTILUX_BACKUP_TARGET="/media/$USER/backupdisk/"
 
