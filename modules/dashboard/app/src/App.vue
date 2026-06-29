@@ -78,11 +78,6 @@ const items = ref([
         component: SystemHome
     },
     {
-        name: 'Notes',
-        icon: Note,
-        component: Notes
-    },
-    {
         name: 'divider',
     },
     {
