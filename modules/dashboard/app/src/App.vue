@@ -65,7 +65,6 @@ import HomeComponent from './Components/Home.vue';
 import Issues from './Components/Issues.vue';
 import Subjects from './Components/Subjects.vue';
 import Settings from './Components/Settings.vue';
-import Notes from './Components/Notes.vue';
 import GitlabMergeRequests from './Components/GitlabMergeRequests.vue';
 import Background from './Components/Background.vue';
 import SystemHome from './Components/System/Home.vue';
