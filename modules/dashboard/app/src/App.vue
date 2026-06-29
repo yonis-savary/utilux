@@ -60,7 +60,7 @@
 <script setup lang="ts">
 import { darkTheme } from 'naive-ui'
 import { ref } from 'vue';
-import {BrandGitlab, ChartCandle, CheckupList, Cpu, Dashboard, DevicesPc, Folder, Gauge, Home, List, Note, Notebook} from '@vicons/tabler'
+import {BrandGitlab, ChartCandle, CheckupList, Dashboard, DevicesPc} from '@vicons/tabler'
 import HomeComponent from './Components/Home.vue';
 import Issues from './Components/Issues.vue';
 import Subjects from './Components/Subjects.vue';

@@ -56,7 +56,7 @@
 </style>
 
 <script setup lang="ts">
-import { ArrowRight, Check, CircleCheck, CircleX, ExternalLink, GitPullRequest, Hourglass } from '@vicons/tabler';
+import { ArrowRight, CircleCheck, CircleX, ExternalLink, Hourglass } from '@vicons/tabler';
 import { useGitlabMergeRequestsStore } from '../../Stores/GitlabMergeRequestsStore';
 import { Approval, MergeRequest, Pipeline } from '../../Types/GitlabMergeRequests';
 import { computed, ref } from 'vue';

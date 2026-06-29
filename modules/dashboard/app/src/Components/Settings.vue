@@ -36,7 +36,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import SettingTextInput from './Settings/SettingTextInput.vue';
-import SettingPathInput from './Settings/SettingPathInput.vue';
 
 const envSyntax = `{{ VAR_NAME }}`
 

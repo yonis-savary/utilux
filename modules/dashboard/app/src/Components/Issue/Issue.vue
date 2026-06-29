@@ -38,7 +38,7 @@
 
 
 <script setup lang="ts">
-import { ExternalLink, GitPullRequest, Minus, Plus } from '@vicons/tabler';
+import { ExternalLink, GitPullRequest } from '@vicons/tabler';
 import { Issue as IssueType } from '../../Types/Issue';
 import { computed, ref } from 'vue';
 import { useGitlabMergeRequestsStore } from '../../Stores/GitlabMergeRequestsStore';
