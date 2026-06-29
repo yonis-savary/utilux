@@ -2,34 +2,47 @@
     <div class="flex flex-col gap-3">
         <div class="flex flex-row items-center justify-between">
             <h1 class="text-2xl">Subjects</h1>
-    
-            <n-popover trigger="click">
-                <template #trigger>
-                    <n-button type="primary">
-                        <n-icon>
-                            <Plus/>
-                        </n-icon>
-                    </n-button>
-                </template>
-                <div class="flex flex-col gap-3">
-                    <b>New Subject</b>
-                    <n-input v-model:value="newSubjectName" placeholder="Subject Name" />
-                    <n-button
-                        :disabled="titles.includes(newSubjectName) || !newSubjectName"
-                        type="primary"
-                        @click="saveNewSubject"
-                    >Save</n-button>
-                </div>
-            </n-popover>
+
+            <div class="flex flex-row gap-2 items-center">
+                <n-select
+                    v-model:value="statusFilter"
+                    :options="statusOptions"
+                    size="small"
+                    style="width: 140px"
+                />
+                <n-popover trigger="click" ref="createPopover">
+                    <template #trigger>
+                        <n-button type="primary">
+                            <n-icon><Plus/></n-icon>
+                        </n-button>
+                    </template>
+                    <div class="flex flex-col gap-3">
+                        <b>New Subject</b>
+                        <n-input
+                            v-model:value="newSubjectName"
+                            placeholder="Subject Name"
+                            @keyup.enter="saveNewSubject"
+                        />
+                        <n-button
+                            :disabled="titles.includes(newSubjectName) || !newSubjectName"
+                            type="primary"
+                            @click="saveNewSubject"
+                        >Save</n-button>
+                    </div>
+                </n-popover>
+            </div>
         </div>
+
         <div class="flex flex-col gap-3">
             <SubjectComponent
-                v-for="subject in subjectsStore.subjects"
+                v-for="subject in filteredSubjects"
+                :key="subject.name"
                 :subject="subject"
                 :is-selected="expendedSubject === subject"
                 @add-issue="issue => subject.issues.push(issue)"
                 @focus="expendedSubject = subject"
                 @blur="expendedSubject = undefined"
+                @delete="subjectsStore.remove(subject.name)"
             />
         </div>
     </div>
@@ -45,18 +58,27 @@ import SubjectComponent from './Subjects/Subject.vue';
 const subjectsStore = useSubjectsStore();
 
 const newSubjectName = ref('');
-const expendedSubject = ref<Subject|undefined>()
+const expendedSubject = ref<Subject | undefined>();
+const statusFilter = ref<string | null>(null);
+
+const statusOptions = [
+    { label: 'All', value: null },
+    { label: 'Active', value: 'active' },
+    { label: 'Standby', value: 'standby' },
+    { label: 'Finished', value: 'finished' },
+]
 
 const titles = computed(() => subjectsStore.subjects.map(x => x.name));
 
+const filteredSubjects = computed(() =>
+    statusFilter.value
+        ? subjectsStore.subjects.filter(s => s.status === statusFilter.value)
+        : subjectsStore.subjects
+);
+
 const saveNewSubject = () => {
-    if (!newSubjectName.value)
-        return;
-
-    subjectsStore.subjects.push({
-        name: newSubjectName.value,
-        issues: []
-    })
+    if (!newSubjectName.value || titles.value.includes(newSubjectName.value)) return;
+    subjectsStore.create(newSubjectName.value)
+    newSubjectName.value = ''
 }
-
 </script>
