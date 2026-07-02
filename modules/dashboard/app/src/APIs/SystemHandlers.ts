@@ -81,7 +81,14 @@ export const registerSystemHandlers = () => {
       const last24hMatch = output.match(/Last 24h\s*·\s*(\d+)\s*requests\s*·\s*(\d+)\s*sessions/);
       const last7dMatch = output.match(/Last 7d\s*·\s*(\d+)\s*requests\s*·\s*(\d+)\s*sessions/);
 
-      if (!(sessionMatch || weekMatch)) return null;
+      if (!(sessionMatch || weekMatch)) {
+        console.log("No Claude Regex Match", {
+          output,
+          sessionMatch,
+          weekMatch
+        })
+        return null;
+      }
 
       return {
         session: sessionMatch

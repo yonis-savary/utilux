@@ -1,28 +1,51 @@
 import { ipcMain } from "electron";
-import Store from 'electron-store'
+import { join } from "path";
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 
-const store = new Store<Record<string, any>>();
+const BASE_DIR = join(process.env.HOME || '', '.config/utilux');
+const CONFIG_FILE = join(BASE_DIR, 'dashboard-config.json');
+
 const interpolatedCache: Record<string, any> = {};
+
+const readConfig = (): Record<string, any> => {
+  if (!existsSync(CONFIG_FILE)) return {};
+  try {
+    return JSON.parse(readFileSync(CONFIG_FILE, 'utf-8'));
+  } catch {
+    return {};
+  }
+};
+
+const writeConfig = (data: Record<string, any>) => {
+  mkdirSync(BASE_DIR, { recursive: true });
+  writeFileSync(CONFIG_FILE, JSON.stringify(data, null, 2));
+};
 
 export const registerConfigHandlers = () => {
   ipcMain.handle('config:get', (_, key: string) => {
     delete interpolatedCache[key]
-    return store.get(key)
+    return readConfig()[key]
   })
-  ipcMain.handle('config:set', (_, key: string, value: any) => store.set(key, value))
+  ipcMain.handle('config:set', (_, key: string, value: any) => {
+    const data = readConfig();
+    data[key] = value;
+    writeConfig(data);
+  })
   ipcMain.handle('config:delete', (_, key: string) => {
-    store.delete(key)
+    const data = readConfig();
+    delete data[key];
+    writeConfig(data);
     delete interpolatedCache[key]
   })
-  ipcMain.handle('config:getAll', () => store.store)
+  ipcMain.handle('config:getAll', () => readConfig())
 }
 
 
 export const getConfigValue = (key: string) => {
-  if (key in interpolatedCache) 
+  if (key in interpolatedCache)
     return interpolatedCache[key]
 
-  let value = (store.get(key) ?? undefined)
+  let value = readConfig()[key] ?? undefined
   if (typeof value !== 'string')
     return interpolatedCache[key] = value;
 
