@@ -7,6 +7,7 @@
                 <n-space vertical>
                     <n-tabs
                     key="appNav"
+                    class="full-height-tabs"
                     type="line"
                     animated
                     placement="left"

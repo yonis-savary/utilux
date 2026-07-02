@@ -16,6 +16,12 @@
                     <n-icon><Refresh/></n-icon>
                 </n-button>
             </div>
+            <MergeRequestTreeTabs
+                v-if="mergeRequestStore.data?.mergeRequests"
+                :merge-requests="mergeRequestStore.data?.mergeRequests"
+            />
+
+            <n-divider/>
             <MergeRequest
                 v-for="mergeRequest in mergeRequestStore.data?.mergeRequests"
                 :merge-request="mergeRequest"
@@ -31,6 +37,7 @@ import { useGitlabMergeRequestsStore } from '../Stores/GitlabMergeRequestsStore'
 import { onMounted, ref } from 'vue';
 import { Refresh } from '@vicons/tabler';
 import MergeRequest from './MergeRequest/MergeRequest.vue';
+import MergeRequestTreeTabs from './MergeRequest/MergeRequestTreeTabs.vue';
 
 
 const isConfigured = ref(false);

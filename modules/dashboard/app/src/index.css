@@ -15,24 +15,10 @@ body {
   overflow-y: auto;
 }
 
-.n-tabs-nav-scroll-wrapper {
+.full-height-tabs > * >  .n-tabs-nav-scroll-wrapper {
   min-height: 100vh;
   height: 100vh;
   background: rgba(128,128,128,0.3);
-}
-
-
-.n-tabs-wrapper {
-    height: 100vh;
-}
-
-.n-tabs-wrapper > .n-tabs-tab-wrapper:nth-last-child(2) {
-    margin-top: auto;
-    margin-bottom: .75em;
-}
-
-.n-tabs-wrapper > .n-tabs-tab-wrapper:nth-child(2) {
-    margin-top: .75em;
 }
 
 .component-holder {
