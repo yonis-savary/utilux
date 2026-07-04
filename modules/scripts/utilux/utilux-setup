@@ -241,7 +241,12 @@ if isInstalled 'code'; then
         updateVSCodeSetting "editor.fontSize" 12
         updateVSCodeSetting "terminal.integrated.fontSize" 11
         updateVSCodeSetting "explorer.compactFolders" false
-
+        updateVSCodeSetting "workbench.secondarySideBar.defaultVisibility" "hidden"
+        updateVSCodeSetting "workbench.browser.showInTitleBar" false
+        updateVSCodeSetting "workbench.layoutControl.enabled" false
+        updateVSCodeSetting "chat.titleBar.openInAgentsWindow.enabled" false
+        updateVSCodeSetting "claudeCode.preferredLocation" "panel"
+        updateVSCodeSetting "workbench.browser.openLocalhostLinks" false
         echo "VSCode configuration edited !"
     fi
 fi
