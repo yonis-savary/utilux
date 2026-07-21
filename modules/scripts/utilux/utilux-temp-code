@@ -1,0 +1,12 @@
+#!/bin/bash
+
+while : ; do
+    tmp_id=$(uuidgen | sed "s/-//g")
+    tmp_path="/tmp/$tmp_id"
+    [[ -d "$tmp_path" ]] || break
+done
+
+echo "Making directory $tmp_path..."
+
+mkdir "$tmp_path"
+code "$tmp_path"
