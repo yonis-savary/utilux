@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Link one or more Claude Code commands into ~/.claude/commands
+# See .claude-link for the implementation
+
+. "$(dirname "$(realpath "$0")")/.claude-link"
+
+claude_link_main command "$@"

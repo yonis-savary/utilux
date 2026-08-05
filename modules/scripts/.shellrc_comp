@@ -55,6 +55,23 @@ _utilux_gxt_autocomplete() {
 
 
 
+_utilux_claude_links_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local subdirectory=""
+
+    case "${COMP_WORDS[0]}" in
+        rm-skill)   subdirectory="skills"   ;;
+        rm-agent)   subdirectory="agents"   ;;
+        rm-command) subdirectory="commands" ;;
+    esac
+
+    local claude_home="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+    local opts=$(ls -1 "$claude_home/$subdirectory" 2>/dev/null)
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
+
 complete -F _utilux_git_branches_autocomplete gxc
 complete -F _utilux_git_branches_autocomplete gxbf
 complete -F _utilux_git_branches_autocomplete gxr
@@ -71,5 +88,9 @@ complete -F _docker_compose_services_list_autocomplete dxe
 complete -F _docker_compose_services_list_autocomplete dxr
 
 complete -F _utilux_gxt_autocomplete gxt
+
+complete -F _utilux_claude_links_autocomplete rm-skill
+complete -F _utilux_claude_links_autocomplete rm-agent
+complete -F _utilux_claude_links_autocomplete rm-command
 
 

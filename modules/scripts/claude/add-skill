@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Link one or more Claude Code skills into ~/.claude/skills
+# See .claude-link for the implementation
+
+. "$(dirname "$(realpath "$0")")/.claude-link"
+
+claude_link_main skill "$@"

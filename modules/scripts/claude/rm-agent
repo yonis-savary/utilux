@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Unlink one or more Claude Code agents from ~/.claude/agents
+# See .claude-link for the implementation
+
+. "$(dirname "$(realpath "$0")")/.claude-link"
+
+claude_unlink_main agent "$@"

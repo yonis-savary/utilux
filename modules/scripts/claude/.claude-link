@@ -1,0 +1,466 @@
+#!/bin/sh
+
+# Shared implementation of add-skill|agent|command and rm-skill|agent|command
+#
+# Those commands create/remove symlinks in ~/.claude/{skills,agents,commands}
+# so a project can keep its own Claude Code resources under version control
+# and expose them globally.
+#
+# Usage from a wrapper script:
+#   . "$(dirname "$(realpath "$0")")/.claude-link"
+#   claude_link_main skill "$@"     # (or) claude_unlink_main skill "$@"
+
+CLAUDE_HOME="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+
+
+claude_link_directory()
+{
+    case "$1" in
+        skill)   echo "$CLAUDE_HOME/skills"   ;;
+        agent)   echo "$CLAUDE_HOME/agents"   ;;
+        command) echo "$CLAUDE_HOME/commands" ;;
+        *)       echo ""                      ;;
+    esac
+}
+
+
+claude_link_help()
+{
+    kind="$1"
+    directory=$(claude_link_directory "$kind")
+
+    echo "add-$kind - Link ${kind}s into $directory"
+    echo ""
+    echo "Usage   : add-$kind [options] <path> [path...]"
+    echo "Example : add-$kind ./project/.claude/${kind}s/*"
+    echo "Example : add-$kind ./project/.claude/${kind}s"
+    echo ""
+
+    if [ "$kind" = "skill" ]; then
+        echo "Each $kind is a directory containing a SKILL.md file."
+    else
+        echo "Each $kind is a markdown (.md) file."
+    fi
+
+    echo "Given a directory that is not itself a $kind, every $kind it contains is linked."
+    echo ""
+    echo " -f | --force     Replace existing symlinks (real files/directories are never deleted)"
+    echo " -n | --dry-run   Print what would be done, without touching anything"
+    echo " -l | --list      List currently linked ${kind}s and exit"
+    echo " -h | --help      Print this help message"
+    echo ""
+    echo "Use rm-$kind to unlink."
+}
+
+
+claude_unlink_help()
+{
+    kind="$1"
+    directory=$(claude_link_directory "$kind")
+
+    echo "rm-$kind - Unlink ${kind}s from $directory"
+    echo ""
+    echo "Usage   : rm-$kind [options] <name|path> [name|path...]"
+    echo "Example : rm-$kind my-$kind"
+    echo "Example : rm-$kind ./project/.claude/${kind}s/*"
+    echo ""
+    echo "Every argument is reduced to its base name, so the same paths given"
+    echo "to add-$kind can be given back to rm-$kind."
+    echo "Only symlinks are removed, real files/directories are never deleted."
+    echo ""
+    echo " -a | --all       Remove every linked $kind"
+    echo " -b | --broken    Remove every broken link"
+    echo " -f | --force     Do not fail on ${kind}s that are not linked"
+    echo " -n | --dry-run   Print what would be done, without touching anything"
+    echo " -l | --list      List currently linked ${kind}s and exit"
+    echo " -h | --help      Print this help message"
+}
+
+
+claude_link_is_markdown()
+{
+    case "$1" in
+        *.md) [ -f "$1" ] ;;
+        *)    return 1    ;;
+    esac
+}
+
+
+# Is the given path a $kind by itself ?
+claude_link_is_entry()
+{
+    kind="$1"
+    path="$2"
+
+    if [ "$kind" = "skill" ]; then
+        [ -d "$path" ] && [ -f "$path/SKILL.md" ]
+    else
+        claude_link_is_markdown "$path"
+    fi
+}
+
+
+# Print every $kind found directly inside the given directory (one per line)
+claude_link_children()
+{
+    kind="$1"
+    directory="$2"
+
+    for child in "$directory"/*; do
+        [ -e "$child" ] || continue
+        claude_link_is_entry "$kind" "$child" || continue
+        echo "$child"
+    done
+}
+
+
+claude_link_list()
+{
+    kind="$1"
+    directory=$(claude_link_directory "$kind")
+
+    if [ ! -d "$directory" ]; then
+        echo "No $directory directory yet, nothing linked"
+        return 0
+    fi
+
+    found=0
+    for entry in "$directory"/*; do
+        [ -e "$entry" ] || [ -L "$entry" ] || continue
+        found=1
+
+        if [ ! -L "$entry" ]; then
+            echo " - [LOCAL] $(basename "$entry")"
+        elif [ -e "$entry" ]; then
+            echo " - [LINK] $(basename "$entry") -> $(readlink "$entry")"
+        else
+            echo " - [BROKEN] $(basename "$entry") -> $(readlink "$entry")"
+        fi
+    done
+
+    [ "$found" = "1" ] || echo "No $kind linked in $directory"
+}
+
+
+# Link one (already validated) $kind, return 1 on failure
+claude_link_one()
+{
+    kind="$1"
+    source_path="$2"
+
+    directory=$(claude_link_directory "$kind")
+    name=$(basename "$source_path")
+    target="$directory/$name"
+
+    if [ -L "$target" ]; then
+        current=$(realpath "$target" 2>/dev/null)
+
+        if [ "$current" = "$source_path" ]; then
+            echo " - [OK] $name (already linked)"
+            return 0
+        fi
+
+        if [ "$claude_link_force" != "1" ]; then
+            echo " - [EXISTS] $name is already linked to $current (use --force to replace)"
+            return 1
+        fi
+
+        if [ "$claude_link_dry_run" = "1" ]; then
+            echo " - [DRY-RUN] would replace $target (currently -> $current)"
+            return 0
+        fi
+
+        rm "$target" || return 1
+    elif [ -e "$target" ]; then
+        echo " - [EXISTS] $name is a real file/directory in $directory, remove it yourself first"
+        return 1
+    fi
+
+    if [ "$claude_link_dry_run" = "1" ]; then
+        echo " - [DRY-RUN] would link $target -> $source_path"
+        return 0
+    fi
+
+    if ln -s "$source_path" "$target"; then
+        echo " - [LINKED] $name -> $source_path"
+        return 0
+    fi
+
+    echo " - [ERROR] Could not link $name"
+    return 1
+}
+
+
+# Link a user-given path: either a $kind, or a directory containing some
+claude_link_path()
+{
+    kind="$1"
+    path="$2"
+
+    if [ ! -e "$path" ]; then
+        echo " - [ERROR] $path does not exist"
+        return 1
+    fi
+
+    path=$(realpath "$path")
+
+    if claude_link_is_entry "$kind" "$path"; then
+        claude_link_one "$kind" "$path"
+        return $?
+    fi
+
+    if [ ! -d "$path" ]; then
+        if [ "$kind" = "skill" ]; then
+            echo " - [ERROR] $path is not a skill (a directory holding a SKILL.md file)"
+        else
+            echo " - [ERROR] $path is not a $kind (a .md file)"
+        fi
+        return 1
+    fi
+
+    children=$(claude_link_children "$kind" "$path")
+
+    if [ -z "$children" ]; then
+        echo " - [ERROR] No $kind found in $path"
+        return 1
+    fi
+
+    status=0
+    old_ifs="$IFS"
+    IFS='
+'
+    for child in $children; do
+        IFS="$old_ifs"
+        claude_link_one "$kind" "$child" || status=1
+        IFS='
+'
+    done
+    IFS="$old_ifs"
+
+    return $status
+}
+
+
+claude_link_main()
+{
+    kind="$1"
+    shift
+
+    claude_link_force=0
+    claude_link_dry_run=0
+    paths=""
+
+    if [ "$#" -eq 0 ]; then
+        claude_link_help "$kind"
+        return 2
+    fi
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            -h|--help)
+                claude_link_help "$kind"
+                return 0
+                ;;
+            -l|--list)
+                claude_link_list "$kind"
+                return 0
+                ;;
+            -f|--force)
+                claude_link_force=1
+                ;;
+            -n|--dry-run)
+                claude_link_dry_run=1
+                ;;
+            -*)
+                echo "Unknown option: $1" >&2
+                claude_link_help "$kind" >&2
+                return 2
+                ;;
+            *)
+                paths="$paths
+$1"
+                ;;
+        esac
+        shift
+    done
+
+    if [ -z "$paths" ]; then
+        echo "No path given" >&2
+        claude_link_help "$kind" >&2
+        return 2
+    fi
+
+    directory=$(claude_link_directory "$kind")
+
+    if [ "$claude_link_dry_run" != "1" ] && [ ! -d "$directory" ]; then
+        mkdir -p "$directory" || return 1
+    fi
+
+    echo "Linking ${kind}s into $directory"
+
+    status=0
+    old_ifs="$IFS"
+    IFS='
+'
+    for path in $paths; do
+        IFS="$old_ifs"
+        [ -z "$path" ] && continue
+        claude_link_path "$kind" "$path" || status=1
+        IFS='
+'
+    done
+    IFS="$old_ifs"
+
+    return $status
+}
+
+
+# Remove one link by name, return 1 on failure
+claude_unlink_one()
+{
+    kind="$1"
+    name="$2"
+
+    directory=$(claude_link_directory "$kind")
+    target="$directory/$name"
+
+    if [ -L "$target" ]; then
+        source_path=$(readlink "$target")
+
+        if [ "$claude_link_dry_run" = "1" ]; then
+            echo " - [DRY-RUN] would remove $target (-> $source_path)"
+            return 0
+        fi
+
+        if rm "$target"; then
+            echo " - [REMOVED] $name (was -> $source_path)"
+            return 0
+        fi
+
+        echo " - [ERROR] Could not remove $target"
+        return 1
+    fi
+
+    if [ -e "$target" ]; then
+        echo " - [SKIP] $name is a real file/directory in $directory, remove it yourself"
+        return 1
+    fi
+
+    if [ "$claude_link_force" = "1" ]; then
+        echo " - [OK] $name is not linked"
+        return 0
+    fi
+
+    echo " - [MISSING] $name is not linked in $directory (use --force to ignore)"
+    return 1
+}
+
+
+# Print the name of every linked $kind ("broken" mode: only the dead ones)
+claude_unlink_candidates()
+{
+    kind="$1"
+    mode="$2"
+
+    directory=$(claude_link_directory "$kind")
+    [ -d "$directory" ] || return 0
+
+    for entry in "$directory"/*; do
+        [ -L "$entry" ] || continue
+        [ "$mode" = "broken" ] && [ -e "$entry" ] && continue
+        basename "$entry"
+    done
+}
+
+
+claude_unlink_main()
+{
+    kind="$1"
+    shift
+
+    claude_link_force=0
+    claude_link_dry_run=0
+    mode=""
+    names=""
+
+    if [ "$#" -eq 0 ]; then
+        claude_unlink_help "$kind"
+        return 2
+    fi
+
+    while [ "$#" -gt 0 ]; do
+        case "$1" in
+            -h|--help)
+                claude_unlink_help "$kind"
+                return 0
+                ;;
+            -l|--list)
+                claude_link_list "$kind"
+                return 0
+                ;;
+            -a|--all)
+                mode="all"
+                ;;
+            -b|--broken)
+                mode="broken"
+                ;;
+            -f|--force)
+                claude_link_force=1
+                ;;
+            -n|--dry-run)
+                claude_link_dry_run=1
+                ;;
+            -*)
+                echo "Unknown option: $1" >&2
+                claude_unlink_help "$kind" >&2
+                return 2
+                ;;
+            *)
+                names="$names
+$(basename "$1")"
+                ;;
+        esac
+        shift
+    done
+
+    directory=$(claude_link_directory "$kind")
+
+    if [ -n "$mode" ]; then
+        if [ -n "$names" ]; then
+            echo "Cannot mix --$mode with ${kind} names" >&2
+            return 2
+        fi
+
+        names=$(claude_unlink_candidates "$kind" "$mode")
+
+        if [ -z "$names" ]; then
+            if [ "$mode" = "broken" ]; then
+                echo "No broken $kind link in $directory"
+            else
+                echo "No $kind linked in $directory"
+            fi
+            return 0
+        fi
+    elif [ -z "$names" ]; then
+        echo "No $kind given" >&2
+        claude_unlink_help "$kind" >&2
+        return 2
+    fi
+
+    echo "Unlinking ${kind}s from $directory"
+
+    status=0
+    old_ifs="$IFS"
+    IFS='
+'
+    for name in $names; do
+        IFS="$old_ifs"
+        [ -z "$name" ] && continue
+        claude_unlink_one "$kind" "$name" || status=1
+        IFS='
+'
+    done
+    IFS="$old_ifs"
+
+    return $status
+}

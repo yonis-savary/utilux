@@ -55,6 +55,12 @@ The most interesting feature of utilux is not its dashboard, it is its collectio
   - `utilux-ssh` : Manage local SSH keys
   - ...and more!
 
+- **Claude Code Tools (`add-`/`rm-`):**
+  - `add-skill [path...]` : Symlink skills into `~/.claude/skills` (e.g. `add-skill ./project/.claude/skills/*`)
+  - `add-agent [path...]` / `add-command [path...]` : Same, for `~/.claude/agents` and `~/.claude/commands`
+  - `rm-skill [name...]` / `rm-agent` / `rm-command` : Unlink them back (`--all`, `--broken`)
+  - `add-*` also accepts a directory to link everything it holds, and every command supports `--list`, `--dry-run` and `--force`
+
 
 > [!IMPORTANT]
 > Autocompletion works for most commands ! gx will look for branch names, dx will look for service names...etc
@@ -72,6 +78,17 @@ utilux-ssh                # SSH key utilities
 utilux-update             # utilux self-update script
 utilux-update-config      # update your utilux configuration with latest changes
 utilux-mount-ssh          # wizard to mount a ssh directory into your fstab
+
+# claude code utils (link project resources into ~/.claude)
+add-skill [PATH...]     # Link skills (directories holding a SKILL.md) into ~/.claude/skills
+add-agent [PATH...]     # Link agents (.md files) into ~/.claude/agents
+add-command [PATH...]   # Link commands (.md files) into ~/.claude/commands
+rm-skill [NAME...]      # Unlink skills from ~/.claude/skills (also accepts the paths given to add-skill)
+rm-agent [NAME...]      # Unlink agents from ~/.claude/agents
+rm-command [NAME...]    # Unlink commands from ~/.claude/commands
+# add-* accepts several paths (add-skill ./project/.claude/skills/*) or a parent directory
+# rm-* accepts --all and --broken (only symlinks are ever removed)
+# Every command supports --list, --dry-run, --force and --help
 
 # dx = docker compose utils
 dx                      # alias for docker compose

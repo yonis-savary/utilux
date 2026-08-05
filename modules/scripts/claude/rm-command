@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# Unlink one or more Claude Code commands from ~/.claude/commands
+# See .claude-link for the implementation
+
+. "$(dirname "$(realpath "$0")")/.claude-link"
+
+claude_unlink_main command "$@"
