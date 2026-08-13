@@ -55,6 +55,25 @@ _utilux_gxt_autocomplete() {
 
 
 
+_utilux_make_targets_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local makefile=""
+
+    # GNU make lookup order, first match wins
+    for candidate in GNUmakefile makefile Makefile; do
+        [ -f "$candidate" ] && makefile="$candidate" && break
+    done
+
+    [ -z "$makefile" ] && return
+
+    # Target lines only : reject variable assignments (:=, =) and anything
+    # starting with a special char (.PHONY, %.o pattern rules, $(VAR) targets)
+    local opts=$(grep -E '^[a-zA-Z0-9][^$#/=:]*:([^=]|$)' "$makefile" | cut -d: -f1 | tr ' ' '\n' | sort -u)
+
+    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
+
 _utilux_claude_links_autocomplete() {
     local cur=${COMP_WORDS[COMP_CWORD]}
     local subdirectory=""
@@ -88,6 +107,8 @@ complete -F _docker_compose_services_list_autocomplete dxe
 complete -F _docker_compose_services_list_autocomplete dxr
 
 complete -F _utilux_gxt_autocomplete gxt
+
+complete -F _utilux_make_targets_autocomplete make
 
 complete -F _utilux_claude_links_autocomplete rm-skill
 complete -F _utilux_claude_links_autocomplete rm-agent
