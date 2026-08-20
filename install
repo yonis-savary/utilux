@@ -13,6 +13,10 @@ echo ""
 
 SHELL_NAME=$(ps -hp $$ | awk '{print $5}')
 
+if [ ! -z "$SHELL_NAME" ]; then
+    SHELL_NAME=$(basename "$SHELL_NAME")
+fi
+
 if [ "$SHELL_NAME" = "zsh" ]
 then
   RC_FILE="$HOME/.zshrc"

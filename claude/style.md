@@ -23,9 +23,6 @@ the result should have. A project with an established structure of its own wins.
   filenames.
 - **One implementation per file, siblings under a shared abstraction.** Interchangeable
   backends live side by side in a leaf folder and never reference each other.
-- **Extension by addition, never by modification.** Adding a backend, a command, a rule or a
-  route must mean creating one file. If it also means editing a registry, a `switch` or a
-  central list, the design is wrong.
 - **Capability self-declaration over central dispatch.** An implementation answers *"do you
   handle this?"* itself; the selector loops over candidates and asks. No central map from
   key to class.

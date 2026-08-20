@@ -7,4 +7,4 @@ gxf
 git pull --ff-only
 git merge "origin/$source_branch"
 
-echo "Git merge done, check for conflicts and commit if necessary."
+echo "Git merge started, check for conflicts and commit if necessary."
