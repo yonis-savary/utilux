@@ -70,6 +70,10 @@ Chercher la commande de test du projet, dans cet ordre : `CLAUDE.md` du dépôt,
 Répondre en français, dans un **bloc de code markdown** copiable tel quel dans la merge request, au format exact ci-dessous. Rien avant, rien après, à l'exception des remarques de déroulement (base retenue, ticket absent, tests non lancés) qui restent **hors du bloc**.
 
 ````
+## tldr;
+
+<Une seule phrase, 400 caractères max, qui résume le travail>
+
 ## <CLE-TICKET> - <Titre>
 
 <Problématique ou besoin, 1 à 3 phrases>
@@ -90,6 +94,7 @@ Répondre en français, dans un **bloc de code markdown** copiable tel quel dans
 
 Règles de rédaction :
 
+- **`tldr;` : une seule phrase**, 400 caractères max, sans liste ni sous-phrases. Mots simples et familiers du domaine, pas de jargon technique ni de nom de fichier ou de classe. Elle doit suffire à un relecteur pressé pour savoir ce que fait la branche.
 - **Le plus succinct possible.** Une ligne par fichier, l'idée générale en quelques mots. Pas de détail d'implémentation, pas de nom de méthode, pas de justification.
 - Décrire une **utilité ou une responsabilité**, pas une opération : « validation du format d'import » plutôt que « ajout de la méthode `checkFormat()` ».
 - Regrouper sur une seule ligne les fichiers d'un même lot mécanique (migrations, traductions, fichiers générés, renommage en masse).
