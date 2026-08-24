@@ -1,0 +1,3 @@
+#!/bin/sh
+gxd
+git push --force-with-lease origin $(gxb) && echo "✅ Force push done."

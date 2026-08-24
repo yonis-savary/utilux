@@ -105,7 +105,7 @@ dxe [service] {program} # docker compose exec
 # gx = git single-repository utils
 gx                              # Help for all gx* scripts
 gxa                             # Commit amend (no edit)
-gxap                            # Amend and push with force
+gxap                            # Amend and force push
 gxb                             # Print current branch name
 gxb+ [name|jira-issue-key]      # Create a new branch tracking current one
 gxbf [name]                     # Change current branch upstream
@@ -114,7 +114,8 @@ gxd                             # Show short diff message
 gxf                             # Fetch & prune
 gxi                             # Git initialize/reset, cleanup repo
 gxl [branch-name|keyword]       # Git lookup, look for a branch name
-gxp                             # Push (force with lease)
+gxp                             # Push on current branch
+gxpf                            # Push (force with lease)
 gxpm                            # Purge merged branches (force)
 gxr [target_branch] [-y|--yes]  # Pull rebase
 gxrc                            # Rebase continue
