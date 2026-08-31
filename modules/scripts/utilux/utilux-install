@@ -71,6 +71,10 @@ if [ "$binName" = "discord" ]; then
     exit $?
 fi
 
+if [ "$binName" = "warp" ]; then
+    utilux-install "https://app.warp.dev/get_warp?package=deb" warp.deb
+    exit $?
+fi
 
 if [ ! -f "$binName" ]; then
     echo "Cannot install: [$binName] is not a valid file"
