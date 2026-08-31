@@ -93,6 +93,7 @@ _utilux_claude_links_autocomplete() {
 
 complete -F _utilux_git_branches_autocomplete gxc
 complete -F _utilux_git_branches_autocomplete gxbf
+complete -F _utilux_git_branches_autocomplete gxm
 complete -F _utilux_git_branches_autocomplete gxr
 complete -F _utilux_git_branches_autocomplete gxl
 
