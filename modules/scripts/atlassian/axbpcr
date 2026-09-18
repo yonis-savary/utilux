@@ -1,0 +1,79 @@
+#!/bin/sh
+
+# Resolve (or unresolve) comment threads of a Bitbucket pull request
+# See .atlassian-api for the shared implementation
+
+. "$(dirname "$(realpath "$0")")/.atlassian-api"
+
+axbpcr_help()
+{
+    echo "axbpcr - Mark comment threads of a pull request as resolved"
+    echo ""
+    echo "Usage   : axbpcr <PR-ID> <COMMENT-ID> [COMMENT-ID...] [-u|--unresolve] [-h|--help]"
+    echo "Example : axbpcr 9436 865287783"
+    echo "Example : axbpcr 9436 865287783 865637104 -u"
+    echo ""
+    echo "Only a thread root can be resolved: give the id of the first comment of"
+    echo "the thread, not the id of a reply."
+    echo "The repository is read from the 'origin' remote of the current directory."
+    echo ""
+    echo " -u | --unresolve  Reopen the threads instead of resolving them"
+    echo " -h | --help       Print this help message"
+}
+
+pull_request_id=""
+comment_ids=""
+method="POST"
+action="resolved"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            axbpcr_help
+            exit 0
+            ;;
+        -u|--unresolve)
+            method="DELETE"
+            action="reopened"
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            axbpcr_help >&2
+            exit 1
+            ;;
+        *)
+            if [ -z "$pull_request_id" ]; then
+                pull_request_id="$1"
+            else
+                comment_ids="$comment_ids $1"
+            fi
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$pull_request_id" ] || [ -z "$comment_ids" ]; then
+    echo "Not enough arguments: this command needs a pull request id and at least one comment id" >&2
+    axbpcr_help >&2
+    exit 1
+fi
+
+atlassian_assert_bitbucket_configured
+
+repository=$(atlassian_bitbucket_repository) || exit 1
+
+status=0
+
+for comment_id in $comment_ids; do
+    path="/repositories/$repository/pullrequests/$pull_request_id/comments/$comment_id/resolve"
+
+    if [ "$method" = "POST" ]; then
+        atlassian_bitbucket_post "$path" >/dev/null || { status=1; continue; }
+    else
+        atlassian_bitbucket_delete "$path" >/dev/null || { status=1; continue; }
+    fi
+
+    echo "Comment #$comment_id $action"
+done
+
+exit $status

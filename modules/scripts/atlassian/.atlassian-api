@@ -167,6 +167,12 @@ atlassian_bitbucket_post()
 }
 
 
+atlassian_bitbucket_delete()
+{
+    atlassian_request "$(atlassian_bitbucket_auth)" DELETE "$ATLASSIAN_BITBUCKET_API$1"
+}
+
+
 # Walk every page of a paginated Bitbucket collection and print the merged
 # "values" entries as one JSON array.
 # Pages are buffered in a file rather than passed to jq as an argument: a single

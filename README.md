@@ -48,6 +48,7 @@ The most interesting feature of utilux is not its dashboard, it is its collectio
   - `axbp` : List your open pull requests on the current repository
   - `axbp+` : Create a pull request from the current branch
   - `axbpc [pr-id]` : Fetch the comments of a pull request
+  - `axbpcr [pr-id] [comment-id]` : Mark a comment thread as resolved
 
 - **Docker Compose Aliases (`dx`):**
   - `dxu` : `docker compose up -d`
@@ -132,6 +133,7 @@ axji <ISSUE-KEY>                # Fetch a Jira issue (an epic comes with its chi
 axbp [-a] [-e] [-p]             # List your open pull requests (-e for every author)
 axbp+ [-t title] [-d desc]      # Create a pull request from the current branch
 axbpc <PR-ID> [-o] [-p]         # Fetch the comments of a pull request
+axbpcr <PR-ID> <ID...> [-u]     # Mark comment threads as resolved (-u to reopen)
 # Note: ax* commands print JSON, use -p|--pretty for a readable output
 # The Bitbucket repository is read from the 'origin' remote of the current directory
 

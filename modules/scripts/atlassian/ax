@@ -4,5 +4,6 @@ echo "axji [ISSUE-KEY]               jira-issue        Fetch a Jira issue and it
 echo "axbp [-a] [-e]                 pull-requests     List your open pull requests on the repository"
 echo "axbp+ [-t title] [-d desc]     pull-request+     Create a pull request from the current branch"
 echo "axbpc [PR-ID]                  pr-comments       Fetch the comments of a pull request"
+echo "axbpcr [PR-ID] [ID...]         pr-comment+       Mark comment threads as resolved"
 echo ""
 echo "(Tip: you can use --help with any of these commands)"
