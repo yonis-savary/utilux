@@ -7,17 +7,16 @@ if echo "$branch_name" | grep -E "$ticket_regex" > /dev/null; then
 
     echo "Making branch for ticket $branch_name"
 
-    if [ ! -z "$UTILUX_JIRA_HOST" ]
-    then
-        output=$(curl -s --request GET \
-            --url "$UTILUX_JIRA_HOST/issue/$branch_name?fields=summary,issuetype" \
-            --user "$UTILUX_JIRA_EMAIL:$UTILUX_JIRA_TOKEN" \
-            --header 'Accept: application/json'
-        )
+    # axji is the canonical Jira fetch, it prints an epic as { issue, children }
+    issue=$(axji "$branch_name" 2>/dev/null)
 
+    if [ -z "$issue" ]; then
+        echo "Could not fetch $branch_name from Jira, keeping the raw issue key"
+    else
+        fields=$(printf '%s\n' "$issue" | jq '.fields // .issue.fields')
 
         branch_type="feat"
-        issue_type=$(echo "$output" | jq '.fields.issuetype.name' -r )
+        issue_type=$(printf '%s\n' "$fields" | jq '.issuetype.name' -r )
         if echo "$issue_type" | grep -qiE "bug"; then
             branch_type="fix"
         elif echo "$issue_type" | grep -qiE "epic"; then
@@ -25,8 +24,8 @@ if echo "$branch_name" | grep -E "$ticket_regex" > /dev/null; then
         fi
 
         title=$(
-            echo "$output" | \
-            jq '.fields.summary' -r | \
+            printf '%s\n' "$fields" | \
+            jq '.summary' -r | \
             iconv -f utf8 -t ascii//TRANSLIT | \
             tr '[:upper:]' '[:lower:]' | \
             perl -pe "s/[a-z]\'//g" | \
@@ -38,8 +37,6 @@ if echo "$branch_name" | grep -E "$ticket_regex" > /dev/null; then
             perl -pe "s/^\-+|\-+$//g"
         )
         branch_name="$branch_type/$branch_name/$title"
-    else
-        echo "Jira is not configured on your utilux setup"
     fi
 
 fi

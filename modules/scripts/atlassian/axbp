@@ -1,0 +1,88 @@
+#!/bin/sh
+
+# List the pull requests of the current Bitbucket repository
+# See .atlassian-api for the shared implementation
+
+. "$(dirname "$(realpath "$0")")/.atlassian-api"
+
+axbp_help()
+{
+    echo "axbp - List the open pull requests you authored on the current repository"
+    echo ""
+    echo "Usage   : axbp [-a|--all] [-e|--everyone] [-p|--pretty] [-h|--help]"
+    echo "Example : axbp -p"
+    echo "Example : axbp -e -a"
+    echo ""
+    echo "Only your own pull requests are listed, 'you' being the account the"
+    echo "token belongs to. The repository is read from the 'origin' remote of"
+    echo "the current directory."
+    echo "The pull requests are printed as a JSON array, use --pretty for a readable list."
+    echo ""
+    echo " -a | --all       Include merged, declined and superseded pull requests"
+    echo "                  (combined with --everyone this walks the whole history"
+    echo "                   of the repository, which can be thousands of entries)"
+    echo " -e | --everyone  List the pull requests of every author, not only yours"
+    echo " -p | --pretty    Print a readable summary instead of JSON"
+    echo " -h | --help      Print this help message"
+}
+
+state="OPEN"
+mine="1"
+pretty="0"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            axbp_help
+            exit 0
+            ;;
+        -a|--all)
+            state=""
+            ;;
+        -e|--everyone)
+            mine="0"
+            ;;
+        -p|--pretty)
+            pretty="1"
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            axbp_help >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+atlassian_assert_bitbucket_configured
+
+repository=$(atlassian_bitbucket_repository) || exit 1
+
+# Bitbucket ignores the 'state' parameter as soon as a 'q' expression is given,
+# and falls back to OPEN alone when neither is given, so every filter lives in
+# that one expression and the wanted states are always named explicitly
+if [ -n "$state" ]; then
+    filters=$(printf 'state="%s"' "$state")
+else
+    filters='(state="OPEN" OR state="MERGED" OR state="DECLINED" OR state="SUPERSEDED")'
+fi
+
+if [ "$mine" = "1" ]; then
+    uuid=$(atlassian_bitbucket_account_uuid) || exit 1
+    filters=$(printf 'author.uuid="%s" AND %s' "$uuid" "$filters")
+fi
+
+query="pagelen=50&q=$(printf '%s' "$filters" | jq -sRr @uri)"
+
+pull_requests=$(atlassian_bitbucket_collection "/repositories/$repository/pullrequests?$query") || exit 1
+
+if [ "$pretty" = "0" ]; then
+    printf '%s' "$pull_requests" | jq .
+    exit 0
+fi
+
+printf '%s' "$pull_requests" | jq -r '
+    .[] | "#\(.id) [\(.state)] \(.title)
+    \(.author.display_name // "?") | \(.source.branch.name) -> \(.destination.branch.name)
+    \(.links.html.href)
+"'

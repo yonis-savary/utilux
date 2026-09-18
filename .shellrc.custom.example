@@ -20,16 +20,25 @@
 #export UTILUX_GXC_CAN_USE_DOCKER="true"
 
 
-#   ______
-# _/ Jira \_
-# So far used by gxb+ and jxt scripts to fetch any issue information
+#   ___________
+# _/ Atlassian \_
+# Used by the ax* scripts (Jira & Bitbucket) and by gxb+ (call axji)
 
+# Jira and Bitbucket authenticate the same way: your Atlassian account email and an API token.
+
+# Email of your Atlassian account
+#export UTILUX_ATLASSIAN_EMAIL=""
+# Your Atlassian api token, which can be generated at https://id.atlassian.com/manage-profile/security/api-tokens
+#export UTILUX_ATLASSIAN_TOKEN=""
 # Your organization jira host name (with '/rest/api/3' suffix)
 #export UTILUX_JIRA_HOST=""
-# Email of your Jira account
-#export UTILUX_JIRA_EMAIL=""
-# Your api jira token, which can be generated at https://id.atlassian.com/manage-profile/security/api-tokens
-#export UTILUX_JIRA_TOKEN=""
+
+# Fallback on UTILUX_ATLASSIAN_TOKEN if not set
+# Needed scopes: read:account, read:pullrequest:bitbucket and write:pullrequest:bitbucket
+#export UTILUX_BITBUCKET_TOKEN=""
+
+# UTILUX_JIRA_EMAIL and UTILUX_JIRA_TOKEN are the former names of
+# UTILUX_ATLASSIAN_EMAIL and UTILUX_ATLASSIAN_TOKEN, they still work
 
 
 #   ________

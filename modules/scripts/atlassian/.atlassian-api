@@ -1,0 +1,195 @@
+#!/bin/sh
+
+# Shared implementation of the ax* commands (Jira and Bitbucket Cloud)
+#
+# Both products authenticate the same way: HTTP Basic auth with an Atlassian
+# account email and an API token. Bitbucket app passwords were removed on
+# 2026-07-28, API tokens are now the only way to use Basic auth.
+# https://support.atlassian.com/bitbucket-cloud/docs/using-api-tokens/
+#
+# Usage from a wrapper script:
+#   . "$(dirname "$(realpath "$0")")/.atlassian-api"
+#   atlassian_assert_bitbucket_configured
+#   repository=$(atlassian_bitbucket_repository) || exit 1
+#   atlassian_bitbucket_get "/repositories/$repository" || exit 1
+
+ATLASSIAN_BITBUCKET_API="https://api.bitbucket.org/2.0"
+
+
+# Credentials are resolved from the most specific name to the most general:
+#   UTILUX_BITBUCKET_TOKEN -> UTILUX_ATLASSIAN_TOKEN -> UTILUX_JIRA_TOKEN
+# A single token carrying both Jira and Bitbucket scopes is enough. The per
+# product names exist because a token issued for Jira alone answers
+# "API Token provided has no Bitbucket scopes" on every Bitbucket call.
+# UTILUX_JIRA_EMAIL and UTILUX_JIRA_TOKEN are the historical names, kept
+# working so existing utilux-config files do not have to be rewritten.
+atlassian_email()
+{
+    echo "${UTILUX_ATLASSIAN_EMAIL:-$UTILUX_JIRA_EMAIL}"
+}
+
+
+atlassian_jira_auth()
+{
+    echo "$(atlassian_email):${UTILUX_ATLASSIAN_TOKEN:-$UTILUX_JIRA_TOKEN}"
+}
+
+
+atlassian_bitbucket_auth()
+{
+    echo "$(atlassian_email):${UTILUX_BITBUCKET_TOKEN:-${UTILUX_ATLASSIAN_TOKEN:-$UTILUX_JIRA_TOKEN}}"
+}
+
+
+# Print the missing-configuration manual, $1 being the token variable to set
+atlassian_configuration_help()
+{
+    echo "Please configure your Atlassian connection first." >&2
+    echo "These variables must be configured :" >&2
+    echo " - UTILUX_ATLASSIAN_EMAIL" >&2
+    echo " - $1" >&2
+    echo "You can configure them through the utilux-config command" >&2
+    echo "Tokens are generated at https://id.atlassian.com/manage-profile/security/api-tokens" >&2
+}
+
+
+atlassian_assert_jira_configured()
+{
+    if [ -z "$(atlassian_email)" ] || [ -z "${UTILUX_ATLASSIAN_TOKEN:-$UTILUX_JIRA_TOKEN}" ]; then
+        atlassian_configuration_help "UTILUX_ATLASSIAN_TOKEN"
+        exit 1
+    fi
+
+    if [ -z "$UTILUX_JIRA_HOST" ]; then
+        echo "UTILUX_JIRA_HOST is not configured (expected your Jira host with the '/rest/api/3' suffix)" >&2
+        echo "You can configure it through the utilux-config command" >&2
+        exit 1
+    fi
+}
+
+
+atlassian_assert_bitbucket_configured()
+{
+    if [ -n "$(atlassian_email)" ] && [ -n "${UTILUX_BITBUCKET_TOKEN:-${UTILUX_ATLASSIAN_TOKEN:-$UTILUX_JIRA_TOKEN}}" ]; then
+        return 0
+    fi
+
+    atlassian_configuration_help "UTILUX_BITBUCKET_TOKEN"
+    exit 1
+}
+
+
+# Print "workspace/repository" for the bitbucket.org origin of the current repository
+# Callers run this in a command substitution, so it returns instead of exiting
+atlassian_bitbucket_repository()
+{
+    remote=$(git config --get remote.origin.url 2>/dev/null)
+
+    if [ -z "$remote" ]; then
+        echo "Not inside a git repository, or no 'origin' remote configured" >&2
+        return 1
+    fi
+
+    repository=$(printf '%s\n' "$remote" | sed -E 's#^git@bitbucket\.org:##; s#^https?://[^/]*bitbucket\.org/##; s#\.git$##')
+
+    if [ "$repository" = "$remote" ]; then
+        echo "Remote '$remote' is not a bitbucket.org repository" >&2
+        return 1
+    fi
+
+    echo "$repository"
+}
+
+
+# Print the uuid of the account the token belongs to (needs the account scope)
+atlassian_bitbucket_account_uuid()
+{
+    account=$(atlassian_bitbucket_get "/user") || return 1
+    printf '%s\n' "$account" | jq -r '.uuid'
+}
+
+
+# Single entry point for every Atlassian call: it fails loudly on any non-2xx
+# response instead of letting an error payload flow downstream.
+# Callers run this in a command substitution, so it returns instead of exiting:
+# every call site must propagate with "|| exit 1"
+atlassian_request()
+{
+    auth="$1"
+    method="$2"
+    url="$3"
+    body="$4"
+
+    if [ -z "$body" ]; then
+        response=$(curl -s -w '\n%{http_code}' \
+            -X "$method" \
+            -u "$auth" \
+            -H "Accept: application/json" \
+            "$url")
+    else
+        response=$(curl -s -w '\n%{http_code}' \
+            -X "$method" \
+            -u "$auth" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -d "$body" \
+            "$url")
+    fi
+
+    status=$(printf '%s\n' "$response" | tail -n 1)
+    payload=$(printf '%s\n' "$response" | sed '$d')
+
+    if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+        echo "Atlassian API answered HTTP $status to $method $url" >&2
+        printf '%s\n' "$payload" >&2
+        return 1
+    fi
+
+    printf '%s\n' "$payload"
+}
+
+
+atlassian_jira_get()
+{
+    atlassian_request "$(atlassian_jira_auth)" GET "$UTILUX_JIRA_HOST$1"
+}
+
+
+atlassian_bitbucket_get()
+{
+    atlassian_request "$(atlassian_bitbucket_auth)" GET "$ATLASSIAN_BITBUCKET_API$1"
+}
+
+
+atlassian_bitbucket_post()
+{
+    atlassian_request "$(atlassian_bitbucket_auth)" POST "$ATLASSIAN_BITBUCKET_API$1" "$2"
+}
+
+
+# Walk every page of a paginated Bitbucket collection and print the merged
+# "values" entries as one JSON array.
+# Pages are buffered in a file rather than passed to jq as an argument: a single
+# page of pull requests can weigh close to a megabyte, far over the per-argument
+# limit of an exec (MAX_ARG_STRLEN, 128 KiB) whatever ARG_MAX says
+atlassian_bitbucket_collection()
+{
+    url="$ATLASSIAN_BITBUCKET_API$1"
+    pages=$(mktemp) || return 1
+
+    while [ -n "$url" ]; do
+        page=$(atlassian_request "$(atlassian_bitbucket_auth)" GET "$url") || {
+            rm -f "$pages"
+            return 1
+        }
+
+        printf '%s\n' "$page" >> "$pages"
+        url=$(printf '%s\n' "$page" | jq -r '.next // ""')
+    done
+
+    jq -s 'map(.values // []) | add // []' "$pages"
+    status=$?
+
+    rm -f "$pages"
+    return $status
+}

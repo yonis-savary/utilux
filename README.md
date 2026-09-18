@@ -43,6 +43,12 @@ The most interesting feature of utilux is not its dashboard, it is its collectio
   - `gxb+` : Create a new branch (with Jira issue support, e.g. `gxb+ APP-3290`)
   - ...and more!
 
+- **Atlassian Aliases (`ax`):**
+  - `axji APP-3290` : Fetch a Jira issue
+  - `axbp` : List your open pull requests on the current repository
+  - `axbp+` : Create a pull request from the current branch
+  - `axbpc [pr-id]` : Fetch the comments of a pull request
+
 - **Docker Compose Aliases (`dx`):**
   - `dxu` : `docker compose up -d`
   - `dxdu` : `docker compose down && docker compose up -d`
@@ -119,6 +125,15 @@ gxpf                            # Push (force with lease)
 gxpm                            # Purge merged branches (force)
 gxr [target_branch] [-y|--yes]  # Pull rebase
 gxrc                            # Rebase continue
+
+# ax = atlassian utils (Jira & Bitbucket Cloud)
+ax                              # Help for all ax* scripts
+axji <ISSUE-KEY>                # Fetch a Jira issue (an epic comes with its children)
+axbp [-a] [-e] [-p]             # List your open pull requests (-e for every author)
+axbp+ [-t title] [-d desc]      # Create a pull request from the current branch
+axbpc <PR-ID> [-o] [-p]         # Fetch the comments of a pull request
+# Note: ax* commands print JSON, use -p|--pretty for a readable output
+# The Bitbucket repository is read from the 'origin' remote of the current directory
 
 # gxt = git global utils (repos management !)
 gxt help                        # Print the manual

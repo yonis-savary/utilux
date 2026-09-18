@@ -1,0 +1,79 @@
+#!/bin/sh
+
+# Fetch the comments of a Bitbucket pull request
+# See .atlassian-api for the shared implementation
+
+. "$(dirname "$(realpath "$0")")/.atlassian-api"
+
+axbpc_help()
+{
+    echo "axbpc - Fetch the comments of a pull request"
+    echo ""
+    echo "Usage   : axbpc <PR-ID> [-o|--open] [-p|--pretty] [-h|--help]"
+    echo "Example : axbpc 412 -o -p"
+    echo ""
+    echo "The comments are printed as a JSON array, use --pretty for a readable list."
+    echo "The repository is read from the 'origin' remote of the current directory."
+    echo ""
+    echo " -o | --open      Keep only the comments left to handle (not deleted, not resolved)"
+    echo " -p | --pretty    Print a readable summary instead of JSON"
+    echo " -h | --help      Print this help message"
+}
+
+pull_request_id=""
+open_only="0"
+pretty="0"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            axbpc_help
+            exit 0
+            ;;
+        -o|--open)
+            open_only="1"
+            ;;
+        -p|--pretty)
+            pretty="1"
+            ;;
+        -*)
+            echo "Unknown option: $1" >&2
+            axbpc_help >&2
+            exit 1
+            ;;
+        *)
+            pull_request_id="$1"
+            ;;
+    esac
+    shift
+done
+
+if [ -z "$pull_request_id" ]; then
+    echo "Not enough arguments: this command needs a pull request id" >&2
+    axbpc_help >&2
+    exit 1
+fi
+
+atlassian_assert_bitbucket_configured
+
+repository=$(atlassian_bitbucket_repository) || exit 1
+
+comments=$(atlassian_bitbucket_collection "/repositories/$repository/pullrequests/$pull_request_id/comments?pagelen=100") || exit 1
+
+if [ "$open_only" = "1" ]; then
+    comments=$(printf '%s' "$comments" | jq '[ .[] | select(.deleted != true) | select(.resolution == null) ]')
+fi
+
+if [ "$pretty" = "0" ]; then
+    printf '%s' "$comments" | jq .
+    exit 0
+fi
+
+printf '%s' "$comments" | jq -r '
+    .[] |
+    "#\(.id) \(.user.display_name // "?")" +
+    (if .inline then " [\(.inline.path):\(.inline.to // .inline.from // "?")]" else "" end) +
+    (if .parent then " (reply to #\(.parent.id))" else "" end) +
+    (if .resolution then " [resolved]" else "" end) +
+    (if .deleted == true then " [deleted]" else "" end) +
+    "\n\(.content.raw // "")\n"'

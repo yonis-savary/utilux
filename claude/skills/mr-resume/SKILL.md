@@ -35,10 +35,14 @@ Toute la suite utilise `BASE=origin/<base>` et la syntaxe **trois points** (`$BA
 
 ## 3. Contexte ticket (non bloquant)
 
-Extraire une clé de ticket du nom de branche (motif `[A-Z][A-Z0-9]+-[0-9]+`, ex : `feat/PRJCT-1234/...`). Si une clé est trouvée :
+Extraire une clé de ticket du nom de branche (motif `[A-Z][A-Z0-9]+-[0-9]+`, ex : `feat/PRJCT-1234/...`).
+
+**Le contexte de la conversation est la source prioritaire.** Dans la plupart des cas, le contenu du ou des tickets a déjà été fourni par l'utilisateur : le réutiliser tel quel et **ne pas appeler Jira**.
+
+N'aller chercher le ticket que si aucune information à son sujet n'est disponible dans la conversation :
 
 ```
-bash ~/utilux/modules/scripts/jira/jx fetch TICKET_KEY
+axji TICKET_KEY
 ```
 
 Le ticket fournit le **titre** et la **problématique** du rendu. Si aucune clé n'est présente ou si la commande échoue, continuer : le titre est déduit des commits, la problématique du diff, et le manque de contexte ticket est signalé hors du bloc de rendu. C'est la seule étape autorisée à échouer sans tout arrêter.
@@ -59,10 +63,6 @@ Pour chaque fichier touché, la question à laquelle il faut savoir répondre es
 
 Séparer les fichiers de test des autres dans le diff (conventions du dépôt : `tests/`, `*Test.php`, `*.test.ts`, `*_test.go`…).
 
-Chercher la commande de test du projet, dans cet ordre : `CLAUDE.md` du dépôt, scripts de `composer.json` / `package.json` / `Makefile`, configuration du framework de test présente à la racine.
-
-- Commande trouvée → l'annoncer, l'exécuter, et **reporter le résultat réel** (nombre de tests, échecs). Si des tests échouent, les lister : c'est une information de merge request, pas un problème à corriger ici.
-- Aucune commande trouvée → ne rien inventer, l'indiquer dans la section `Tests`.
 - Aucun test ajouté sur la branche → le dire explicitement, ne pas supprimer la section.
 
 ## 6. Rendu
@@ -87,6 +87,10 @@ Répondre en français, dans un **bloc de code markdown** copiable tel quel dans
 
 <Tests ajoutés + résultat de l'exécution>
 
+## Résultat QA Navigateur
+
+<Tableau des tests & des résultats de la QA Navigateur>
+
 ## Points d'attention
 
 - <Faille potentielle ou point de vigilance>
@@ -101,3 +105,4 @@ Règles de rédaction :
 - Ne rien inventer : ce qui n'est pas lisible dans le diff, le ticket ou la sortie des tests n'apparaît pas.
 - La section **`Points d'attention` est optionnelle** : elle n'existe que s'il y a une faille de sécurité potentielle, un risque de régression, une rupture de compatibilité, une migration ou une action manuelle à prévoir au déploiement. Sinon, l'omettre entièrement — ne jamais écrire « RAS ».
 - Si le ticket n'a pas été récupéré, le titre reprend le nom de la branche, sans clé inventée.
+- N'afficher la section "Résultat QA Navigateur" qu'uniquement si une QA a effectivement été faite

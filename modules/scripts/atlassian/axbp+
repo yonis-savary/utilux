@@ -1,0 +1,97 @@
+#!/bin/sh
+
+# Create a Bitbucket pull request from the current branch
+# See .atlassian-api for the shared implementation
+
+. "$(dirname "$(realpath "$0")")/.atlassian-api"
+
+axbp_create_help()
+{
+    echo "axbp+ - Create a pull request from the current branch"
+    echo ""
+    echo "Usage   : axbp+ [-t <title>] [-d <description>] [-b <branch>] [-c] [-h|--help]"
+    echo "Example : axbp+ -t \"APP-3290 invoice export\""
+    echo "Example : mr-resume | axbp+ -d -"
+    echo ""
+    echo "Without -t, the subject of the last commit is used as the title."
+    echo "Without -b, the main branch of the repository is used as the destination."
+    echo ""
+    echo " -t | --title <title>        Pull request title"
+    echo " -d | --description <text>   Pull request description ('-' reads it from stdin)"
+    echo " -b | --base <branch>        Destination branch"
+    echo " -c | --close-source         Delete the source branch once the pull request is merged"
+    echo " -h | --help                 Print this help message"
+}
+
+title=""
+description=""
+base=""
+close_source="false"
+
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            axbp_create_help
+            exit 0
+            ;;
+        -t|--title)
+            title="$2"
+            shift
+            ;;
+        -d|--description)
+            description="$2"
+            shift
+            ;;
+        -b|--base)
+            base="$2"
+            shift
+            ;;
+        -c|--close-source)
+            close_source="true"
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            axbp_create_help >&2
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+atlassian_assert_bitbucket_configured
+
+repository=$(atlassian_bitbucket_repository) || exit 1
+source_branch=$(git rev-parse --abbrev-ref HEAD)
+
+[ "$description" = "-" ] && description=$(cat)
+[ -n "$title" ] || title=$(git log -1 --pretty=%s)
+
+if [ -z "$base" ]; then
+    repository_details=$(atlassian_bitbucket_get "/repositories/$repository") || exit 1
+    base=$(printf '%s' "$repository_details" | jq -r '.mainbranch.name')
+fi
+
+if ! git ls-remote --exit-code --heads origin "$source_branch" >/dev/null 2>&1; then
+    echo "Branch '$source_branch' does not exist on origin, push it first (gxp)" >&2
+    exit 1
+fi
+
+body=$(jq -n \
+    --arg title "$title" \
+    --arg description "$description" \
+    --arg source "$source_branch" \
+    --arg destination "$base" \
+    --argjson close_source "$close_source" \
+    '{
+        title: $title,
+        description: $description,
+        source: { branch: { name: $source } },
+        destination: { branch: { name: $destination } },
+        close_source_branch: $close_source
+    }')
+
+echo "Creating pull request $source_branch -> $base on $repository"
+
+pull_request=$(atlassian_bitbucket_post "/repositories/$repository/pullrequests" "$body") || exit 1
+
+printf '%s' "$pull_request" | jq -r '"Pull request #\(.id) created\n\(.links.html.href)"'

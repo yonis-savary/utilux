@@ -8,7 +8,7 @@ description: Va chercher un ou plusieurs tickets Jira par ligne de commande, cr�
 Une fois la/les clés obtenue (ex: `PRJCT-1234`), exécuter (par ticket) via Bash en remplaçant `TICKET_KEY` par la vraie valeur :
 
 ```
-bash ~/utilux/modules/scripts/jira/jx fetch TICKET_KEY
+axji TICKET_KEY
 ```
 
 STOPPER TOUT SI UNE DES COMMANDES ECHOUE, LE RESTE DU SKILL REPOSE DESSUS

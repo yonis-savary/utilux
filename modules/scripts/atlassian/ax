@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "Command                        Reminder          Description"
+echo "axji [ISSUE-KEY]               jira-issue        Fetch a Jira issue and its content"
+echo "axbp [-a] [-e]                 pull-requests     List your open pull requests on the repository"
+echo "axbp+ [-t title] [-d desc]     pull-request+     Create a pull request from the current branch"
+echo "axbpc [PR-ID]                  pr-comments       Fetch the comments of a pull request"
+echo ""
+echo "(Tip: you can use --help with any of these commands)"

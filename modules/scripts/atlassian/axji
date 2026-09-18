@@ -1,0 +1,60 @@
+#!/bin/sh
+
+# Fetch a Jira issue as JSON
+# See .atlassian-api for the shared implementation
+
+. "$(dirname "$(realpath "$0")")/.atlassian-api"
+
+axji_help()
+{
+    echo "axji - Fetch a Jira issue content from its issue key"
+    echo ""
+    echo "Usage   : axji <ISSUE-KEY> [-h|--help]"
+    echo "Example : axji PRJCT-5002"
+    echo ""
+    echo "The issue is printed as JSON. An epic is printed as { issue, children }."
+    echo ""
+    echo " -h | --help     Print this help message"
+}
+
+for argument in "$@"; do
+    case "$argument" in
+        -h|--help)
+            axji_help
+            exit 0
+            ;;
+    esac
+done
+
+issue_key="$1"
+
+if [ -z "$issue_key" ]; then
+    echo "Not enough arguments: this command needs an issue key" >&2
+    axji_help >&2
+    exit 1
+fi
+
+atlassian_assert_jira_configured
+
+issue=$(atlassian_jira_get "/issue/$issue_key") || exit 1
+issue_type=$(printf '%s' "$issue" | jq -r '.fields.issuetype.name // ""')
+
+if [ "$issue_type" = "Epic" ]; then
+    # /search was removed by Atlassian (HTTP 410), /search/jql replaces it and
+    # returns bare ids unless the wanted fields are named
+    children=$(atlassian_jira_get "/search/jql?jql=parent%3D$issue_key&maxResults=100&fields=*all") || exit 1
+
+    # Both documents go through a file: an epic with its children easily exceeds
+    # the per-argument limit of an exec, which --argjson would run into
+    epic=$(mktemp) || exit 1
+    printf '%s\n' "$issue" > "$epic"
+    printf '%s\n' "$children" >> "$epic"
+
+    jq -s '{ issue: .[0], children: (.[1].issues // []) }' "$epic"
+    status=$?
+
+    rm -f "$epic"
+    exit $status
+fi
+
+printf '%s' "$issue" | jq .
