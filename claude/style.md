@@ -190,11 +190,9 @@ consumer never changes the descriptor's own shape.
 
 ## Comments
 
-Default to none — naming and structure carry the *what*. Roughly one comment per file, for:
-a non-obvious optimisation and why it is safe; a deliberate indirection and the reason it
-exists; a case intentionally left unhandled; a `TODO` with its concrete follow-up. Public
-entry points get a docblock explaining what the type is *for* and how it is meant to be
-entered.
+None, except for a technical implementation constraint or a business rule that imposes a
+constraint — the full rule lives in `guidelines.md`. There is no per-file quota and no
+docblock on classes or methods: most files carry zero comments.
 
 ## Deliberately absent
 

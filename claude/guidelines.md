@@ -39,26 +39,34 @@ add stack-specific rules and take precedence where they conflict.
 
 ## Comments
 
-Default to **no comment**. The code is the comment — clear names and structure carry
-the *what*. Write a comment only when it explains something the code cannot, and
-delete it the moment it stops earning its place.
+**No comment is the rule.** Code must read on its own in 99% of cases: names and
+structure carry the *what*, the *how* and usually the *why*. A comment exists **only
+and exclusively** for one of two reasons:
 
-- **Comment the why, not the what.** Explain intent, reasoning and decisions, not
-  syntax. Never use a comment to compensate for code you could fix — rename the
-  variable or extract the method instead.
-- **What earns a comment:** workarounds, magic numbers, regex intent, business rules,
-  external constraints; edge cases and what is intentionally *not* handled; danger
-  warnings (side effects, order dependencies); contracts (units, formats, encodings).
-- **Public interfaces:** document them in the language's standard format so tooling can
-  use them. A docblock that merely restates the signature is noise.
-- **Technical debt:** mark it `TODO` / `FIXME` / `HACK` **with context** — a name or
-  ticket number — so it is actionable. This is the only place a ticket reference
-  belongs in code.
-- **Never:** restate code; tag a comment with the ticket or PR that introduced it;
-  leave commented-out code; add section markers, banners or divider lines; narrate a
-  refactor ("simplified from previous version" is a commit message).
-- **Keep them honest.** An outdated comment is worse than none. Keep comments in sync,
-  close to what they describe, concise, and consistent in style.
+1. **A technical implementation constraint** the code cannot express — a workaround for
+   a library or platform bug, a non-obvious ordering or side effect, a magic number
+   imposed from outside, a performance trick and why it is safe, the intent of a regex.
+2. **A business rule that imposes a constraint** — a regulation, a legal or accounting
+   norm, a contractual requirement: something that would look arbitrary or wrong to a
+   reader who doesn't know the domain rule behind it.
+
+If a comment does neither, it does not get written. When unsure, don't write it.
+
+- **No docblocks by default.** Do not put a comment above a class, method, property or
+  constant to describe what it is or does — that is the name's job. No summary lines,
+  no "This class handles…", no `@param` / `@return` that repeat the signature. The only
+  acceptable docblock content is a type annotation the language cannot express natively
+  (e.g. generic or array shapes) that static analysis needs — and only that tag.
+- **Technical debt:** `TODO` / `FIXME` / `HACK` **with context** — a name or ticket
+  number — so it is actionable. This is the only place a ticket reference belongs.
+- **Never:** restate or paraphrase code; describe a class or method; tag a comment with
+  the ticket or PR that introduced it; leave commented-out code; add section markers,
+  banners or divider lines; narrate a refactor ("simplified from previous version" is a
+  commit message).
+- **One line (One short sentence at most).** A justified comment is short and sits right next to the
+  line it constrains. Keep it in sync — an outdated comment is worse than none.
+- **Before handing over a diff, reread every comment you added** and delete each one
+  that is not a technical constraint or a business rule.
 
 ## Shared knowledge
 
