@@ -1,28 +1,5 @@
 #!/bin/sh
 
-installCodeExtension()
-{
-    packageName="$1"
-    prettyName="${packageName##*.}"
-
-    if [ -z "$packageName" ]; then
-        echo "[ERROR] No package name provided."
-        return 1
-    fi
-
-    if ! codeOutput=$(code --install-extension "$packageName" 2>&1); then
-        echo "[FAILED] Failed to install $prettyName:"
-        echo "$codeOutput"
-        return 1
-    fi
-
-    if echo "$codeOutput" | grep -q "already installed"; then
-        echo " - [EXISTING] $prettyName"
-    else
-        echo " - [INSTALLED] $prettyName"
-    fi
-}
-
 isInstalled()
 {
     package="$1"
@@ -50,45 +27,6 @@ checkInstalled() {
             echo " - [MISSING] $package (→ manual installation required)"
         fi
     fi
-}
-
-
-updateVSCodeSetting() {
-    key="$1"
-    value="$2"
-    settings_path="$HOME/.config/Code/User/settings.json"
-
-    [ ! -f "$settings_path" ] && echo "{}" > "$settings_path"
-
-
-    if echo "$value" | grep -E '^(true|false|[0-9]+)$' > /dev/null; then
-        json_value="$value"
-    else
-        json_value="\"$value\""
-    fi
-
-    tmp=$(mktemp)
-    jq --arg key "$key" --argjson val "$json_value" '. + {($key): $val}' "$settings_path" > "$tmp" && mv "$tmp" "$settings_path"
-}
-
-backupVSCodeSettings() {
-    settings="$HOME/.config/Code/User/settings.json"
-    backup_base="${settings}.bak"
-    backup="$backup_base"
-
-    if [ ! -f "$settings" ]; then
-        return 1
-    fi
-
-    echo "Making backup of your VSCode Config !"
-
-    i=1
-    while [ -f "$backup" ]; do
-        backup="${backup_base}.${i}"
-        i=$(expr "$i" + 1)
-    done
-
-    cp "$settings" "$backup"
 }
 
 
@@ -161,83 +99,11 @@ echo
 
 
 if isInstalled 'code'; then
-
-    # Regenerate with
-    # code --list-extensions | awk '{print "installCodeExtension \"" $1 "\""}' | sort
-    if utilux-prompt --prompt "Install Visual Studio Code extensions ?"; then
-        echo "Checking code extensions..."
-        installCodeExtension "adpyke.vscode-sql-formatter"
-        installCodeExtension "anthropic.claude-code"
-        installCodeExtension "bmewburn.vscode-intelephense-client"
-        installCodeExtension "bradlc.vscode-tailwindcss"
-        installCodeExtension "davidanson.vscode-markdownlint"
-        installCodeExtension "dbaeumer.vscode-eslint"
-        installCodeExtension "github.github-vscode-theme"
-        installCodeExtension "johnpapa.vscode-peacock"
-        installCodeExtension "mechatroner.rainbow-csv"
-        installCodeExtension "mhutchie.git-graph"
-        installCodeExtension "ms-azuretools.vscode-containers"
-        installCodeExtension "ms-python.debugpy"
-        installCodeExtension "ms-python.python"
-        installCodeExtension "ms-python.vscode-pylance"
-        installCodeExtension "ms-python.vscode-python-envs"
-        installCodeExtension "mujichok.vscode-project-name-in-statusbar"
-        installCodeExtension "pkief.material-icon-theme"
-        installCodeExtension "shardulm94.trailing-spaces"
-        installCodeExtension "usernamehw.errorlens"
-        installCodeExtension "waderyan.gitblame"
-        installCodeExtension "xabikos.javascriptsnippets"
-        installCodeExtension "yoavbls.pretty-ts-errors"
-        installCodeExtension "zhuangtongfa.material-theme"
+    if utilux-prompt --prompt "Apply utilux VSCode config (settings, keybindings & extensions) ?"; then
+        "$UTILUX_PATH/setup/vscode/apply-config"
         echo
     fi
-
-    # Regenerate with
-    # cat .config/Code/User/settings.json \
-    # | grep -E "^  \".+" \
-    # | sed 's/  "//g' \
-    # | sed 's/": /\t/g' \
-    # | sed 's/,$//g' \
-    # | grep -v -E "{$" \
-    # | awk -F '\t' '{print "updateVSCodeSetting \"" $1 "\" " $2}'
-
-    if utilux-prompt --prompt "Apply custom Visual Studio Code config ?"; then
-        backupVSCodeSettings
-        updateVSCodeSetting "workbench.iconTheme" "material-icon-theme"
-        updateVSCodeSetting "editor.smoothScrolling" true
-        updateVSCodeSetting "editor.cursorSmoothCaretAnimation" "on"
-        updateVSCodeSetting "workbench.list.smoothScrolling" true
-        updateVSCodeSetting "terminal.integrated.smoothScrolling" true
-        updateVSCodeSetting "editor.cursorBlinking" "smooth"
-        updateVSCodeSetting "editor.fontFamily" "'JetBrains Mono', 'Droid Sans Mono', 'monospace', monospace"
-        updateVSCodeSetting "terminal.integrated.fontLigatures.enabled" true
-        updateVSCodeSetting "editor.fontLigatures" true
-        updateVSCodeSetting "window.zoomLevel" 1
-        updateVSCodeSetting "workbench.externalBrowser" "firefox"
-        updateVSCodeSetting "git.blame.statusBarItem.enabled" false
-        updateVSCodeSetting "git.blame.editorDecoration.enabled" false
-        updateVSCodeSetting "workbench.colorTheme" "One Dark Pro"
-        updateVSCodeSetting "workbench.editor.empty.hint" "hidden"
-        updateVSCodeSetting "git.confirmSync" false
-        updateVSCodeSetting "gitlens.graph.scrollMarkers.enabled" false
-        updateVSCodeSetting "gitlens.graph.avatars" false
-        updateVSCodeSetting "diffEditor.ignoreTrimWhitespace" false
-        updateVSCodeSetting "breadcrumbs.symbolPath" "off"
-        updateVSCodeSetting "workbench.editor.pinnedTabsOnSeparateRow" true
-        updateVSCodeSetting "workbench.editor.highlightModifiedTabs" true
-        updateVSCodeSetting "breadcrumbs.icons" false
-        updateVSCodeSetting "terminal.integrated.fontSize" 11
-        updateVSCodeSetting "explorer.compactFolders" false
-        updateVSCodeSetting "workbench.secondarySideBar.defaultVisibility" "hidden"
-        updateVSCodeSetting "workbench.browser.showInTitleBar" false
-        updateVSCodeSetting "workbench.layoutControl.enabled" false
-        updateVSCodeSetting "chat.titleBar.openInAgentsWindow.enabled" false
-        updateVSCodeSetting "claudeCode.preferredLocation" "panel"
-        echo "VSCode configuration edited !"
-    fi
 fi
-
-
 
 if isInstalled 'gsettings'; then
     if utilux-prompt --prompt "Install custom keyboard shortcuts ?"; then
@@ -249,6 +115,6 @@ fi
 
 if echo "$XDG_CURRENT_DESKTOP" | grep -q "KDE"; then
     if utilux-prompt --prompt "Apply utilux KDE layout (panels & Konsole profile) ?"; then
-        "$UTILUX_PATH/kde/apply-layout"
+        "$UTILUX_PATH/setup/kde/apply-layout"
     fi
 fi

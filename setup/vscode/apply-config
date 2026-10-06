@@ -1,0 +1,56 @@
+#!/bin/sh
+
+VSCODE_TEMPLATE_PATH=$(dirname "$(realpath "$0")")
+VSCODE_USER_PATH="$HOME/.config/Code/User"
+BACKUP_PATH="${UTILUX_APPDATA_PATH:?utilux is not loaded in this shell}/vscode-backups/$(date +%Y%m%d-%H%M%S)"
+
+if ! command -v code >/dev/null 2>&1; then
+    echo "[ERROR] VSCode (code) is not installed."
+    exit 1
+fi
+
+mergeJsonFile()
+{
+    target="$1"
+    template="$2"
+    merge_filter="$3"
+    empty_value="$4"
+
+    [ -f "$target" ] || echo "$empty_value" > "$target"
+    cp "$target" "$BACKUP_PATH/"
+
+    merged=$(jq --indent 4 -s "$merge_filter" "$target" "$template") || return 1
+    printf "%s\n" "$merged" > "$target"
+}
+
+installCodeExtension()
+{
+    packageName="$1"
+
+    if ! codeOutput=$(code --install-extension "$packageName" 2>&1); then
+        echo " - [FAILED] $packageName:"
+        echo "$codeOutput"
+        return 1
+    fi
+
+    if echo "$codeOutput" | grep -q "already installed"; then
+        echo " - [EXISTING] $packageName"
+    else
+        echo " - [INSTALLED] $packageName"
+    fi
+}
+
+mkdir -p "$VSCODE_USER_PATH" "$BACKUP_PATH"
+echo "Backup saved in $BACKUP_PATH"
+
+mergeJsonFile "$VSCODE_USER_PATH/settings.json" "$VSCODE_TEMPLATE_PATH/config/settings.json" '.[0] * .[1]' '{}' \
+    && echo " - [MERGED] Settings"
+
+# VSCode gives precedence to the last matching keybinding, so template entries go last.
+mergeJsonFile "$VSCODE_USER_PATH/keybindings.json" "$VSCODE_TEMPLATE_PATH/config/keybindings.json" '(.[0] - .[1]) + .[1]' '[]' \
+    && echo " - [MERGED] Keybindings"
+
+echo "Checking extensions..."
+while read -r extension; do
+    installCodeExtension "$extension"
+done < "$VSCODE_TEMPLATE_PATH/config/extensions.txt"

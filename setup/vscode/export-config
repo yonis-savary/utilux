@@ -1,0 +1,18 @@
+#!/bin/sh
+
+VSCODE_TEMPLATE_PATH=$(dirname "$(realpath "$0")")
+VSCODE_USER_PATH="$HOME/.config/Code/User"
+
+if ! command -v code >/dev/null 2>&1; then
+    echo "[ERROR] VSCode (code) is not installed."
+    exit 1
+fi
+
+jq --indent 4 '.' "$VSCODE_USER_PATH/settings.json" > "$VSCODE_TEMPLATE_PATH/config/settings.json"
+echo " - [EXPORTED] Settings"
+
+jq --indent 4 '.' "$VSCODE_USER_PATH/keybindings.json" > "$VSCODE_TEMPLATE_PATH/config/keybindings.json"
+echo " - [EXPORTED] Keybindings"
+
+code --list-extensions | sort > "$VSCODE_TEMPLATE_PATH/config/extensions.txt"
+echo " - [EXPORTED] Extensions"
