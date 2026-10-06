@@ -13,7 +13,7 @@ My Plasma panels and Konsole profile, packaged as a template that can be applied
 ## Apply
 
 ```bash
-~/utilux/kde/apply-layout
+~/utilux/setup/kde/apply-layout
 ```
 
 `utilux-setup` also offers to run it when launched in a KDE session.
@@ -33,7 +33,7 @@ cp ~/.local/share/utilux/kde-backups/<date>/konsolerc ~/.config/
 ## Update the template
 
 ```bash
-~/utilux/kde/export-layout
+~/utilux/setup/kde/export-layout
 ```
 
 Replaces the template with the current session: the panels (the `desktops` part, holding wallpapers with absolute paths, is left out) and the default Konsole profile, renamed `Utilux`, with its color scheme when it is not a built-in one.

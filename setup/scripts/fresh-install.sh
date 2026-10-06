@@ -5,7 +5,7 @@
 
 # One liner-install
 # Copy-paste this line to execute this script
-# sudo apt install git && git clone https://github.com/yonis-savary/utilux ~/utilux && bash ~/utilux/scripts/fresh-install.sh
+# sudo apt install git && git clone https://github.com/yonis-savary/utilux ~/utilux && bash ~/utilux/setup/scripts/fresh-install.sh
 
 check_whiptail() {
     if ! command -v whiptail >/dev/null 2>&1; then

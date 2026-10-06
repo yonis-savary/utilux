@@ -184,6 +184,7 @@ Utilux creation was motivated by a desire to have a unified Linux setup between 
 
 So, naturally, some notes/scripts were written here:
 
-- [Fresh Linux install script](./scripts/fresh-install.sh)
+- [Fresh Linux install script](./setup/scripts/fresh-install.sh)
 - [Mount Remote SSH Directory](./docs/remote_sshfs.md)
-- [KDE Plasma layout (panels & Konsole profile)](./kde/README.md)
+- [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
+- [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)
