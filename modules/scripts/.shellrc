@@ -17,3 +17,11 @@ source "$SCRIPT_DIR/.shellrc_comp"
 alias dx="docker compose"
 alias dxr="docker compose restart"
 alias dxl="docker compose logs --follow"
+
+gxcode() {
+    code $(gxt find "$1") && exit
+}
+
+gxcd() {
+    cd $(gxt find "$1")
+}
