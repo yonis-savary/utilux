@@ -1,0 +1,60 @@
+#!/bin/sh
+
+KDE_TEMPLATE_PATH=$(dirname "$(realpath "$0")")
+KONSOLE_DATA_PATH="$HOME/.local/share/konsole"
+
+if ! qdbus6 org.kde.plasmashell /PlasmaShell >/dev/null 2>&1; then
+    echo "[ERROR] plasmashell is not reachable on D-Bus, run this script inside a Plasma session."
+    exit 1
+fi
+
+profile_file=$(kreadconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile)
+if [ ! -f "$KONSOLE_DATA_PATH/$profile_file" ]; then
+    echo "[ERROR] Konsole default profile '$profile_file' not found in $KONSOLE_DATA_PATH"
+    exit 1
+fi
+
+panels=$(
+    qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.dumpCurrentLayoutJS \
+    | sed -n '/^var layout = {$/,/^}$/p' \
+    | sed 's/^var layout = //' \
+    | jq --indent 4 '{panels, serializationFormatVersion} | del(.panels[].config."/".lastScreen)'
+)
+
+panel_settings=$(
+    qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript \
+        'print(JSON.stringify(panels().map(panel => ({screen: panel.screen, lengthMode: panel.lengthMode, floating: panel.floating, hiding: panel.hiding, opacity: panel.opacity}))))' \
+    | jq --indent 4 '.'
+)
+
+{
+    echo "var plasma = getApiVersion(1);"
+    echo
+    echo "panels().forEach(panel => panel.remove());"
+    echo
+    echo "var layout = $panels;"
+    echo
+    echo "var panelSettings = $panel_settings;"
+    echo
+    echo "plasma.loadSerializedLayout(layout);"
+    echo
+    echo "// The serialized layout carries neither the screen, length mode, floating state nor opacity of panels."
+    echo "panels().slice(-panelSettings.length).forEach((panel, index) => {"
+    echo "    panel.screen = Math.min(panelSettings[index].screen, screenCount - 1);"
+    echo "    panel.lengthMode = panelSettings[index].lengthMode;"
+    echo "    panel.floating = panelSettings[index].floating;"
+    echo "    panel.hiding = panelSettings[index].hiding;"
+    echo "    panel.opacity = panelSettings[index].opacity;"
+    echo "});"
+} > "$KDE_TEMPLATE_PATH/themes/panels.js"
+echo " - [EXPORTED] Plasma panels"
+
+rm -f "$KDE_TEMPLATE_PATH"/themes/konsole/*
+sed 's/^Name=.*/Name=Utilux/' "$KONSOLE_DATA_PATH/$profile_file" > "$KDE_TEMPLATE_PATH/themes/konsole/Utilux.profile"
+
+color_scheme=$(kreadconfig6 --file "$KONSOLE_DATA_PATH/$profile_file" --group Appearance --key ColorScheme)
+# Built-in color schemes live in /usr/share/konsole and need no export.
+if [ -f "$KONSOLE_DATA_PATH/$color_scheme.colorscheme" ]; then
+    cp "$KONSOLE_DATA_PATH/$color_scheme.colorscheme" "$KDE_TEMPLATE_PATH/themes/konsole/"
+fi
+echo " - [EXPORTED] Konsole profile '$profile_file'"

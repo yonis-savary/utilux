@@ -246,3 +246,9 @@ if isInstalled 'gsettings'; then
         register_new_gnome_keyboard_shortcut "utilux-terminal" "Utilux - Terminal" "gnome-terminal" "<Ctrl><Alt>T"
     fi
 fi
+
+if echo "$XDG_CURRENT_DESKTOP" | grep -q "KDE"; then
+    if utilux-prompt --prompt "Apply utilux KDE layout (panels & Konsole profile) ?"; then
+        "$UTILUX_PATH/kde/apply-layout"
+    fi
+fi

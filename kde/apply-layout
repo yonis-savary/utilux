@@ -1,0 +1,30 @@
+#!/bin/sh
+
+KDE_TEMPLATE_PATH=$(dirname "$(realpath "$0")")
+KONSOLE_DATA_PATH="$HOME/.local/share/konsole"
+BACKUP_PATH="${UTILUX_APPDATA_PATH:?utilux is not loaded in this shell}/kde-backups/$(date +%Y%m%d-%H%M%S)"
+
+if ! qdbus6 org.kde.plasmashell /PlasmaShell >/dev/null 2>&1; then
+    echo "[ERROR] plasmashell is not reachable on D-Bus, run this script inside a Plasma session."
+    exit 1
+fi
+
+mkdir -p "$BACKUP_PATH"
+
+{
+    echo "panels().forEach(panel => panel.remove());"
+    qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.dumpCurrentLayoutJS
+} > "$BACKUP_PATH/layout.js"
+cp "$HOME/.config/konsolerc" "$BACKUP_PATH/" 2>/dev/null
+for file in "$KDE_TEMPLATE_PATH"/themes/konsole/*; do
+    cp "$KONSOLE_DATA_PATH/$(basename "$file")" "$BACKUP_PATH/" 2>/dev/null
+done
+echo "Backup saved in $BACKUP_PATH"
+
+qdbus6 org.kde.plasmashell /PlasmaShell org.kde.PlasmaShell.evaluateScript "$(cat "$KDE_TEMPLATE_PATH/themes/panels.js")"
+echo " - [APPLIED] Plasma panels"
+
+mkdir -p "$KONSOLE_DATA_PATH"
+cp "$KDE_TEMPLATE_PATH"/themes/konsole/* "$KONSOLE_DATA_PATH/"
+kwriteconfig6 --file konsolerc --group "Desktop Entry" --key DefaultProfile "Utilux.profile"
+echo " - [APPLIED] Konsole profile (default: Utilux)"

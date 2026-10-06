@@ -186,3 +186,4 @@ So, naturally, some notes/scripts were written here:
 
 - [Fresh Linux install script](./scripts/fresh-install.sh)
 - [Mount Remote SSH Directory](./docs/remote_sshfs.md)
+- [KDE Plasma layout (panels & Konsole profile)](./kde/README.md)
