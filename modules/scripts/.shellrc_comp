@@ -102,6 +102,7 @@ complete -F _comp_complete_longopt utilux-install-ln
 complete -F _comp_complete_longopt utilux-lf
 complete -F _comp_complete_longopt utilux-share
 complete -F _utilux_ssh_autocomplete utilux-ssh
+complete -W "mount umount help" utilux-vault
 
 complete -F _docker_compose_services_list_autocomplete dxl
 complete -F _docker_compose_services_list_autocomplete dxe

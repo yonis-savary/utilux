@@ -51,7 +51,7 @@
 #export UTILUX_GITLAB_TOKEN=""
 
 
-#   ___________________
+#   __________________
 # _/ Backup directory \_
 
 # utilux-launch-backup command can help you sync a source and a target
@@ -66,3 +66,14 @@
 # Target directory (backup path, MUST END WITH A SLASH) - Can be updated with utilux-launch-backup
 #export UTILUX_BACKUP_TARGET="/media/$USER/backupdisk/"
 
+
+#   _______
+# _/ Vault \_
+# Used by utilux-vault, see docs/vault.md
+
+# Remote host, asked by utilux-vault mount when not set
+#export UTILUX_VAULT_HOST=""
+# Remote user ($USER by default)
+#export UTILUX_VAULT_USER=""
+# Remote vault directory, must exist (/home/$UTILUX_VAULT_USER/vault by default)
+#export UTILUX_VAULT_REMOTE_PATH=""

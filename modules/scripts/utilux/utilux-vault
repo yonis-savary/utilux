@@ -1,0 +1,78 @@
+#!/bin/sh
+
+mount_path="$HOME/.local/share/utilux/vault"
+password_options="-o PubkeyAuthentication=no"
+
+load_config() {
+    remote_user="${UTILUX_VAULT_USER:-$USER}"
+    remote_host="$UTILUX_VAULT_HOST"
+    remote_path="${UTILUX_VAULT_REMOTE_PATH:-/home/$remote_user/vault}"
+
+    while [ -z "$remote_host" ]; do
+        echo "Remote host (set UTILUX_VAULT_HOST through utilux-config to skip this question) ? "
+        read remote_host
+    done
+}
+
+mount_vault() {
+    load_config
+
+    if mountpoint -q "$mount_path"; then
+        echo "Vault already mounted at $mount_path"
+        exit 0
+    fi
+
+    mkdir -p "$mount_path"
+    chmod 700 "$mount_path"
+
+    # Running sshfs under the user manager makes logind stop it, hence unmount, when the last session closes
+    if ! systemd-run --user --scope --quiet --unit=utilux-vault \
+        sshfs "$remote_user@$remote_host:$remote_path" "$mount_path" -o idmap=user $password_options; then
+        echo "Error: could not mount the vault"
+        exit 1
+    fi
+
+    echo "✅ Vault mounted at $mount_path"
+}
+
+umount_vault() {
+    if ! mountpoint -q "$mount_path"; then
+        echo "Vault is not mounted"
+        exit 0
+    fi
+
+    fusermount -u "$mount_path"
+    echo "✅ Vault unmounted"
+}
+
+help() {
+    echo ""
+    echo "utilux-vault - Password protected remote directory"
+    echo ""
+    echo "mount    Mount the vault in $mount_path (asks for the server password)"
+    echo "umount   Unmount the vault (also done automatically on logout)"
+    echo "help     Show this help message"
+    echo ""
+    echo "Configured through utilux-config, the host is asked when UTILUX_VAULT_HOST is not set:"
+    echo "UTILUX_VAULT_HOST, UTILUX_VAULT_USER [\$USER], UTILUX_VAULT_REMOTE_PATH [/home/<user>/vault]"
+}
+
+action="$1"
+case "$action" in
+    mount)
+        mount_vault
+        ;;
+    umount)
+        umount_vault
+        ;;
+    h|help)
+        help
+        ;;
+    *)
+        echo "Option inconnue : $action"
+        help
+        exit 1
+        ;;
+esac
+
+exit 0

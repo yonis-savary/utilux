@@ -85,6 +85,7 @@ utilux-ssh                # SSH key utilities
 utilux-update             # utilux self-update script
 utilux-update-config      # update your utilux configuration with latest changes
 utilux-mount-ssh          # wizard to mount a ssh directory into your fstab
+utilux-vault              # password protected remote directory (mount, umount)
 
 # claude code utils (link project resources into ~/.claude)
 add-skill [PATH...]     # Link skills (directories holding a SKILL.md) into ~/.claude/skills
@@ -186,5 +187,6 @@ So, naturally, some notes/scripts were written here:
 
 - [Fresh Linux install script](./setup/scripts/fresh-install.sh)
 - [Mount Remote SSH Directory](./docs/remote_sshfs.md)
+- [Password Protected Vault](./docs/vault.md)
 - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
 - [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)
