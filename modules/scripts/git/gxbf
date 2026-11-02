@@ -1,2 +1,12 @@
 #!/bin/sh
-git branch "$(gxb)" --set-upstream-to $(gxl "$1")
+
+
+TO_FOLLOW="$1"
+
+if [ -z "$TO_FOLLOW" ]; then
+    TO_FOLLOW="origin/$(gxb)"
+else
+    TO_FOLLOW=$(gxl "$TO_FOLLOW")
+fi
+
+git branch "$(gxb)" --set-upstream-to "$TO_FOLLOW"
