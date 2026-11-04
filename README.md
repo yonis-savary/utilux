@@ -190,3 +190,4 @@ So, naturally, some notes/scripts were written here:
 - [Password Protected Vault](./docs/vault.md)
 - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
 - [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)
+- [WezTerm configuration](./setup/wezterm/README.md)

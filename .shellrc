@@ -25,7 +25,7 @@ export PATH
 SHELL_NAME=$(ps -hp $$ | awk '{print $5}')
 
 if [ ! -z "$SHELL_NAME" ]; then
-    SHELL_NAME=$(basename "$SHELL_NAME")
+    SHELL_NAME=$(basename -- "${SHELL_NAME#-}")
 fi
 
 if [ -f "$UTILUX_USER_RC" ]
@@ -46,6 +46,11 @@ then
         PROMPT='%{$fg[green]%}%~%{$reset_color%}\$'
     fi
 fi
+
+# Add support for shift+enter for bash
+case "$SHELL_NAME:$-" in
+    bash:*i*) bind '"\e\r": "\C-v\C-j"' ;;
+esac
 
 alias utilux-config="nano $UTILUX_USER_RC"
 

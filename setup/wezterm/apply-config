@@ -1,0 +1,14 @@
+#!/bin/sh
+
+WEZTERM_TEMPLATE_PATH=$(dirname "$(realpath "$0")")
+WEZTERM_CONFIG_PATH="$HOME/.wezterm.lua"
+
+if [ -f "$WEZTERM_CONFIG_PATH" ] && [ ! -L "$WEZTERM_CONFIG_PATH" ]; then
+    BACKUP_PATH="${UTILUX_APPDATA_PATH:?utilux is not loaded in this shell}/wezterm-backups/$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$BACKUP_PATH"
+    mv "$WEZTERM_CONFIG_PATH" "$BACKUP_PATH/"
+    echo "Backup saved in $BACKUP_PATH"
+fi
+
+ln -sfn "$WEZTERM_TEMPLATE_PATH/wezterm.lua" "$WEZTERM_CONFIG_PATH"
+echo " - [LINKED] $WEZTERM_CONFIG_PATH -> $WEZTERM_TEMPLATE_PATH/wezterm.lua"

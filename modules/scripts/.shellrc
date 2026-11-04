@@ -25,3 +25,16 @@ gxcode() {
 gxcd() {
     cd $(gxt find "$1")
 }
+
+
+# "Command && Exit" variants
+
+alias e="exit"
+
+ce() {
+    code "$1" && exit
+}
+
+claudee() {
+    claude && exit
+}

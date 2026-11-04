@@ -128,6 +128,19 @@ install_vscode() {
     utilux-setup
 }
 
+install_wezterm() {
+    if dpkg -s wezterm-nightly >/dev/null 2>&1; then
+        already_installed "wezterm-nightly"
+    else
+        curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
+        echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
+        sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg
+        sudo apt update
+        sudo apt install -y wezterm-nightly
+    fi
+    "$HOME/utilux/setup/wezterm/apply-config"
+}
+
 ########
 # Menu #
 ########
@@ -145,6 +158,7 @@ SELECTED=$(whiptail --checklist "Select what you want to install" 22 78 14 \
     "utilux"      "Utilux (personal dotfiles/config)" ON \
     "claude"      "Claude Code" ON \
     "vscode"      "Visual Studio Code + setup" ON \
+    "wezterm"     "WezTerm (nightly) + config" ON \
     3>&1 1>&2 2>&3)
 
 if [ -z "$SELECTED" ]; then
@@ -162,3 +176,4 @@ is_selected php        && install_php
 is_selected utilux     && install_utilux
 is_selected claude     && install_claude
 is_selected vscode     && install_vscode
+is_selected wezterm    && install_wezterm
