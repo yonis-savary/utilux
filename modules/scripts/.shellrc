@@ -31,7 +31,7 @@ gxcd() {
 
 alias e="exit"
 
-ce() {
+codee() {
     code "$1" && exit
 }
 
