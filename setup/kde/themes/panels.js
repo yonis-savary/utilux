@@ -10,8 +10,8 @@ var layout = {
                 {
                     "config": {
                         "/": {
-                            "popupHeight": "400",
-                            "popupWidth": "560"
+                            "popupHeight": "517",
+                            "popupWidth": "655"
                         },
                         "/General": {
                             "favoritesPortedToKAstats": "true",
@@ -29,6 +29,23 @@ var layout = {
                     "plugin": "org.kde.plasma.marginsseparator"
                 },
                 {
+                    "config": {
+                        "/": {
+                            "launchers": "applications:systemsettings.desktop,applications:org.kubuntu.manage-software.desktop,applications:org.kde.dolphin.desktop,applications:org.kde.konsole.desktop,preferred://browser"
+                        },
+                        "/ConfigDialog": {
+                            "DialogHeight": "630",
+                            "DialogWidth": "810"
+                        },
+                        "/General": {
+                            "groupingStrategy": "0",
+                            "launchers": "applications:slack.desktop,applications:com.microsoft.VSCode.desktop,applications:chrome-dgeamngojanepclobfocibdhooadljbj-Default.desktop",
+                            "middleClickAction": "Close"
+                        }
+                    },
+                    "plugin": "org.kde.plasma.icontasks"
+                },
+                {
                     "config": {},
                     "plugin": "org.kde.plasma.panelspacer"
                 },
@@ -39,7 +56,7 @@ var layout = {
                 {
                     "config": {
                         "/": {
-                            "popupHeight": "400",
+                            "popupHeight": "451",
                             "popupWidth": "560"
                         },
                         "/Appearance": {
@@ -71,41 +88,6 @@ var layout = {
             "maximumLength": 106.66666666666667,
             "minimumLength": 106.66666666666667,
             "offset": 0
-        },
-        {
-            "alignment": "center",
-            "applets": [
-                {
-                    "config": {
-                        "/": {
-                            "launchers": "applications:systemsettings.desktop,applications:org.kubuntu.manage-software.desktop,applications:org.kde.dolphin.desktop,applications:org.kde.konsole.desktop,preferred://browser"
-                        },
-                        "/ConfigDialog": {
-                            "DialogHeight": "630",
-                            "DialogWidth": "810"
-                        },
-                        "/General": {
-                            "groupingStrategy": "0",
-                            "launchers": "applications:org.kde.konsole.desktop,applications:code.desktop,applications:slack.desktop",
-                            "middleClickAction": "Close"
-                        }
-                    },
-                    "plugin": "org.kde.plasma.icontasks"
-                }
-            ],
-            "config": {
-                "/": {
-                    "formfactor": "2",
-                    "immutability": "1",
-                    "wallpaperplugin": "org.kde.image"
-                }
-            },
-            "height": 5.111111111111111,
-            "hiding": "autohide",
-            "location": "bottom",
-            "maximumLength": 106.66666666666667,
-            "minimumLength": 106.66666666666667,
-            "offset": 0
         }
     ],
     "serializationFormatVersion": "1"
@@ -117,13 +99,6 @@ var panelSettings = [
         "lengthMode": "fill",
         "floating": false,
         "hiding": "none",
-        "opacity": "adaptive"
-    },
-    {
-        "screen": 0,
-        "lengthMode": "fit",
-        "floating": true,
-        "hiding": "autohide",
         "opacity": "adaptive"
     }
 ];
