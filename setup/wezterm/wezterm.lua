@@ -14,7 +14,7 @@ config.initial_rows = 28
 config.font_size = 12
 config.color_scheme = 'OneHalfDark'
 config.font = wezterm.font('JetBrains Mono')
-config.window_background_opacity = 0.5
+config.window_background_opacity = 0.8
 config.wayland_window_background_blur = true
 
 local act = wezterm.action
