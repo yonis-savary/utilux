@@ -39,7 +39,7 @@ var layout = {
                         },
                         "/General": {
                             "groupingStrategy": "0",
-                            "launchers": "applications:slack.desktop,applications:com.microsoft.VSCode.desktop,applications:chrome-dgeamngojanepclobfocibdhooadljbj-Default.desktop",
+                            "launchers": "applications:slack.desktop,applications:code.desktop,applications:resound.desktop",
                             "middleClickAction": "Close"
                         }
                     },
