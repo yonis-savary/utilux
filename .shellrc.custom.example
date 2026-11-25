@@ -76,4 +76,5 @@
 # Remote user ($USER by default)
 #export UTILUX_VAULT_USER=""
 # Remote vault directory, must exist (/home/$UTILUX_VAULT_USER/vault by default)
+# ChrootDirectory : Give the path as seen from inside the chroot ! (e.g. /files/vault for /home/<user>/files/vault when chrooted in /home/<user>)
 #export UTILUX_VAULT_REMOTE_PATH=""
