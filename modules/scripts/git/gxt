@@ -10,7 +10,20 @@
 
 gxt_find()
 {
-    gxt list -l | grep "$1" | head -n1
+    local keyword="$1"
+    local repos match
+    # Match on relative paths (host/author/repo) so the user's home directory
+    # (e.g. /home/yonis_evoliz/...) doesn't make every repo match
+    repos=$(gxt list -l -r)
+
+    # 1. Exact repository name
+    match=$(echo "$repos" | awk -F/ -v k="$keyword" '$NF == k' | head -n1)
+    # 2. Repository name containing the keyword
+    [ -z "$match" ] && match=$(echo "$repos" | awk -F/ -v k="$keyword" 'index($NF, k)' | head -n1)
+    # 3. Relative path containing the keyword (e.g. "triiptic/api")
+    [ -z "$match" ] && match=$(echo "$repos" | grep -F -- "$keyword" | head -n1)
+
+    [ -n "$match" ] && echo "$gxt_repos_path/$match"
 }
 
 gxt_find_help()
