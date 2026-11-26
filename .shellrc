@@ -19,7 +19,7 @@ export PATH
 
 [ -d "$UTILUX_CONFIG_PATH" ] || mkdir -p "$UTILUX_CONFIG_PATH"
 [ -d "$UTILUX_BIN_PATH" ] || mkdir "$UTILUX_BIN_PATH"
-[ -d "$UTILUX_APPDATA_PATH" ] || mkdir "$UTILUX_APPDATA_PATH"
+[ -d "$UTILUX_APPDATA_PATH" ] || mkdir -p "$UTILUX_APPDATA_PATH"
 
 
 SHELL_NAME=$(ps -hp $$ | awk '{print $5}')

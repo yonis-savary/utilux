@@ -1,10 +1,11 @@
 #!/bin/sh
 
+# Sourced by the one-liner: return instead of exit, which would close the user shell
 # Empêche l'exécution en tant que root
 if [ "$EUID" = "0" ]
 then
   echo "Please do not run this script as root"
-  exit 1
+  return 1 2>/dev/null || exit 1
 fi
 
 echo ""
@@ -25,13 +26,13 @@ then
   RC_FILE="$HOME/.bashrc"
 else
   echo "Unsupported shell: $SHELL_NAME"
-  exit 1
+  return 1 2>/dev/null || exit 1
 fi
 
 if [ -f "$RC_FILE" ]; then
   if grep -q "utilux" "$RC_FILE"; then
     echo "Utilux is already installed (called by $RC_FILE)"
-    exit 0
+    return 0 2>/dev/null || exit 0
   fi
 fi
 
@@ -42,6 +43,6 @@ echo "Installing utilux in $RC_FILE"
   echo ""
 } >> "$RC_FILE"
 
-source "$HOME/.zshrc"
+. "$RC_FILE"
 
 echo "Utilux installed in your $RC_FILE !"
