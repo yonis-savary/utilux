@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     htop \
     tree \
     unzip \
+    p7zip-full \
+    python3 \
     ca-certificates \
     locales \
     sudo \
@@ -45,6 +47,9 @@ USER root
 RUN chsh -s /bin/zsh devuser
 
 USER devuser
+
+# Stands for the git clone, so unpushed work can be tested (make context builds .build/utilux)
+COPY --chown=devuser:devuser .build/utilux /home/devuser/utilux
 
 # Commande par défaut pour garder le conteneur en vie
 CMD ["/bin/zsh"]

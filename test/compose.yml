@@ -12,6 +12,8 @@ services:
     environment:
       - TERM=xterm-256color
     command: tail -f /dev/null
+    volumes:
+      - ./shared:/home/devuser/shared
     networks:
       - dev-network
 
