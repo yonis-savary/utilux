@@ -79,41 +79,6 @@ install_wezterm() {
     sudo apt install -y wezterm-nightly
 }
 
-register_new_gnome_keyboard_shortcut()
-{
-    binding_identifier="$1"
-    binding_name="$2"
-    binding_command="$3"
-    binding_binding="$4"
-
-    echo "Making new shortcut with"
-    echo " - identifier: $binding_identifier"
-    echo " - name: $binding_name"
-    echo " - command: $binding_command"
-    echo " - binding: $binding_binding"
-
-    existing=$(gsettings get org.gnome.settings-daemon.plugins.media-keys custom-keybindings)
-
-    new_binding="/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/$binding_identifier/"
-    escaped_new_binding=$(echo "$new_binding" | sed 's/\//\\\//g' )
-
-    if echo "$existing" | grep -q "$new_binding"; then
-        echo "$binding_identifier is already present in your system, overwriting it..."
-    else
-        echo "Adding the shortcut to gsettings"
-        if [ "$existing" = "@as []" ]; then
-            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "['$new_binding']"
-        else
-            updated=$(echo "$existing" | sed "s/]$/, '$escaped_new_binding']/g")
-            gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings "$updated"
-        fi
-
-    fi
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$new_binding name "$binding_name"
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$new_binding command "$binding_command"
-    gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:$new_binding binding "$binding_binding"
-
-}
 
 software_menu() {
     set --
@@ -123,20 +88,6 @@ software_menu() {
         set -- "$@" "$software" "$(describe "$software")($status)" OFF
     done
     whiptail --checklist "Select the software to install" 22 78 14 "$@" 3>&1 1>&2 2>&3
-}
-
-config_menu() {
-    set --
-    command -v code      >/dev/null 2>&1 && set -- "$@" "vscode"  "VSCode config (settings, keybindings & extensions)" OFF
-    command -v wezterm   >/dev/null 2>&1 && set -- "$@" "wezterm" "WezTerm config" OFF
-    command -v claude    >/dev/null 2>&1 && set -- "$@" "claude"  "Claude Code config (guidelines & skills)" OFF
-    command -v gsettings >/dev/null 2>&1 && set -- "$@" "gnome"   "Keyboard shortcuts (Only on GNOME setups)" OFF
-    echo "$XDG_CURRENT_DESKTOP" | grep -q "KDE" && set -- "$@" "kde" "KDE layout (panels & Konsole profile)" OFF
-
-    if [ "$#" -eq 0 ]; then
-        return
-    fi
-    whiptail --checklist "Select the utilux configs to apply" 16 78 5 "$@" 3>&1 1>&2 2>&3
 }
 
 selected_softwares=$(software_menu)
@@ -163,30 +114,4 @@ for software in $SOFTWARES; do
     "install_$software"
 done
 
-selected_configs=$(config_menu)
-
-if is_selected vscode "$selected_configs"; then
-    "$UTILUX_PATH/setup/vscode/apply-config"
-    echo
-fi
-
-if is_selected wezterm "$selected_configs"; then
-    "$UTILUX_PATH/setup/wezterm/apply-config"
-    echo
-fi
-
-if is_selected claude "$selected_configs"; then
-    "$UTILUX_PATH/setup/claude/apply-config"
-    echo
-fi
-
-if is_selected gnome "$selected_configs"; then
-    register_new_gnome_keyboard_shortcut "utilux-browser" "Utilux - Launch Browser" "xdg-open about:blank" "<Ctrl><Alt>F"
-    register_new_gnome_keyboard_shortcut "utilux-home" "Utilux - Home folder" "nautilus -w '$HOME'" "<Ctrl><Alt>E"
-    register_new_gnome_keyboard_shortcut "utilux-terminal" "Utilux - Terminal" "gnome-terminal" "<Ctrl><Alt>T"
-    echo
-fi
-
-if is_selected kde "$selected_configs"; then
-    "$UTILUX_PATH/setup/kde/apply-config"
-fi
+utilux-setup-run apply-config "Select the utilux configs to apply"

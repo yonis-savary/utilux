@@ -1,7 +1,7 @@
 # Setup modules
 
-Every directory here is a module holding one piece of my setup. `utilux-setup-save` finds the
-modules by itself, a new one only has to follow the layout below.
+Every directory here is a module holding one piece of my setup. `utilux-setup` and `utilux-setup-save` find the
+modules by themselves, a new one only has to follow the layout below.
 
 ```
 setup/<module>/
@@ -13,7 +13,8 @@ setup/<module>/
 
 | Command | Menu content |
 |---|---|
+| `utilux-setup` | The modules with an `apply-config`, after the software menu |
 | `utilux-setup-save` | The modules with an `export-config`, then offers to commit and push the template changes |
 
-Nothing is checked by default in the menu. Modules linking their file into the home folder (WezTerm, Claude Code)
+Nothing is checked by default in either menu. Modules linking their file into the home folder (WezTerm, Claude Code)
 have no `export-config`: their changes already land in the repository.

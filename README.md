@@ -78,7 +78,7 @@ Here is a detailed version of every utilux command:
 # utilux global utils
 utilux-install [FILE|URL|PROGRAM] # Copy/Download a file into your $PATH (Supports URL to binaries and deb files) (Also supports code, discord & warp keywords)
 utilux-install-ln [FILE]  # Link a file into your $PATH
-utilux-setup              # Pick the software to install, then the configs to apply (VSCode, WezTerm, Claude Code, GNOME shortcuts, KDE layout)
+utilux-setup              # Pick the software to install, then the setup modules to apply (VSCode, WezTerm, Claude Code, GNOME, KDE)
 utilux-setup-save         # Pick the setup modules to export into utilux, then optionally commit and push
 utilux-share [FILE]       # Start a web server to share files
 utilux-ssh                # SSH key utilities
@@ -155,13 +155,6 @@ c                               # claude
 
 ```
 
-## Custom GNOME Shortcuts
-
-`utilux-setup` can create some custom keyboard shortcuts for GNOME environments, which are
-  - Launch Web browser : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>
-  - Launch Terminal : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>
-  - Open Home Folder : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>E</kbd>
-
 ## Tools & Resources
 
 Utilux creation was motivated by a desire to have a unified Linux setup between all my devices.
@@ -169,8 +162,9 @@ Utilux creation was motivated by a desire to have a unified Linux setup between 
 So, naturally, some notes/scripts were written here:
 
 1. Installation & Configuration
-  - [Setup modules (utilux-setup-save)](./setup/README.md)
+  - [Setup modules (utilux-setup, utilux-setup-save)](./setup/README.md)
     - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
+  - [GNOME keyboard shortcuts](./setup/gnome/README.md)
   - [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)
   - [WezTerm configuration](./setup/wezterm/README.md)
   - [Claude Code configuration (guidelines & skills)](./setup/claude/README.md)
