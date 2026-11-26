@@ -118,28 +118,17 @@ while [ -z "$local_path" ]; do
     fi
 done
 
-echo "Making a backup of /etc/fstab"
-
 fstab_file="/etc/fstab"
-backup_base="./fstab.bak"
-backup="$backup_base"
 
 if [ ! -f "$fstab_file" ]; then
     echo "/etc/fstab does not exists"
     exit 1
 fi
 
-echo "Making backup of your VSCode Config !"
-
-i=1
-while [ -f "$backup" ]; do
-    backup="${backup_base}.${i}"
-    i=$(expr "$i" + 1)
-done
-
-cp "$fstab_file" "$backup"
-
-echo "Made a backup file at $backup"
+backup_path="${UTILUX_APPDATA_PATH:?utilux is not loaded in this shell}/fstab-backups/$(date +%Y%m%d-%H%M%S)"
+mkdir -p "$backup_path"
+cp "$fstab_file" "$backup_path/"
+echo "Backup of /etc/fstab saved in $backup_path"
 
 local_user_uid=$(id -u)
 local_user_gid=$(id -g)
