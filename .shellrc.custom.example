@@ -20,6 +20,15 @@
 #export UTILUX_GXC_CAN_USE_DOCKER="true"
 
 
+#   _____________
+# _/ Claude Code \_
+
+export CLAUDE_CODE_SUBAGENT_MODEL="opus"
+export CLAUDE_CODE_SUBAGENT_MODEL_FORCE="1"
+export CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH="1"
+export CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS="4"
+
+
 #   __________________
 # _/ Backup directory \_
 
@@ -38,7 +47,7 @@
 
 #   _______
 # _/ Vault \_
-# Used by utilux-vault, see docs/vault.md
+# Used by utilux-vault, see modules/scripts/README.md
 
 # Remote host, asked by utilux-vault mount when not set
 #export UTILUX_VAULT_HOST=""

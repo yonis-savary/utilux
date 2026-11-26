@@ -1,0 +1,52 @@
+#!/bin/sh
+
+CLAUDE_TEMPLATE_PATH="$(dirname "$(realpath "$0")")/config"
+CLAUDE_HOME_PATH="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
+
+# Moves every entry of $1 missing from $2, recursing into directories both sides have
+merge_into()
+{
+    source_dir="$1"
+    target_dir="$2"
+
+    for entry in "$source_dir"/* "$source_dir"/.[!.]* "$source_dir"/..?*; do
+        [ -e "$entry" ] || [ -L "$entry" ] || continue
+        name=$(basename "$entry")
+
+        if [ ! -e "$target_dir/$name" ] && [ ! -L "$target_dir/$name" ]; then
+            mv "$entry" "$target_dir/$name" || return 1
+            continue
+        fi
+
+        if [ -d "$entry" ] && [ ! -L "$entry" ] && [ -d "$target_dir/$name" ] && [ ! -L "$target_dir/$name" ]; then
+            # Subshell because sh has no local variables and the loop state would be overwritten
+            (merge_into "$entry" "$target_dir/$name") || return 1
+            continue
+        fi
+
+        echo " - [KEPT REPO] ${entry#"$CLAUDE_HOME_PATH"/} (the local version goes to the backup)"
+    done
+}
+
+if [ "$(realpath "$CLAUDE_HOME_PATH" 2>/dev/null)" = "$CLAUDE_TEMPLATE_PATH" ]; then
+    echo " - [OK] $CLAUDE_HOME_PATH already points to $CLAUDE_TEMPLATE_PATH"
+    exit 0
+fi
+
+if [ -d "$CLAUDE_HOME_PATH" ] && [ ! -L "$CLAUDE_HOME_PATH" ]; then
+    echo "Merging $CLAUDE_HOME_PATH into $CLAUDE_TEMPLATE_PATH"
+    merge_into "$CLAUDE_HOME_PATH" "$CLAUDE_TEMPLATE_PATH" || exit 1
+
+    BACKUP_PATH="${UTILUX_APPDATA_PATH:?utilux is not loaded in this shell}/claude-backups/$(date +%Y%m%d-%H%M%S)"
+    mkdir -p "$(dirname "$BACKUP_PATH")"
+    mv "$CLAUDE_HOME_PATH" "$BACKUP_PATH" || exit 1
+    echo "Leftovers saved in $BACKUP_PATH"
+fi
+
+ln -sfn "$CLAUDE_TEMPLATE_PATH" "$CLAUDE_HOME_PATH"
+echo " - [LINKED] $CLAUDE_HOME_PATH -> $CLAUDE_TEMPLATE_PATH"
+
+if pgrep -x claude >/dev/null; then
+    echo ""
+    echo "⚠️  Claude Code is running: restart your sessions so they use the new $CLAUDE_HOME_PATH"
+fi

@@ -9,7 +9,7 @@ Ce skill **modifie des fichiers mais ne commite ni ne pousse jamais**. Il ne tou
 
 # La règle
 
-La seule référence est la section **Comments** de `/home/yonis/utilux/claude/guidelines.md` (déjà chargée via `CLAUDE.md` ; sinon la lire). Ne pas la reformuler ni l'assouplir ici : chaque décision de l'étape 4 s'y rapporte.
+La seule référence est la section **Comments** de `~/.claude/guidelines/guidelines.md` (déjà chargée via `CLAUDE.md` ; sinon la lire). Ne pas la reformuler ni l'assouplir ici : chaque décision de l'étape 4 s'y rapporte.
 
 # Étapes
 

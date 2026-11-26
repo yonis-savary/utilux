@@ -149,8 +149,9 @@ Utilux creation was motivated by a desire to have a unified Linux setup between 
 So, naturally, some notes/scripts were written here:
 
 - [Fresh Linux install script](./setup/scripts/fresh-install.sh)
-- [Mount Remote SSH Directory](./docs/remote_sshfs.md)
-- [Password Protected Vault](./docs/vault.md)
+- [Mount Remote SSH Directory](./modules/scripts/README.md#mount-a-remote-ssh-directory)
+- [Password Protected Vault](./modules/scripts/README.md#password-protected-vault)
 - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
 - [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)
 - [WezTerm configuration](./setup/wezterm/README.md)
+- [Claude Code configuration (guidelines & skills)](./setup/claude/README.md)
