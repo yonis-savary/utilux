@@ -35,7 +35,7 @@ else
     cp "$UTILUX_PATH/.shellrc.custom.example" "$UTILUX_USER_RC"
 fi
 
-if [ ! -z "$UTILUX_ALLOW_PROMPT_CHANGE" ]
+if [ "$UTILUX_ALLOW_PROMPT_CHANGE" = "true" ]
 then
     # Custom prompt
     if [ "$SHELL_NAME" = "bash" ]

@@ -1,14 +1,9 @@
 #!/bin/bash
 
-can_use_docker="0"
-
-if [ ! -z "$UTILUX_GXC_CAN_USE_DOCKER" ]
-then
-    can_use_docker="1"
-fi
-
 branch_name=$(gxl "$1")
 shift
-git checkout "$branch_name" "$@"
+git checkout "$branch_name" "$@" || exit $?
 
-[ "$can_use_docker" = "1" ] && dxu
+if [ "$UTILUX_GXC_CAN_USE_DOCKER" = "true" ]; then
+    dxu
+fi

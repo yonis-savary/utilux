@@ -16,7 +16,7 @@
 #   _________
 # _/ Scripts \_
 
-# If set to true, gxc will perform a dxd before checking out a branch and dxu after
+# If set to true, gxc will perform a dxu after checking out a branch
 #export UTILUX_GXC_CAN_USE_DOCKER="true"
 
 
