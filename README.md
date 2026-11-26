@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./img/utilux-128.png" width="96" height="96" alt="Resound logo">
+    <img src="./img/utilux-128.png" width="96" height="96" alt="utilux logo">
 </p>
 
 # utilux: Git, Docker and Work Utilities ! 🚀
@@ -26,6 +26,10 @@ utilux-config # (OR) nano ~/.config/utilux/utilux-config
 > It is advised that you configure every constant in your config if you want to use utilux to its full potential.
 
 ### Uninstall
+
+> [!WARNING]
+> `~/.local/share/utilux` holds the `utilux-skeln` store, and `~/.claude` may point inside `~/utilux`:
+> run `utilux-skeln umount` on every entry of `utilux-skeln ls`, and move `~/.claude` back to a real directory first.
 
 1. Remove the `~/utilux` directory
 2. Remove `~/.config/utilux` directory
@@ -69,15 +73,16 @@ Here is a detailed version of every utilux command:
 
 ```bash
 # utilux global utils
-utilux-install [FILE|URL|PROGRAM] # Copy/Download a file into your $PATH (Supports URL to binaries and deb files) (Also support code & discord keywords)
+utilux-install [FILE|URL|PROGRAM] # Copy/Download a file into your $PATH (Supports URL to binaries and deb files) (Also supports code, discord & warp keywords)
 utilux-install-ln [FILE]  # Link a file into your $PATH
-utilux-lf [DIRECTORY]     # Recursively convert CRLF to LF (default: current dir)
-utilux-setup              # Check/install required packages & VSCode extensions
+utilux-setup              # Check required packages, offer to apply the VSCode config, GNOME shortcuts and KDE layout
 utilux-share [FILE]       # Start a web server to share files
 utilux-ssh                # SSH key utilities
 utilux-update             # utilux self-update script
 utilux-update-config      # update your utilux configuration with latest changes
 utilux-mount-ssh          # wizard to mount a ssh directory into your fstab
+utilux-launch-backup      # rsync UTILUX_BACKUP_SOURCE to UTILUX_BACKUP_TARGET (dry-run first)
+utilux-temp-code          # open VSCode in a new temporary directory
 utilux-vault              # password protected remote directory (mount, umount)
 utilux-skeln              # central skeleton directory (mount, umount, ls, install, zip, unzip)
 
@@ -100,6 +105,7 @@ dxd                     # docker compose down
 dxdu                    # dxd && dxu
 dxr [service]           # docker compose restart
 dxsp                    # docker system prune -a
+dxsa                    # stop and remove every container
 dxp                     # docker compose ps
 dxl [service]           # docker compose logs --follow
 dxe [service] {program} # docker compose exec
@@ -112,10 +118,11 @@ gxb                             # Print current branch name
 gxb+ <name>                     # Create a new branch tracking current one
 gxbf [name]                     # Change current branch upstream
 gxc                             # Alias for git checkout
-gxd                             # Show short diff message
+gxd                             # List unpushed commits
 gxf                             # Fetch & prune
 gxi                             # Git initialize/reset, cleanup repo
 gxl [branch-name|keyword]       # Git lookup, look for a branch name
+gxm [branch-name|keyword]       # Merge origin/<branch> into the current branch
 gxp                             # Push on current branch
 gxpf                            # Push (force with lease)
 gxpm                            # Purge merged branches (force)
@@ -129,20 +136,26 @@ gxt status [-q]                 # Show status of local branches (-q to skip git 
 gxt clone <SSH|HTTP-URL>        # Clone a repository
 gxt fetch                       # Fetch every repository changes
 gxt explore <repo>              # Open file explorer in repos directory
-gxt desktop <repo> [-o]         # Create a VSCode desktop shortcut for one 
+gxt desktop <repo> [-o]         # Create a VSCode desktop shortcut for one repository
 gxt find <repo>                 # Find the absolute path of a repository
 gxt code <repo>                 # Open VSCode for one repo
 # Note: repo can mean the full repository name or a part of it !
 # Also you can use --help with any of gxt subcommands, and tab for autocompletion of repos names !
+gxcd <repo>                     # cd into a repository
+gxcode <repo>                   # Open VSCode for one repo and close the terminal
+
+# shell aliases
+e                               # exit
+c                               # claude
 
 ```
 
 ## Custom GNOME Shortcuts
 
-`utilux-setup` can create some custome keyboard for GNOME environments, which are
+`utilux-setup` can create some custom keyboard shortcuts for GNOME environments, which are
   - Launch Web browser : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>
   - Launch Terminal : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>T</kbd>
-  - Open Home Folder : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>
+  - Open Home Folder : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>E</kbd>
 
 ## Tools & Resources
 
@@ -151,8 +164,8 @@ Utilux creation was motivated by a desire to have a unified Linux setup between 
 So, naturally, some notes/scripts were written here:
 
 - [Fresh Linux install script](./setup/scripts/fresh-install.sh)
-- [Mount Remote SSH Directory](./modules/scripts/README.md#mount-a-remote-ssh-directory)
-- [Password Protected Vault](./modules/scripts/README.md#password-protected-vault)
+- [Mount Remote SSH Directory (utilux-mount-ssh)](./modules/scripts/README.md#mount-a-remote-ssh-directory)
+- [Password Protected Vault (utilux-vault)](./modules/scripts/README.md#password-protected-vault)
 - [Skeleton Directory (utilux-skeln)](./modules/scripts/README.md#skeleton-directory)
 - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
 - [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)

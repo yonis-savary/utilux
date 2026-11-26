@@ -99,7 +99,6 @@ complete -F _utilux_git_branches_autocomplete gxl
 
 complete -F _comp_complete_longopt utilux-install
 complete -F _comp_complete_longopt utilux-install-ln
-complete -F _comp_complete_longopt utilux-lf
 complete -F _comp_complete_longopt utilux-share
 complete -F _utilux_ssh_autocomplete utilux-ssh
 complete -W "mount umount help" utilux-vault

@@ -38,9 +38,9 @@ export CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS="4"
 # To group all of your documents in one place, see utilux-skeln (modules/scripts/README.md)
 
 # Source directory (local copy path, MUST END WITH A SLASH)
-#export UTILUX_BACKUP_SOURCE="$HOME/central/"
+#export UTILUX_BACKUP_SOURCE="$HOME/.local/share/utilux/skeln/"
 
-# Target directory (backup path, MUST END WITH A SLASH) - Can be updated with utilux-launch-backup
+# Target directory (backup path, MUST END WITH A SLASH)
 #export UTILUX_BACKUP_TARGET="/media/$USER/backupdisk/"
 
 
