@@ -1,0 +1,22 @@
+#!/bin/sh
+
+if ! utilux-setup-run export-config "Select the configs to export into utilux"; then
+    echo "An export failed, nothing will be committed"
+    exit 1
+fi
+
+changes=$(git -C "$UTILUX_PATH" status --short -- setup)
+if [ -z "$changes" ]; then
+    echo "The templates did not change"
+    exit 0
+fi
+
+echo "Template changes :"
+echo "$changes"
+echo
+
+utilux-prompt --prompt "Commit and push these changes ?" || exit 0
+
+git -C "$UTILUX_PATH" add -- setup
+git -C "$UTILUX_PATH" commit -m "Saved setup from $(hostname)" -- setup
+git -C "$UTILUX_PATH" push

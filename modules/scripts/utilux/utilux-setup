@@ -188,5 +188,5 @@ if is_selected gnome "$selected_configs"; then
 fi
 
 if is_selected kde "$selected_configs"; then
-    "$UTILUX_PATH/setup/kde/apply-layout"
+    "$UTILUX_PATH/setup/kde/apply-config"
 fi

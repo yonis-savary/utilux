@@ -1,0 +1,49 @@
+#!/bin/sh
+
+script_name="$1"
+title="$2"
+
+case "$script_name" in
+    apply-config|export-config) ;;
+    *)
+        echo "Usage : utilux-setup-run <apply-config|export-config> <menu title> (got '$script_name')" >&2
+        exit 2
+        ;;
+esac
+
+if ! command -v whiptail >/dev/null 2>&1; then
+    echo "utilux-setup-run needs whiptail : sudo apt install whiptail" >&2
+    exit 1
+fi
+
+available_modules() {
+    for module_path in "$UTILUX_PATH"/setup/*; do
+        [ -x "$module_path/$script_name" ] || continue
+        command -v "$(cat "$module_path/requires")" >/dev/null 2>&1 || continue
+        printf '%s\t%s\n' "$(basename "$module_path")" "$(head -n 1 "$module_path/README.md" | sed 's/^# //')"
+    done
+}
+
+tab=$(printf '\t')
+set --
+while IFS="$tab" read -r module_name module_label; do
+    [ -n "$module_name" ] || continue
+    set -- "$@" "$module_name" "$module_label" OFF
+done <<MODULES
+$(available_modules)
+MODULES
+
+if [ "$#" -eq 0 ]; then
+    echo "No setup module provides $script_name on this machine"
+    exit 0
+fi
+
+selected_modules=$(whiptail --checklist "$title" 16 78 6 "$@" 3>&1 1>&2 2>&3)
+
+status=0
+for module_name in $(printf '%s' "$selected_modules" | tr -d '"'); do
+    "$UTILUX_PATH/setup/$module_name/$script_name" || status=1
+    echo
+done
+
+exit $status
