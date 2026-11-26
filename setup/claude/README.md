@@ -29,4 +29,6 @@ The script:
 3. Replaces `~/.claude` with a symlink to `config/`
 4. Warns you to restart the Claude Code sessions still running
 
+`utilux-setup` also lists it in its menu when Claude Code is installed.
+
 `settings.json` stays per machine: copy `config/settings-template.json` to start one.

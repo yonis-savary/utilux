@@ -11,8 +11,11 @@ This repository gathers posix-compatible scripts and tools to make my optimal Li
 One-liner installer:
 
 ```bash
-git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install
+sudo apt install -y git whiptail && git clone https://github.com/yonis-savary/utilux ~/utilux && source ~/utilux/install && utilux-setup
 ```
+
+`utilux-setup` then lets you pick the software to install and the utilux configs to apply. It can be launched again
+at any time.
 
 After installation, you may need to restart your terminal/session.
 
@@ -75,7 +78,7 @@ Here is a detailed version of every utilux command:
 # utilux global utils
 utilux-install [FILE|URL|PROGRAM] # Copy/Download a file into your $PATH (Supports URL to binaries and deb files) (Also supports code, discord & warp keywords)
 utilux-install-ln [FILE]  # Link a file into your $PATH
-utilux-setup              # Check required packages, offer to apply the VSCode config, GNOME shortcuts and KDE layout
+utilux-setup              # Pick the software to install, then the configs to apply (VSCode, WezTerm, Claude Code, GNOME shortcuts, KDE layout)
 utilux-share [FILE]       # Start a web server to share files
 utilux-ssh                # SSH key utilities
 utilux-update             # utilux self-update script
@@ -164,8 +167,7 @@ Utilux creation was motivated by a desire to have a unified Linux setup between 
 So, naturally, some notes/scripts were written here:
 
 1. Installation & Configuration
-  - [Fresh Linux install script](./setup/scripts/fresh-install.sh)
-  - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
+    - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
   - [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)
   - [WezTerm configuration](./setup/wezterm/README.md)
   - [Claude Code configuration (guidelines & skills)](./setup/claude/README.md)

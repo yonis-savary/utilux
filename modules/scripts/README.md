@@ -78,7 +78,7 @@ real filesystem: `utilux-skeln --root=/tmp/testenv mount /etc/nginx`.
 ```
 
 - `install` only creates a symlink where nothing exists yet (or an empty directory), anything else is reported and skipped.
-- `zip` and `unzip` need `7z` (`p7zip-full`). With `-p`, the archive is encrypted with AES-256: `7z` opens it,
+- `zip` and `unzip` need `7z` (`7zip` package, `p7zip-full` on Ubuntu 22.04). With `-p`, the archive is encrypted with AES-256: `7z` opens it,
   the `unzip` command does not. The password is asked on the terminal, `unzip` asks it only for an encrypted archive.
 - `unzip` refuses to run when the store or the registry already holds something. The registry keeps absolute
   paths, so the links are created at the same paths as on the zipped machine, unless `--patch` rewrites them.

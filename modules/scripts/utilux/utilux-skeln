@@ -255,7 +255,7 @@ def ask_password(confirm):
 
 def require_7z():
     if shutil.which("7z") is None:
-        print("Error: 7z is required (sudo apt-get install p7zip-full).", file=sys.stderr)
+        print("Error: 7z is required (sudo apt-get install 7zip, or p7zip-full on Ubuntu 22.04).", file=sys.stderr)
         sys.exit(1)
 
 

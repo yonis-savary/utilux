@@ -16,7 +16,7 @@ My Plasma panels and Konsole profile, packaged as a template that can be applied
 ~/utilux/setup/kde/apply-layout
 ```
 
-`utilux-setup` also offers to run it when launched in a KDE session.
+`utilux-setup` also lists it in its menu when launched in a KDE session.
 
 The script:
 1. Backs up the current layout and Konsole files in `~/.local/share/utilux/kde-backups/<date>/`

@@ -16,7 +16,7 @@ My VSCode settings, keybindings and extensions, packaged as a template that can 
 ~/utilux/setup/vscode/apply-config
 ```
 
-`utilux-setup` also offers to run it when VSCode is installed.
+`utilux-setup` also lists it in its menu when VSCode is installed.
 
 The script:
 1. Backs up the current `settings.json` and `keybindings.json` in `~/.local/share/utilux/vscode-backups/<date>/`

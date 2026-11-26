@@ -1,34 +1,83 @@
 #!/bin/sh
 
-isInstalled()
-{
-    package="$1"
+if ! command -v whiptail >/dev/null 2>&1; then
+    echo "utilux-setup needs whiptail : sudo apt install whiptail"
+    exit 1
+fi
 
-    if dpkg -s "$package" >/dev/null 2>&1; then
-        return 0 
-    fi
+SOFTWARES="git jq curl sqlite3 ffmpeg iproute2 net-tools sshfs 7zip htop nodejs npm filezilla firefox libreoffice gimp inkscape easytag asunder nvm docker php claude code wezterm"
 
-    if command -v "$package" >/dev/null 2>&1; then
-        return 0
-    fi
-
-    return 1
+is_selected() {
+    case "$2" in
+        *"\"$1\""*) return 0 ;;
+        *) return 1 ;;
+    esac
 }
 
-checkInstalled() {
-    package="$1"
+is_installed() {
+    case "$1" in
+        nvm)     [ -d "$HOME/.nvm" ] ;;
+        7zip)    command -v 7z >/dev/null 2>&1 ;;
+        wezterm) dpkg -s wezterm-nightly >/dev/null 2>&1 ;;
+        docker|php|claude|code) command -v "$1" >/dev/null 2>&1 ;;
+        *)       dpkg -s "$1" >/dev/null 2>&1 ;;
+    esac
+}
 
-    if isInstalled "$package"; then
-        echo " - [OK] $package"
+describe() {
+    case "$1" in
+        nvm)     echo "Node Version Manager " ;;
+        wezterm) echo "WezTerm nightly " ;;
+        docker)  echo "Docker + compose " ;;
+        php)     echo "PHP + composer (php.new) " ;;
+        claude)  echo "Claude Code " ;;
+        code)    echo "Visual Studio Code " ;;
+    esac
+}
+
+# Ubuntu 22.04 only ships 7z as p7zip-full, newer releases dropped it for 7zip
+install_7zip() {
+    if apt-cache show 7zip >/dev/null 2>&1; then
+        sudo apt install -y 7zip
     else
-        if apt-cache show "$package" >/dev/null 2>&1; then
-            echo " - [MISSING] $package (→ sudo apt-get install $package)"
-        else
-            echo " - [MISSING] $package (→ manual installation required)"
-        fi
+        sudo apt install -y p7zip-full
     fi
 }
 
+install_nvm() {
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+}
+
+install_docker() {
+    installer=$(mktemp)
+    curl -fsSL https://get.docker.com -o "$installer"
+    sh "$installer" --dry-run
+    sudo sh "$installer"
+    rm "$installer"
+    sudo groupadd -f docker
+    sudo usermod -aG docker "$USER"
+    echo "Docker installed, log out and back in to use it without sudo"
+}
+
+install_php() {
+    /bin/bash -c "$(curl -fsSL https://php.new/install/linux)"
+}
+
+install_claude() {
+    curl -fsSL https://claude.ai/install.sh | bash
+}
+
+install_code() {
+    utilux-install code
+}
+
+install_wezterm() {
+    curl -fsSL https://apt.fury.io/wez/gpg.key | sudo gpg --yes --dearmor -o /usr/share/keyrings/wezterm-fury.gpg
+    echo 'deb [signed-by=/usr/share/keyrings/wezterm-fury.gpg] https://apt.fury.io/wez/ * *' | sudo tee /etc/apt/sources.list.d/wezterm.list
+    sudo chmod 644 /usr/share/keyrings/wezterm-fury.gpg
+    sudo apt update
+    sudo apt install -y wezterm-nightly
+}
 
 register_new_gnome_keyboard_shortcut()
 {
@@ -66,56 +115,78 @@ register_new_gnome_keyboard_shortcut()
 
 }
 
-echo "Languages/tools to install";
-checkInstalled "jq";
-checkInstalled "p7zip-full";
-checkInstalled "git";
-checkInstalled "curl";
-checkInstalled "php";
-checkInstalled "composer"
-checkInstalled "sqlite3";
-checkInstalled "nodejs";
-checkInstalled "npm";
-checkInstalled "docker";
-checkInstalled "docker-compose-plugin";
-echo
+software_menu() {
+    set --
+    for software in $SOFTWARES; do
+        status="MISSING"
+        is_installed "$software" && status="INSTALLED"
+        set -- "$@" "$software" "$(describe "$software")($status)" OFF
+    done
+    whiptail --checklist "Select the software to install" 22 78 14 "$@" 3>&1 1>&2 2>&3
+}
 
-echo "Software to install";
-checkInstalled "filezilla";
-checkInstalled "code";
-checkInstalled "firefox";
-checkInstalled "ffmpeg";
-echo
+config_menu() {
+    set --
+    command -v code      >/dev/null 2>&1 && set -- "$@" "vscode"  "VSCode config (settings, keybindings & extensions)" OFF
+    command -v wezterm   >/dev/null 2>&1 && set -- "$@" "wezterm" "WezTerm config" OFF
+    command -v claude    >/dev/null 2>&1 && set -- "$@" "claude"  "Claude Code config (guidelines & skills)" OFF
+    command -v gsettings >/dev/null 2>&1 && set -- "$@" "gnome"   "Keyboard shortcuts (Only on GNOME setups)" OFF
+    echo "$XDG_CURRENT_DESKTOP" | grep -q "KDE" && set -- "$@" "kde" "KDE layout (panels & Konsole profile)" OFF
 
-echo "Office Softwares"
-checkInstalled "libreoffice";
-checkInstalled "gimp";
-checkInstalled "inkscape";
-echo
-
-echo "DVD/Music Utilities"
-checkInstalled "easytag";
-checkInstalled "asunder";
-echo
-
-
-if isInstalled 'code'; then
-    if utilux-prompt --prompt "Apply utilux VSCode config (settings, keybindings & extensions) ?"; then
-        "$UTILUX_PATH/setup/vscode/apply-config"
-        echo
+    if [ "$#" -eq 0 ]; then
+        return
     fi
+    whiptail --checklist "Select the utilux configs to apply" 16 78 5 "$@" 3>&1 1>&2 2>&3
+}
+
+selected_softwares=$(software_menu)
+
+apt_packages=""
+for software in $SOFTWARES; do
+    is_selected "$software" "$selected_softwares" || continue
+    if is_installed "$software"; then
+        echo "$software already installed"
+        continue
+    fi
+    command -v "install_$software" >/dev/null 2>&1 && continue
+    apt_packages="$apt_packages $software"
+done
+
+if [ -n "$apt_packages" ]; then
+    sudo apt install -y $apt_packages
 fi
 
-if isInstalled 'gsettings'; then
-    if utilux-prompt --prompt "Install custom keyboard shortcuts ?"; then
-        register_new_gnome_keyboard_shortcut "utilux-browser" "Utilux - Launch Browser" "xdg-open about:blank" "<Ctrl><Alt>F"
-        register_new_gnome_keyboard_shortcut "utilux-home" "Utilux - Home folder" "nautilus -w '$HOME'" "<Ctrl><Alt>E"
-        register_new_gnome_keyboard_shortcut "utilux-terminal" "Utilux - Terminal" "gnome-terminal" "<Ctrl><Alt>T"
-    fi
+for software in $SOFTWARES; do
+    is_selected "$software" "$selected_softwares" || continue
+    command -v "install_$software" >/dev/null 2>&1 || continue
+    is_installed "$software" && continue
+    "install_$software"
+done
+
+selected_configs=$(config_menu)
+
+if is_selected vscode "$selected_configs"; then
+    "$UTILUX_PATH/setup/vscode/apply-config"
+    echo
 fi
 
-if echo "$XDG_CURRENT_DESKTOP" | grep -q "KDE"; then
-    if utilux-prompt --prompt "Apply utilux KDE layout (panels & Konsole profile) ?"; then
-        "$UTILUX_PATH/setup/kde/apply-layout"
-    fi
+if is_selected wezterm "$selected_configs"; then
+    "$UTILUX_PATH/setup/wezterm/apply-config"
+    echo
+fi
+
+if is_selected claude "$selected_configs"; then
+    "$UTILUX_PATH/setup/claude/apply-config"
+    echo
+fi
+
+if is_selected gnome "$selected_configs"; then
+    register_new_gnome_keyboard_shortcut "utilux-browser" "Utilux - Launch Browser" "xdg-open about:blank" "<Ctrl><Alt>F"
+    register_new_gnome_keyboard_shortcut "utilux-home" "Utilux - Home folder" "nautilus -w '$HOME'" "<Ctrl><Alt>E"
+    register_new_gnome_keyboard_shortcut "utilux-terminal" "Utilux - Terminal" "gnome-terminal" "<Ctrl><Alt>T"
+    echo
+fi
+
+if is_selected kde "$selected_configs"; then
+    "$UTILUX_PATH/setup/kde/apply-layout"
 fi

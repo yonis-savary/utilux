@@ -17,12 +17,14 @@ The script:
 1. Backs up an existing `~/.wezterm.lua` in `~/.local/share/utilux/wezterm-backups/<date>/`, unless it already is a symlink
 2. Replaces `~/.wezterm.lua` with a symlink to `wezterm.lua`
 
+`utilux-setup` also lists it in its menu when WezTerm is installed.
+
 WezTerm reloads the configuration on save, no restart needed.
 
 ## Version
 
 The configuration targets `wezterm-nightly`: the latest stable release dates back to February 2024 and lacks
-options used here, such as `wayland_window_background_blur`. `fresh-install.sh` installs the nightly from the
+options used here, such as `wayland_window_background_blur`. `utilux-setup` installs the nightly from the
 official apt repository.
 
 ## Keybindings
