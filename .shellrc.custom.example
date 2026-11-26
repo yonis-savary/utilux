@@ -20,37 +20,6 @@
 #export UTILUX_GXC_CAN_USE_DOCKER="true"
 
 
-#   ___________
-# _/ Atlassian \_
-# Used by the ax* scripts (Jira & Bitbucket) and by gxb+ (call axji)
-
-# Jira and Bitbucket authenticate the same way: your Atlassian account email and an API token.
-
-# Email of your Atlassian account
-#export UTILUX_ATLASSIAN_EMAIL=""
-# Your Atlassian api token, which can be generated at https://id.atlassian.com/manage-profile/security/api-tokens
-#export UTILUX_ATLASSIAN_TOKEN=""
-# Your organization jira host name (with '/rest/api/3' suffix)
-#export UTILUX_JIRA_HOST=""
-
-# Fallback on UTILUX_ATLASSIAN_TOKEN if not set
-# Needed scopes: read:account, read:pullrequest:bitbucket and write:pullrequest:bitbucket
-#export UTILUX_BITBUCKET_TOKEN=""
-
-# UTILUX_JIRA_EMAIL and UTILUX_JIRA_TOKEN are the former names of
-# UTILUX_ATLASSIAN_EMAIL and UTILUX_ATLASSIAN_TOKEN, they still work
-
-
-#   ________
-# _/ Gitlab \_
-
-# Your gitlab host (with "/api/v4" suffix)
-#export UTILUX_GITLAB_HOST=""
-# Can be configured at https://YOUR_GITLAB_HOST/-/user_settings/personal_access_tokens
-# (Needed scope : api, read_api)
-#export UTILUX_GITLAB_TOKEN=""
-
-
 #   __________________
 # _/ Backup directory \_
 

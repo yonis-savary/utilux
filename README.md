@@ -29,26 +29,18 @@ utilux-config # (OR) nano ~/.config/utilux/utilux-config
 
 1. Remove the `~/utilux` directory
 2. Remove `~/.config/utilux` directory
-3. Remove `~/.config/utilux-dashboard` directory
-4. Remove `~/.local/share/utilux` directory (Warning: delete all your utilux command data, such as your repositories if you're using `gxt`)
-5. Remove the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
+3. Remove `~/.local/share/utilux` directory (Warning: delete all your utilux command data, such as your repositories if you're using `gxt`)
+4. Remove the `. ~/utilux/.shellrc` line from your `.bashrc`/`.zshrc` file
 
 ## Utilux shortcuts/aliases
 
-The most interesting feature of utilux is not its dashboard, it is its collection of aliases and productivity scripts
+The most interesting feature of utilux is its collection of aliases and productivity scripts
 
 - **Git Aliases (`gx`):**
   - `gxap` : Amend (no-edit) and Push (force with lease)
   - `gxf` : Fetch all & prune
-  - `gxb+` : Create a new branch (with Jira issue support, e.g. `gxb+ APP-3290`)
+  - `gxb+` : Create a new branch tracking the current one
   - ...and more!
-
-- **Atlassian Aliases (`ax`):**
-  - `axji APP-3290` : Fetch a Jira issue
-  - `axbp` : List your open pull requests on the current repository
-  - `axbp+` : Create a pull request from the current branch
-  - `axbpc [pr-id]` : Fetch the comments of a pull request
-  - `axbpcr [pr-id] [comment-id]` : Mark a comment thread as resolved
 
 - **Docker Compose Aliases (`dx`):**
   - `dxu` : `docker compose up -d`
@@ -115,7 +107,7 @@ gx                              # Help for all gx* scripts
 gxa                             # Commit amend (no edit)
 gxap                            # Amend and force push
 gxb                             # Print current branch name
-gxb+ [name|jira-issue-key]      # Create a new branch tracking current one
+gxb+ <name>                     # Create a new branch tracking current one
 gxbf [name]                     # Change current branch upstream
 gxc                             # Alias for git checkout
 gxd                             # Show short diff message
@@ -127,16 +119,6 @@ gxpf                            # Push (force with lease)
 gxpm                            # Purge merged branches (force)
 gxr [target_branch] [-y|--yes]  # Pull rebase
 gxrc                            # Rebase continue
-
-# ax = atlassian utils (Jira & Bitbucket Cloud)
-ax                              # Help for all ax* scripts
-axji <ISSUE-KEY>                # Fetch a Jira issue (an epic comes with its children)
-axbp [-a] [-e] [-p]             # List your open pull requests (-e for every author)
-axbp+ [-t title] [-d desc]      # Create a pull request from the current branch
-axbpc <PR-ID> [-o] [-p]         # Fetch the comments of a pull request
-axbpcr <PR-ID> <ID...> [-u]     # Mark comment threads as resolved (-u to reopen)
-# Note: ax* commands print JSON, use -p|--pretty for a readable output
-# The Bitbucket repository is read from the 'origin' remote of the current directory
 
 # gxt = git global utils (repos management !)
 gxt help                        # Print the manual
@@ -153,26 +135,7 @@ gxt code <repo>                 # Open VSCode for one repo
 
 ```
 
-## Dashboard
-
-Utilux includes an Electron App for developers, this app can help you manage your Jira Issues, Gitlab Merge Requests, Notes...etc
-
-> Requirements: Node, Npm
-
-Dashboard commands
-
-```bash
-# build (once) and launch the dashboard
-utilux-dashboard
-
-# rebuild the app
-utilux-dashboard-build
-
-# create a .desktop shortcut !
-utilux-dashboard-desktop
-```
-
-### Custom GNOME Shortcuts
+## Custom GNOME Shortcuts
 
 `utilux-setup` can create some custome keyboard for GNOME environments, which are
   - Launch Web browser : <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>F</kbd>
