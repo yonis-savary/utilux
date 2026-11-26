@@ -40,6 +40,7 @@ install_core() {
         iproute2 \
         net-tools \
         sshfs \
+        p7zip-full \
         htop
 }
 

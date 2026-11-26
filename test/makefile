@@ -4,3 +4,5 @@ up:
 	docker compose up -d
 down:
 	docker compose down -v
+skeln:
+	pytest skeln/ -v

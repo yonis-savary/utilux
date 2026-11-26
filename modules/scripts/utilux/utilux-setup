@@ -68,6 +68,7 @@ register_new_gnome_keyboard_shortcut()
 
 echo "Languages/tools to install";
 checkInstalled "jq";
+checkInstalled "p7zip-full";
 checkInstalled "git";
 checkInstalled "curl";
 checkInstalled "php";

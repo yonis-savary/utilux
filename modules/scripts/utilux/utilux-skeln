@@ -1,0 +1,442 @@
+#!/usr/bin/env python3
+
+import argparse
+import getpass
+import os
+import re
+import secrets
+import shutil
+import subprocess
+import sys
+import tempfile
+from datetime import datetime
+from pathlib import Path, PurePosixPath
+
+
+#region platform
+
+def check_platform():
+    if sys.platform != "linux":
+        print("Error: utilux-skeln only supports Linux.", file=sys.stderr)
+        sys.exit(1)
+
+
+def check_not_root():
+    if os.geteuid() == 0:
+        print("Error: utilux-skeln must not be run as root.", file=sys.stderr)
+        sys.exit(1)
+
+#endregion
+
+#region configuration
+
+def utilux_config_dir():
+    appdata_path = os.environ.get("UTILUX_APPDATA_PATH")
+    if not appdata_path:
+        print("Error: UTILUX_APPDATA_PATH is not set, utilux is not loaded in this shell.", file=sys.stderr)
+        sys.exit(1)
+    return os.path.join(appdata_path, "skeln")
+
+def ensure_config(config_dir):
+    config_dir = Path(config_dir)
+    config_dir.mkdir(parents=True, exist_ok=True)
+    (config_dir / "store").mkdir(exist_ok=True)
+    config_file = config_dir / "registry"
+    if not config_file.exists():
+        config_file.touch()
+
+def read_config(config_file):
+    entries = {}
+    for line in Path(config_file).read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        hex_id, _, target = line.partition(":")
+        entries[hex_id] = target
+    return entries
+
+
+def write_config(config_file, entries):
+    Path(config_file).write_text(
+        "".join(f"{hex_id}:{target}\n" for hex_id, target in entries.items())
+    )
+
+#endregion
+
+
+#region utils
+
+class SkelnError(Exception):
+    pass
+
+def resolve_target(root, target):
+    target = Path(os.path.expanduser(target)).absolute()
+    return Path(root) / target.relative_to("/")
+
+def generate_hex_id(existing_ids):
+    while True:
+        hex_id = secrets.token_hex(8)
+        if hex_id not in existing_ids:
+            return hex_id
+
+#endregion
+#region mount
+
+def ensure_symlink(target, dest):
+    """Create a symlink at target pointing to dest.
+
+    Returns True if the symlink was created, False if it already exists.
+    Raises SkelnError on conflict.
+    """
+    if target.is_symlink():
+        if target.resolve() == dest.resolve():
+            return False
+        raise SkelnError(f"'{target}' is a symlink but points elsewhere")
+    if target.is_dir() and not any(target.iterdir()):
+        target.rmdir()
+    elif target.exists():
+        raise SkelnError(f"'{target}' exists and is not a symlink")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.symlink_to(dest)
+    return True
+
+def cmd_mount(args):
+    target = resolve_target(args.root, args.target)
+    config_dir = Path(args.config_dir)
+    config_file = config_dir / "registry"
+    store_dir = config_dir / "store"
+
+    if not target.exists() and not target.is_symlink():
+        print(f"Error: '{target}' does not exist.", file=sys.stderr)
+        sys.exit(1)
+    if target.is_symlink():
+        print(f"Error: '{target}' is already a symlink (already mounted?).", file=sys.stderr)
+        sys.exit(1)
+
+    entries = read_config(config_file)
+    if any(resolve_target(args.root, t) == target for t in entries.values()):
+        print(f"Error: '{target}' is already registered.", file=sys.stderr)
+        sys.exit(1)
+
+    if args.name is not None:
+        if not re.fullmatch(r"[a-z0-9_]+", args.name):
+            print(f"Error: name '{args.name}' is invalid, must match ^[a-z0-9_]+$.", file=sys.stderr)
+            sys.exit(1)
+        if args.name in entries:
+            print(f"Error: name '{args.name}' is already in use.", file=sys.stderr)
+            sys.exit(1)
+        entry_id = args.name
+    else:
+        entry_id = generate_hex_id(entries.keys())
+
+    dest = store_dir / entry_id
+
+    shutil.move(str(target), str(dest))
+    try:
+        ensure_symlink(target, dest)
+    except SkelnError as e:
+        shutil.move(str(dest), str(target))  # rollback
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    entries[entry_id] = args.target
+    write_config(config_file, entries)
+
+    print(f"Mounted  {target} → {dest} [{entry_id}]")
+
+#endregion
+#region unmount
+
+def cmd_unmount(args):
+    config_dir = Path(args.config_dir)
+    config_file = config_dir / "registry"
+    store_dir = config_dir / "store"
+
+    entries = read_config(config_file)
+
+    if args.target in entries:
+        hex_id = args.target
+    else:
+        target = resolve_target(args.root, args.target)
+        hex_id = next((hid for hid, tgt in entries.items() if resolve_target(args.root, tgt) == target), None)
+
+    if hex_id is None:
+        print(f"Error: '{args.target}' is not mounted.", file=sys.stderr)
+        sys.exit(1)
+
+    target = resolve_target(args.root, entries[hex_id])
+
+    dest = store_dir / hex_id
+    if not dest.exists():
+        print(f"Error: store entry '{dest}' not found (corrupted state?).", file=sys.stderr)
+        sys.exit(1)
+
+    if target.is_symlink():
+        target.unlink()
+    elif target.exists():
+        print(f"Error: '{target}' exists but is not a symlink.", file=sys.stderr)
+        sys.exit(1)
+
+    shutil.move(str(dest), str(target))
+
+    del entries[hex_id]
+    write_config(config_file, entries)
+
+    print(f"Unmounted  {target} ← {dest} [{hex_id}]")
+
+
+#endregion
+#region install
+
+def cmd_install(args):
+    config_dir = Path(args.config_dir)
+    config_file = config_dir / "registry"
+    store_dir = config_dir / "store"
+
+    entries = read_config(config_file)
+    if not entries:
+        print("Nothing to install.")
+        return
+
+    for hex_id, target_str in entries.items():
+        target = resolve_target(args.root, target_str)
+        dest = store_dir / hex_id
+
+        if not dest.exists():
+            print(f"[WARN] skeleton missing for '{target_str}' [{hex_id}], skipping.", file=sys.stderr)
+            continue
+
+        try:
+            created = ensure_symlink(target, dest)
+        except SkelnError as e:
+            print(f"[WARN] {e}, skipping.", file=sys.stderr)
+            continue
+
+        if created:
+            print(f"[LINK] {target_str} → {dest}")
+        else:
+            print(f"[OK]   {target_str}")
+
+#endregion
+#region list
+
+def cmd_list(args):
+    config_file = Path(args.config_dir) / "registry"
+    store_dir = Path(args.config_dir) / "store"
+    entries = read_config(config_file)
+
+    if not entries:
+        print("No mounted paths.")
+        return
+
+    for hex_id, target_str in entries.items():
+        target = resolve_target(args.root, target_str)
+        dest = store_dir / hex_id
+        if target.is_symlink() and target.resolve() == dest.resolve():
+            status = "installed"
+        else:
+            status = "missing  "
+        print(f"{hex_id}  [{status}]  {target_str}")
+
+#endregion
+
+#region archive
+
+def ask_password(confirm):
+    password = getpass.getpass("Archive password: ")
+    if not password:
+        print("Error: the password cannot be empty.", file=sys.stderr)
+        sys.exit(1)
+    if confirm and getpass.getpass("Confirm password: ") != password:
+        print("Error: passwords do not match.", file=sys.stderr)
+        sys.exit(1)
+    return password
+
+
+def require_7z():
+    if shutil.which("7z") is None:
+        print("Error: 7z is required (sudo apt-get install p7zip-full).", file=sys.stderr)
+        sys.exit(1)
+
+
+def run_7z(arguments, cwd, password=None):
+    # The password goes through stdin so it never shows up in the process list
+    password_input = f"{password}\n{password}\n" if password else None
+    result = subprocess.run(
+        ["7z", *arguments, "-snl", "-bso0", "-bsp1"],
+        cwd=cwd, input=password_input, text=True,
+    )
+    if result.returncode != 0:
+        print(f"Error: 7z {arguments[0]} failed with exit code {result.returncode}.", file=sys.stderr)
+        sys.exit(1)
+
+
+def is_encrypted(archive):
+    listing = subprocess.run(["7z", "l", "-slt", "-p", str(archive)], input="\n", text=True, capture_output=True)
+    return "Encrypted = +" in listing.stdout
+
+#endregion
+#region zip
+
+def cmd_zip(args):
+    require_7z()
+    config_dir = Path(args.config_dir)
+
+    if not read_config(config_dir / "registry"):
+        print("Error: nothing to zip, no path is mounted.", file=sys.stderr)
+        sys.exit(1)
+
+    archive = Path(args.output or f"skeln-{datetime.now():%Y%m%d-%H%M%S}.zip").absolute()
+    if archive.exists() or archive.is_symlink():
+        print(f"Error: '{archive}' already exists.", file=sys.stderr)
+        sys.exit(1)
+
+    password = ask_password(confirm=True) if args.password else None
+    # "a" reads the password from stdin when -p has no value, "x" does the same only without -p
+    encryption_arguments = ["-mem=AES256", "-p"] if password else []
+    run_7z(["a", "-tzip", *encryption_arguments, str(archive), "registry", "store"], config_dir, password)
+
+    print(f"Zipped  {config_dir} → {archive}")
+
+#endregion
+#region patch
+
+def parse_patches(raw_patches):
+    patches = {}
+    for raw_patch in raw_patches:
+        old_prefix, separator, new_prefix = raw_patch.partition("=")
+        if not separator or not old_prefix.startswith("/") or not new_prefix.startswith("/"):
+            print(f"Error: invalid patch '{raw_patch}', expected /old/prefix=/new/prefix.", file=sys.stderr)
+            sys.exit(1)
+        old_path = PurePosixPath(old_prefix)
+        if old_path in patches:
+            print(f"Error: prefix '{old_path}' is patched twice.", file=sys.stderr)
+            sys.exit(1)
+        patches[old_path] = PurePosixPath(new_prefix)
+    return patches
+
+
+def find_patch(target, patches):
+    target_path = PurePosixPath(target)
+    matching_prefixes = [old_path for old_path in patches if target_path.is_relative_to(old_path)]
+    if not matching_prefixes:
+        return None
+    return max(matching_prefixes, key=lambda old_path: len(old_path.parts))
+
+
+def apply_patches(config_file, patches):
+    entries = read_config(config_file)
+    rewrites = {}
+    for entry_id, target in entries.items():
+        old_path = find_patch(target, patches)
+        if old_path is None:
+            continue
+        rewrites[entry_id] = (old_path, str(patches[old_path] / PurePosixPath(target).relative_to(old_path)))
+
+    used_prefixes = {old_path for old_path, _ in rewrites.values()}
+    unused_patches = [f"{old_path}={new_path}" for old_path, new_path in patches.items() if old_path not in used_prefixes]
+    if unused_patches:
+        print(f"Error: patch matching no registered path: {', '.join(unused_patches)}.", file=sys.stderr)
+        sys.exit(1)
+
+    for entry_id, (_, patched_target) in rewrites.items():
+        print(f"[PATCH] {entries[entry_id]} → {patched_target}")
+        entries[entry_id] = patched_target
+    write_config(config_file, entries)
+
+#endregion
+#region unzip
+
+def cmd_unzip(args):
+    require_7z()
+    patches = parse_patches(args.patch)
+    config_dir = Path(args.config_dir)
+    archive = Path(args.archive).absolute()
+
+    if not archive.is_file():
+        print(f"Error: '{archive}' is not a file.", file=sys.stderr)
+        sys.exit(1)
+    if read_config(config_dir / "registry") or any((config_dir / "store").iterdir()):
+        print(f"Error: '{config_dir}' already holds data, unzip only sets up an empty skeln.", file=sys.stderr)
+        sys.exit(1)
+
+    password = ask_password(confirm=False) if is_encrypted(archive) else None
+    staging = Path(tempfile.mkdtemp(prefix=".unzip-", dir=config_dir))
+    try:
+        run_7z(["x", f"-o{staging}", str(archive)], config_dir, password)
+        if not (staging / "registry").is_file() or not (staging / "store").is_dir():
+            print(f"Error: '{archive}' is not a skeln archive (registry or store/ missing).", file=sys.stderr)
+            sys.exit(1)
+        apply_patches(staging / "registry", patches)
+        (config_dir / "store").rmdir()
+        (staging / "store").rename(config_dir / "store")
+        (staging / "registry").replace(config_dir / "registry")
+    finally:
+        shutil.rmtree(staging)
+
+    print(f"Unzipped  {archive} → {config_dir}")
+    cmd_install(args)
+
+#endregion
+
+#region main
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        prog="utilux-skeln",
+        description="utilux-skeln - system skeleton manager",
+    )
+    parser.set_defaults(config_dir=utilux_config_dir())
+    parser.add_argument(
+        "--root",
+        default="/",
+        metavar="PATH",
+        help="root directory (default: /)",
+    )
+
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    mount_p = sub.add_parser("mount", help="move a path into skeln and replace it with a symlink")
+    mount_p.add_argument("target", help="path to mount")
+    mount_p.add_argument("--name", default=None, metavar="NAME", help="custom identifier (default: auto hex ID), must match ^[a-z0-9_]+$")
+
+    unmount_p = sub.add_parser("unmount", aliases=["umount"], help="restore a path and remove it from skeln")
+    unmount_p.add_argument("target", help="path to unmount")
+
+    sub.add_parser("list", aliases=["ls"], help="list mounted paths")
+    sub.add_parser("install", help="create missing symlinks for all registered entries")
+
+    zip_p = sub.add_parser("zip", help="archive the store and the registry")
+    zip_p.add_argument("output", nargs="?", default=None, help="archive path (default: ./skeln-<date>.zip)")
+    zip_p.add_argument("-p", "--password", action="store_true", help="encrypt the archive (AES-256), the password is asked")
+
+    unzip_p = sub.add_parser("unzip", help="set up an empty skeln from an archive, then install it")
+    unzip_p.add_argument("archive", help="archive made by zip")
+    unzip_p.add_argument("--patch", action="append", default=[], metavar="OLD=NEW", help="rewrite the registered paths starting with the OLD directory into NEW, repeatable")
+
+    return parser.parse_args()
+
+
+def main():
+    check_platform()
+    check_not_root()
+
+    args = parse_args()
+    ensure_config(args.config_dir)
+
+    if args.command == "mount":
+        cmd_mount(args)
+    elif args.command in ("unmount", "umount"):
+        cmd_unmount(args)
+    elif args.command in ("list", "ls"):
+        cmd_list(args)
+    elif args.command == "install":
+        cmd_install(args)
+    elif args.command == "zip":
+        cmd_zip(args)
+    elif args.command == "unzip":
+        cmd_unzip(args)
+
+
+if __name__ == "__main__":
+    main()

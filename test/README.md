@@ -21,3 +21,12 @@ exit
 make down # docker compose down -v
 ```
 
+## Testing utilux-skeln
+
+Requirements : pytest
+
+```bash
+make skeln # pytest skeln/ -v
+```
+
+Tests run in temporary directories, the real filesystem is never touched.

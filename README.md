@@ -52,6 +52,7 @@ The most interesting feature of utilux is its collection of aliases and producti
   - `utilux-install [file|url]` : Install a binary in your `$PATH` (Support url for binaries and deb files)
   - `utilux-share [file]` : Start a local Python server to share a file
   - `utilux-ssh` : Manage local SSH keys
+  - `utilux-skeln mount [path]` : Move a file/directory into a central store and leave a symlink behind
   - ...and more!
 
 - **Claude Code Tools (`add-`/`rm-`):**
@@ -78,6 +79,7 @@ utilux-update             # utilux self-update script
 utilux-update-config      # update your utilux configuration with latest changes
 utilux-mount-ssh          # wizard to mount a ssh directory into your fstab
 utilux-vault              # password protected remote directory (mount, umount)
+utilux-skeln              # central skeleton directory (mount, umount, ls, install, zip, unzip)
 
 # claude code utils (link project resources into ~/.claude)
 add-skill [PATH...]     # Link skills (directories holding a SKILL.md) into ~/.claude/skills
@@ -151,6 +153,7 @@ So, naturally, some notes/scripts were written here:
 - [Fresh Linux install script](./setup/scripts/fresh-install.sh)
 - [Mount Remote SSH Directory](./modules/scripts/README.md#mount-a-remote-ssh-directory)
 - [Password Protected Vault](./modules/scripts/README.md#password-protected-vault)
+- [Skeleton Directory (utilux-skeln)](./modules/scripts/README.md#skeleton-directory)
 - [KDE Plasma layout (panels & Konsole profile)](./setup/kde/README.md)
 - [VSCode configuration (settings, keybindings & extensions)](./setup/vscode/README.md)
 - [WezTerm configuration](./setup/wezterm/README.md)
