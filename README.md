@@ -146,6 +146,7 @@ gxt code <repo>                 # Open VSCode for one repo
 # Also you can use --help with any of gxt subcommands, and tab for autocompletion of repos names !
 gxcd <repo>                     # cd into a repository
 gxcode <repo>                   # Open VSCode for one repo and close the terminal
+gxopen <repo>                   # cd into a repository, open VSCode there and start claude in the terminal
 
 # shell aliases
 e                               # exit

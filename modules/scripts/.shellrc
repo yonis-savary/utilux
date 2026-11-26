@@ -25,6 +25,15 @@ gxcd() {
     cd $(gxt find "$1")
 }
 
+gxopen() {
+    local repo_path
+    if ! repo_path=$(gxt find "$1"); then
+        echo "No repository matches '$1'" >&2
+        return 1
+    fi
+    cd "$repo_path" && code . && claude
+}
+
 
 # "Command && Exit" variants
 
