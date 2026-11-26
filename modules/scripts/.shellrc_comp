@@ -32,25 +32,34 @@ _utilux_ssh_autocomplete() {
 }
 
 
-_utilux_gxt_autocomplete() {
-    local cur=${COMP_WORDS[COMP_CWORD]}
-    local opts=""
-
+_utilux_gxt_repo_names() {
+    local relatives hostless repoonly
     relatives=$(gxt list -l -r)
     hostless=$(echo "$relatives" | sed "s/[^\/]*\///")
     repoonly=$(echo "$relatives" | sed "s/.*\///")
-    all=$(echo "$relatives" "$hostless" "$repoonly")
+    echo "$relatives" "$hostless" "$repoonly"
+}
+
+_utilux_gxt_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    local opts=""
 
     case $COMP_CWORD in
         1)
             opts="help list clone fetch explore"
             ;;
         *)
-            opts="$all"
+            opts=$(_utilux_gxt_repo_names)
             ;;
     esac
 
     COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+}
+
+_utilux_gxt_repos_autocomplete() {
+    local cur=${COMP_WORDS[COMP_CWORD]}
+    [ "$COMP_CWORD" -eq 1 ] || return
+    COMPREPLY=( $(compgen -W "$(_utilux_gxt_repo_names)" -- ${cur}) )
 }
 
 
@@ -108,6 +117,9 @@ complete -F _docker_compose_services_list_autocomplete dxe
 complete -F _docker_compose_services_list_autocomplete dxr
 
 complete -F _utilux_gxt_autocomplete gxt
+complete -F _utilux_gxt_repos_autocomplete gxcd
+complete -F _utilux_gxt_repos_autocomplete gxcode
+complete -F _utilux_gxt_repos_autocomplete gxopen
 
 complete -F _utilux_make_targets_autocomplete make
 
