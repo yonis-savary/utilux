@@ -37,7 +37,12 @@ if is_url "$binName"; then
         echo "Using automatic name: $installName"
     fi
 
-    localBinName="./$installName"
+    downloadDir=$(mktemp -d)
+    trap 'rm -rf "$downloadDir"' EXIT
+    # apt reads local .deb files as the _apt user, which cannot enter a private mktemp directory
+    chmod 755 "$downloadDir"
+
+    localBinName="$downloadDir/$installName"
     echo "Downloading $binName to $localBinName"
     curl -fsSL "$binName" -o "$localBinName" || {
         echo "Download failed."
@@ -46,7 +51,8 @@ if is_url "$binName"; then
 
     if is_deb_file "$localBinName"; then
         echo ".deb file detected! Installing $localBinName"
-        sudo apt-get install -y "./$localBinName"
+        chmod 644 "$localBinName"
+        sudo apt-get install -y "$localBinName"
     else
         targetBinName="$UTILUX_BIN_PATH/$installName"
         if [ -f "$targetBinName" ]; then
