@@ -17,20 +17,28 @@ alias dx="docker compose"
 alias dxr="docker compose restart"
 alias dxl="docker compose logs --follow"
 
+_utilux_gxt_find() {
+    if ! gxt find "$1"; then
+        echo "No repository matches '$1'" >&2
+        return 1
+    fi
+}
+
 gxcode() {
-    code $(gxt find "$1") && exit
+    local repo_path
+    repo_path=$(_utilux_gxt_find "$1") || return 1
+    code "$repo_path" && exit
 }
 
 gxcd() {
-    cd $(gxt find "$1")
+    local repo_path
+    repo_path=$(_utilux_gxt_find "$1") || return 1
+    cd "$repo_path"
 }
 
 gxopen() {
     local repo_path
-    if ! repo_path=$(gxt find "$1"); then
-        echo "No repository matches '$1'" >&2
-        return 1
-    fi
+    repo_path=$(_utilux_gxt_find "$1") || return 1
     cd "$repo_path" && code . && claude
 }
 
