@@ -1,5 +1,7 @@
 #!/bin/sh
 
+template="$UTILUX_PATH/.shellrc.custom.example"
+
 backupUtiluxUserConfig() {
     file_to_backup="$UTILUX_USER_RC"
     if [ ! -f "$file_to_backup" ]; then
@@ -22,28 +24,80 @@ backupUtiluxUserConfig() {
     cp "$file_to_backup" "$backup"
 }
 
+declaredVariable() {
+    printf '%s\n' "$1" | sed -n 's/^#\{0,1\}export \([A-Za-z_][A-Za-z0-9_]*\)=.*/\1/p'
+}
+
+isCommented() {
+    case "$1" in
+        "#"*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+lastDeclaration() {
+    grep -E "^#?export $1=" "$2" | tail -n 1
+}
+
+mergeTemplateLine() {
+    line="$1"
+    variable_name=$(declaredVariable "$line")
+    if [ -z "$variable_name" ]; then
+        printf '%s\n' "$line"
+        return
+    fi
+
+    user_line=$(lastDeclaration "$variable_name" "$UTILUX_USER_RC")
+    if [ -z "$user_line" ]; then
+        echo "+ New variable $variable_name" >&2
+        printf '%s\n' "$line"
+        return
+    fi
+
+    if [ "$user_line" = "$line" ] || { isCommented "$user_line" && isCommented "$line"; }; then
+        printf '%s\n' "$line"
+        return
+    fi
+
+    echo "= Keeping your $variable_name" >&2
+    printf '%s\n' "$user_line"
+}
+
+isCustomLine() {
+    line="$1"
+    [ -n "$line" ] || return 1
+    isCommented "$line" && return 1
+    grep -qxF -- "$line" "$template" && return 1
+
+    variable_name=$(declaredVariable "$line")
+    [ -z "$variable_name" ] && return 0
+    [ -z "$(lastDeclaration "$variable_name" "$template")" ]
+}
+
+customLines() {
+    while IFS= read -r line; do
+        isCustomLine "$line" || continue
+        echo "+ Keeping your custom line: $line" >&2
+        printf '%s\n' "$line"
+    done < "$UTILUX_USER_RC"
+}
+
 backupUtiluxUserConfig
 
 echo ""
 tmpOutput=$(mktemp)
 
 while IFS= read -r line; do
+    mergeTemplateLine "$line"
+done < "$template" > "$tmpOutput"
 
-    if echo "$line" | grep -q -E "^#export"; then 
-        variable_name=$(echo "$line" | cut -d' ' -f2 | cut -d'=' -f1)
-        variable_value=$(eval "echo \"\$$variable_name\"")
-
-        if [ ! -z "$variable_value" ]; then
-            echo "= Retrieving $variable_name"
-            line="export $variable_name=\"$variable_value\""
-        else
-            echo "+ Undefined/New variable $variable_name"
-        fi
-    fi
-
-    #echo "$line"
-    echo "$line" >> $tmpOutput
-done < "$UTILUX_PATH/.shellrc.custom.example"
+custom_lines=$(customLines)
+if [ -n "$custom_lines" ]; then
+    {
+        printf '\n\n%s\n%s\n\n' '#   ________' '# _/ Custom \_'
+        printf '%s\n' "$custom_lines"
+    } >> "$tmpOutput"
+fi
 
 echo "Overwriting $UTILUX_USER_RC"
 mv "$tmpOutput" "$UTILUX_USER_RC"
